@@ -1,0 +1,16 @@
+# Lycopene
+
+A command line interactive shell tracking daily task for !!! ME !!!
+
+## Getting started
+
+Download the executable binary and run it.
+
+```
+$ curl -O <url of released binary>
+$ ./lyco
+lyco> 
+lyco> quit
+```
+
+## Feature

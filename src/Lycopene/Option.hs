@@ -1,14 +1,20 @@
 -- | Includes functions providing command line I/O
 module Lycopene.Option
             ( parseOptions
+            , module Lycopene.Option.Command
             ) where
 
+import Control.Applicative
 import Options.Applicative
 
+import Lycopene.Option.Command
+import Lycopene.Option.Version
+
+{- | Hmmmmm,
+ - How to think about 
+ -}
+
 type Argument = String
-
-data LycoCommand = Version | Project deriving (Show, Eq)
-
 
 parseOptions :: [Argument] -> Maybe LycoCommand
 parseOptions = getParseResult . execParserPure (prefs idm) parserInfo
@@ -17,15 +23,10 @@ parserInfo :: ParserInfo LycoCommand
 parserInfo = info commandParser ( progDesc "interactive shell for document development." )
 
 commandParser :: Parser LycoCommand
-commandParser = subparser
-    ( 
-          command "version" (info versionParser (progDesc "indicate appilcation version"))
-      <>  command "project" (info projectParser (progDesc "initialize current directory"))
-    )
+commandParser = LycoCommand <$> commonOption <*> subcommand
 
-versionParser :: Parser LycoCommand
-versionParser = pure Version
-
-projectParser :: Parser LycoCommand
-projectParser = pure Project
+subcommand :: Parser LycoSubcommand
+subcommand = subparser
+           ( command "version" version
+           )
 
