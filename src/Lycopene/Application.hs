@@ -1,15 +1,15 @@
 module Lycopene.Application (Lycopene) where
 
 import Control.Monad.Reader
+
+import Lycopene.Core
 import Lycopene.Configuration
 
-data Lycopene = Sucess
-               | Fail
-               | Process Configuration
 
-instance Show Lycopene where
-    show Process c = "Process with configuration: " ++ (show c)
-    show Success = "Success"
-    show Fail = "Fail"
+data LycoApp i r = LycoApp
+                 { getConfiguration :: Configuration
+                 , service :: (Lycopene i IO r)
+                 }
+
 
 

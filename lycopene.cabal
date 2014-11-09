@@ -8,7 +8,7 @@ name:                lycopene
 -- for standards guiding when and how versions should be incremented.
 -- http://www.haskell.org/haskellwiki/Package_versioning_policy
 -- PVP summary:      +-+------- breaking API changes
---                   | | +----- non-breaking API additions
+--                   | | +----- non-breaking API additionIs
 --                   | | | +--- code changes with no API change
 version:             0.1.0.0
 
@@ -50,12 +50,18 @@ library
   hs-source-dirs:      src
   exposed-modules:     Lycopene
                        Lycopene.Core
+                       Lycopene.Core.Type
+                       Lycopene.Core.Persist
                        Lycopene.Configuration
   -- other-modules:
   build-depends:       base                   >= 4.7    && < 4.8
+                       , filepath             >= 1.3
+                       , mtl
+                       , transformers
                        , persistent           >= 2.1
                        , persistent-template  >= 2.1
                        , persistent-sqlite    >= 2.1 
+  ghc-options:         -Wall
 
 executable lyco
   default-language:    Haskell2010
@@ -83,6 +89,7 @@ executable lyco
   
   -- Base language which the package is written in.
   default-language:    Haskell2010
+  ghc-options:         -Wall
  
 test-suite spec
   default-language:    Haskell2010

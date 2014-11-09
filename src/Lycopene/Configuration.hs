@@ -3,4 +3,6 @@ module Lycopene.Configuration
     ) where
 
 data Configuration = Configuration
+                   { lycoHome :: FilePath
+                   }
 
