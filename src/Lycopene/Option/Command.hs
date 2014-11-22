@@ -8,6 +8,7 @@ module Lycopene.Option.Command
 
 import Control.Applicative
 import Options.Applicative
+import System.FilePath
 
 import Lycopene.Configuration
 
@@ -32,7 +33,7 @@ commonOption = CommonOption <$> optionP <*> lycoHomeP where
   lycoHomeP = option auto
           (  short 'c'
           <> help "Set lycopene home directory path as context"
-          <> value ("~/.lyco" :: FilePath) )
+          <> value ("~" </> ".lyco" :: FilePath) )
  
 runLycoCommand :: LycoCommand -> IO ()
 runLycoCommand (LycoCommand c s) = runWithConfiguration configure where

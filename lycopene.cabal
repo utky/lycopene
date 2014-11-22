@@ -51,11 +51,14 @@ library
   exposed-modules:     Lycopene
                        Lycopene.Core
                        Lycopene.Core.Type
+                       Lycopene.Core.Entity
                        Lycopene.Core.Persist
                        Lycopene.Configuration
   -- other-modules:
   build-depends:       base                   >= 4.7    && < 4.8
-                       , filepath             >= 1.3
+                       , text
+                       , time 
+                       , filepath
                        , mtl
                        , transformers
                        , persistent           >= 2.1

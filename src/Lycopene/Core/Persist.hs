@@ -1,42 +1,22 @@
-{-# LANGUAGE EmptyDataDecls             #-}
-{-# LANGUAGE FlexibleContexts           #-}
-{-# LANGUAGE GADTs                      #-}
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE OverloadedStrings          #-}
-{-# LANGUAGE QuasiQuotes                #-}
-{-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE TypeFamilies               #-}
-module Lycopene.Core.Persist
-        ( connect
-        ) where
+module Lycopene.Core.Persist where 
 
-import           Control.Monad.IO.Class  (liftIO)
-import           Database.Persist
+--import           Control.Monad.IO.Class  (liftIO)
+--import           Database.Persist
 import           Database.Persist.Sqlite
-import           Database.Persist.TH
-
+import           Data.Text (pack)
 import           System.FilePath
+
+import           Lycopene.Core.Entity
 import           Lycopene.Configuration
 
-share [mkPersist sqlSettings, mkMigrate "migrateTables"] [persistLowerCase|
-Project
-  name String
-  description String Maybe
-  deriving Show
-Release
-  name String
-  description String Maybe
-  project ProjectId
-  startOn Int
-  endOn Int
-Issue
-  title String
-  description String Maybe
-  relrease ReleaseId
-Record
-  startOn Int
-|]
+
+defaultDatapath :: Configuration -> FilePath
+defaultDatapath config = lycoHome config </> "issues.db"
+
+initDatabase :: FilePath -> IO ()
+initDatabase datapath = runSqlite (pack datapath) $ do
+  runMigration migrateAll
+
 
 -- type PersistM m a = SqlPersistT (NoLoggingT (ResourceT m)) a
 
@@ -48,9 +28,9 @@ runPersist c = runSqlite $ conn c where
   pool = createSqlitePool conn 3
 -}
 
-connect :: Configuration -> Text
-connect = sqlDatabase . configureSqlite
+-- connect :: Configuration -> Text
+-- connect = sqlDatabase . configureSqlite
 
-configureSqlite :: Configuration -> SqliteConf
-configureSqlite c = SqliteConf dataPath 3 where
-  dataPath = (lycoHome c) </> "issues.db"
+-- configureSqlite :: Configuration -> SqliteConf
+-- configureSqlite c = SqliteConf dataPath 3 where
+--   dataPath = (lycoHome c) </> "issues.db"
