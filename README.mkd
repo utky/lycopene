@@ -14,3 +14,77 @@ lyco> quit
 ```
 
 ## Feature
+
+### Initial configuration
+
+```
+$ lyco configure
+Globacl context directory path [$HOME/.lyco]: 
+configured.
+```
+
+### Creating your project
+
+```
+$ mkdir my-project
+$ cd my-project
+$ lyco init
+Project name [my-project]:
+created.
+```
+
+This command creates some project respective configuration in .lyco.json file.
+
+```
+$ cat .lyco.json
+{
+    "projectId": 1,
+    "projectName": "my-project"
+}
+```
+
+### Sprint in project
+
+List sprints in this project.
+
+```
+$ lyco sprint
+$ lyco sprint new
+Name: Planning backlog
+Description: My boss said me to make a list of backlog.
+End on (yyyy-mm-dd) [current date]: 2014-12-31
+```
+
+Sprint is a iteration in terms of Agile.
+It's a milestone in a nutshell.
+
+if sprint name says something about value to be delivered to user, it's preferable.
+Describe not "what you will do" but "what value to be done"
+
+```
+Planning backlog: until 2014-12-31
+```
+
+The restriction above aims to support reducing overhead of multi-sprint context switch of us.
+
+### Issues in a sprint
+
+Let's check current sprint.
+
+``
+$ lyco sprint
+* Planning backlog: until 2014-12-31
+```
+
+asterisk mark indicates that current sprint.
+currently implementation will support only single sprint and not multiple sprint at the same time because we should get things done step by step.
+
+Creating new issue.
+
+```
+$ lyco issue new
+Title: 
+Description:
+Sprint [Planning backlog]:
+Point:
+```

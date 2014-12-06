@@ -61,9 +61,12 @@ library
                        , filepath
                        , mtl
                        , transformers
+                       , conduit              >= 1.2   
+                       , conduit-extra        >= 1.1
                        , persistent           >= 2.1
                        , persistent-template  >= 2.1
                        , persistent-sqlite    >= 2.1 
+
   ghc-options:         -Wall
 
 executable lyco

@@ -1,5 +1,6 @@
 {-# LANGUAGE EmptyDataDecls             #-}
 {-# LANGUAGE FlexibleContexts           #-}
+{-# LANGUAGE FlexibleInstances          #-}
 {-# LANGUAGE GADTs                      #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses      #-}
@@ -13,23 +14,31 @@ import           Data.Time
 import           Database.Persist.TH
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
-Project
+Project json
   name String
   description String Maybe
+  UniqueProjectName name
   deriving Show
-Sprint
+
+Sprint json
   name String
   description String Maybe
   project ProjectId
   startOn Int
   endOn Int
-Issue
+  deriving Show
+
+Issue json
   title String
   description String Maybe
-  relrease SprintId
-Record
+  sprint SprintId
+  deriving Show
+
+Record json
   issue IssueId
   startOn UTCTime
   endOn UTCTime
+  deriving Show
+  
 |]
 
