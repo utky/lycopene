@@ -1,28 +1,35 @@
 module Lycopene.Option.Command
     ( LycoCommand (..)
-    , LycoSubcommand (..)
+    , LycoAction (..)
     , CommonOption (..)
     , commonOption
     , runLycoCommand
+    , mkAction
     ) where
 
 import Control.Applicative
 import Options.Applicative
 import System.FilePath
 
+import Lycopene.Core
 import Lycopene.Configuration
 
-data LycoCommand = LycoCommand CommonOption LycoSubcommand
+mkAction :: LycopeneT IO () -> Parser LycoAction
+mkAction = pure . LycoAction
 
-newtype LycoSubcommand = LycoSubcommand 
-                         { runSubcommand :: Configuration -> IO ()
-                         }
+data LycoCommand = LycoCommand CommonOption LycoAction
+
+newtype LycoAction = LycoAction { runAction :: LycopeneT IO () }
 
 data CommonOption = CommonOption
                    { verbose :: Bool
-                   , lycoHome :: FilePath
+                   , homeLocation :: FilePath
                    }
 
+configure :: CommonOption -> Configuration
+configure co = Configuration
+               { lycoHome = homeLocation co
+               }
 
 commonOption :: Parser CommonOption
 commonOption = CommonOption <$> optionP <*> lycoHomeP where
@@ -36,7 +43,7 @@ commonOption = CommonOption <$> optionP <*> lycoHomeP where
           <> value ("~" </> ".lyco" :: FilePath) )
  
 runLycoCommand :: LycoCommand -> IO ()
-runLycoCommand (LycoCommand c s) = runWithConfiguration configure where
-  runWithConfiguration = runSubcommand s
-  configure = Configuration
+runLycoCommand (LycoCommand c action) = runWithConfiguration action config where
+  runWithConfiguration = runLycopeneT . runAction
+  config = configure c
 

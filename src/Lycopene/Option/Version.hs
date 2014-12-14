@@ -1,22 +1,16 @@
 module Lycopene.Option.Version (version) where
 
 
-import Control.Applicative
 import Options.Applicative
+import Control.Monad.Trans.Class (lift)
 
 import Lycopene.Option.Command
 
-data Version = Version
-             { majorVersion :: Int
-             , minorVersion :: Int
-             , patchVersion :: Int
-             } deriving (Eq)
 
-version :: ParserInfo LycoSubcommand
+
+version :: ParserInfo LycoAction
 version = info versionP (progDesc "Print appilcation version infomation")
-
-versionP :: Parser LycoSubcommand
-versionP = pure $ LycoSubcommand runVersion
-
-runVersion c = do { putStrLn "version is 0.0.1" }
+  where
+    versionP = mkAction runVersion
+    runVersion = lift $ putStrLn "version 0.0.0"
 

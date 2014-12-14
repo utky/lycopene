@@ -4,8 +4,8 @@
 configure:
 	cabal configure --enable-tests --enable-benchmarks 
 
-all: cabal.sandbox.config
-	cabal configure --enable-tests --enable-benchmarks && cabal build
+all: configure
+	cabal build
 
 test: all
 	cabal test

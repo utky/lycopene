@@ -2,18 +2,15 @@
 {-# LANGUAGE RankNTypes        #-}
 module Lycopene.Core.Monad
     ( LycopeneT
-    , LycoT
+    , runLycopeneT
+    , getConfig
     ) where
 
-import Control.Monad.Trans.Class
-import Control.Monad.Identity
-import Control.Monad.Reader
-import Control.Monad.Writer
-import Control.Monad.Except
+import           Control.Monad.Reader
+--import           Control.Monad.Except
 
-import           Database.Persist.Sqlite
 
-import Lycopene.Configuration
+import           Lycopene.Configuration
 
 -- | First intuitive definition of runner
 
@@ -36,29 +33,15 @@ data LycoError = ValidationFailure String
 
 type ConfigReader = ReaderT Configuration
 
-type LycoExcept = ExceptT LycoError
+--type LycoExcept = ExceptT LycoError
 
 -- ここのどこかにPersistのMonadが入っているはずで
 -- runするときにConnectionを与えてm aが戻ってくるはず
-newtype LycopeneT m a = LycopeneT
-                      { runLycopeneT :: ConfigReader (LycoExcept m) a }
-
-instance Monad m => Monad (LycopeneT m) where
-  return a = undefined
-  mma >>= f = undefined
-
-instance MonadTrans LycopeneT where
-  lift = LycopeneT . lift . lift 
-
-type LycoT = LycopeneT
-
-type Lycopene = LycopeneT Identity
-
-type Lyco = Lycopene
+type LycopeneT = ConfigReader
 
 
-runLycopene :: Monad m => Configuration -> LycopeneT m a -> m (Either LycoError a)
-runLycopene c = runExceptT . runReaderT' . runLycopeneT where
-  runReaderT' = (flip runReaderT) c
+runLycopeneT :: LycopeneT m a -> Configuration -> m a
+runLycopeneT = runReaderT
 
-
+getConfig :: Monad m => LycopeneT m Configuration
+getConfig = ask

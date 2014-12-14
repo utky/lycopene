@@ -60,6 +60,8 @@ library
                        , time 
                        , filepath
                        , mtl
+                       , monad-logger
+                       , resourcet
                        , transformers
                        , conduit              >= 1.2   
                        , conduit-extra        >= 1.1
@@ -78,16 +80,24 @@ executable lyco
   other-modules:       Lycopene.Option
                        Lycopene.Option.Command
                        Lycopene.Option.Version
+                       Lycopene.Option.Init
   
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
   build-depends:       base                   >= 4.7    && < 4.8
+                       , text
+                       , time 
+                       , filepath
+                       , mtl
+                       , transformers
                        , haskeline            >= 0.7.1
                        , optparse-applicative >= 0.10   && < 0.12
                        , conduit              >= 1.2   
                        , conduit-extra        >= 1.1
+                       , persistent-template  >= 2.1
+                       , persistent-sqlite    >= 2.1 
                        , lycopene
 
   -- Directories containing source files.

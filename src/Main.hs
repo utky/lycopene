@@ -3,19 +3,19 @@ module Main
         ) where
 
 import System.Environment
-import System.Console.Haskeline
+--import System.Console.Haskeline
 import Lycopene.Option
 
 main :: IO ()
 main = getArgs >>= runWithArguments
 
 runWithArguments :: [String] -> IO ()
-runWithArguments []          = interactive
-runWithArguments args@(c:cs) = do
+--runWithArguments []          = interactive
+runWithArguments args = do
     case  parseOptions args of
       Just c   -> runLycoCommand c
       Nothing  -> putStrLn "Invalid parameter"
-
+{-
 interactive :: IO ()
 interactive = runInputT defaultSettings loop where
     loop = getInputLine prompt >>= consumeInput
@@ -25,3 +25,4 @@ interactive = runInputT defaultSettings loop where
     execute = return . fmap runLycoCommand . parseOptions . arguments
     arguments = return
     prompt = "todo> "
+-}
