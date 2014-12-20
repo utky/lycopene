@@ -8,6 +8,7 @@ module Lycopene.Option.Command
     ) where
 
 import Control.Applicative
+import Control.Monad.IO.Class
 import Options.Applicative
 import System.Directory
 import System.FilePath
@@ -15,8 +16,9 @@ import System.FilePath
 import Lycopene.Core
 import Lycopene.Configuration
 
-mkAction :: LycopeneT IO () -> Parser LycoAction
-mkAction = pure . LycoAction
+mkAction :: Show a => LycopeneT IO a -> Parser LycoAction
+mkAction m = pure $ LycoAction printOutput where
+  printOutput = m >>= liftIO . print
 
 data LycoCommand = LycoCommand CommonOption LycoAction
 
@@ -63,4 +65,5 @@ runLycoCommand (LycoCommand c ac) = config >>= (runWithConfiguration ac) where
   config = fmap configure $ (commonOptsWithHome c) <$> getHomeDirectory
   commonOptsWithHome commonops hp = commonops { homeLocation = expandHome commonops hp }
   expandHome commonops hp = replaceHome (homeLocation commonops) hp
+
 

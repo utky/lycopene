@@ -2,11 +2,13 @@
 {-# LANGUAGE RankNTypes        #-}
 module Lycopene.Core.Monad
     ( LycopeneT
+    , LycoApp
     , runLycopeneT
     , getConfig
     ) where
 
 import           Control.Monad.Reader
+import           Control.Monad.Logger
 --import           Control.Monad.Except
 
 
@@ -26,22 +28,19 @@ data LycoError = ValidationFailure String
                | PersistentError String
                deriving Show
 
-{-
--- Eitherを使って「失敗するかもしれない」可能性を相手に伝えるのは必須だなあ
--- もっとも単純な表現
--}
+-- xcX1Hq3B
 
 type ConfigReader = ReaderT Configuration
 
 --type LycoExcept = ExceptT LycoError
 
--- ここのどこかにPersistのMonadが入っているはずで
--- runするときにConnectionを与えてm aが戻ってくるはず
 type LycopeneT = ConfigReader
 
+type LycoApp = LycopeneT IO
 
 runLycopeneT :: LycopeneT m a -> Configuration -> m a
 runLycopeneT = runReaderT
+
 
 getConfig :: Monad m => LycopeneT m Configuration
 getConfig = ask

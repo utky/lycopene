@@ -12,6 +12,7 @@ import Options.Applicative
 import Lycopene.Option.Command
 import Lycopene.Option.Version
 import Lycopene.Option.Init
+import Lycopene.Option.Project
 
 
 type Argument = String
@@ -32,5 +33,6 @@ subcommand :: Parser LycoAction
 subcommand = subparser
            ( command "version" version
            <> command "init" initDB
+           <> command "pj" project
            )
 

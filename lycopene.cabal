@@ -61,6 +61,7 @@ library
                        , filepath
                        , mtl
                        , transformers
+                       , monad-logger
                        , conduit              >= 1.2   
                        , conduit-extra        >= 1.1
                        , persistent           >= 2.1
@@ -79,6 +80,7 @@ executable lyco
                        Lycopene.Option.Command
                        Lycopene.Option.Version
                        Lycopene.Option.Init
+                       Lycopene.Option.Project
   
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:    
@@ -91,6 +93,7 @@ executable lyco
                        , filepath
                        , mtl
                        , transformers
+                       , monad-logger
                        , haskeline            >= 0.7.1
                        , optparse-applicative >= 0.10   && < 0.12
                        , conduit              >= 1.2   
