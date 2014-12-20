@@ -9,6 +9,7 @@ module Lycopene.Option.Command
 
 import Control.Applicative
 import Options.Applicative
+import System.Directory
 import System.FilePath
 
 import Lycopene.Core
@@ -25,11 +26,24 @@ data CommonOption = CommonOption
                    { verbose :: Bool
                    , homeLocation :: FilePath
                    }
+                  
+type HomePath = FilePath
+
+home :: FilePath
+home = "~" ++ [pathSeparator]
+
+replaceHome :: FilePath -> HomePath -> FilePath
+replaceHome fp hp
+  | (firstdir fp) == home = hp </> (tailPath fp)
+  | otherwise = fp
+  where firstdir = head . splitPath
+        tailPath = joinPath . tail . splitPath
 
 configure :: CommonOption -> Configuration
 configure co = Configuration
                { lycoHome = homeLocation co
                }
+
 
 commonOption :: Parser CommonOption
 commonOption = CommonOption <$> optionP <*> lycoHomeP where
@@ -39,11 +53,14 @@ commonOption = CommonOption <$> optionP <*> lycoHomeP where
           <> help "Set to print verbosely ")
   lycoHomeP = option auto
           (  short 'c'
+          <> long "context"
           <> help "Set lycopene home directory path as context"
           <> value ("~" </> ".lyco" :: FilePath) )
  
 runLycoCommand :: LycoCommand -> IO ()
-runLycoCommand (LycoCommand c action) = runWithConfiguration action config where
+runLycoCommand (LycoCommand c ac) = config >>= (runWithConfiguration ac) where
   runWithConfiguration = runLycopeneT . runAction
-  config = configure c
+  config = fmap configure $ (commonOptsWithHome c) <$> getHomeDirectory
+  commonOptsWithHome commonops hp = commonops { homeLocation = expandHome commonops hp }
+  expandHome commonops hp = replaceHome (homeLocation commonops) hp
 

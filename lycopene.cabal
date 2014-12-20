@@ -60,8 +60,6 @@ library
                        , time 
                        , filepath
                        , mtl
-                       , monad-logger
-                       , resourcet
                        , transformers
                        , conduit              >= 1.2   
                        , conduit-extra        >= 1.1
@@ -89,6 +87,7 @@ executable lyco
   build-depends:       base                   >= 4.7    && < 4.8
                        , text
                        , time 
+                       , directory
                        , filepath
                        , mtl
                        , transformers
