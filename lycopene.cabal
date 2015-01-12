@@ -51,24 +51,35 @@ library
   exposed-modules:     Lycopene
                        Lycopene.Core
                        Lycopene.Core.Type
-                       Lycopene.Core.Entity
-                       Lycopene.Core.Persist
+                       Lycopene.Core.Datapath
+                       Lycopene.Core.Schema
+                       Lycopene.Core.DataSource
+                       Lycopene.Core.Query
+                       Lycopene.Core.Database
+                       Lycopene.Core.Project
+                       Lycopene.Core.Sprint
+                       Lycopene.Core.Issue
+                       Lycopene.Core.Record
                        Lycopene.Configuration
   -- other-modules:
-  build-depends:       base                   >= 4.7    && < 4.8
+  build-depends:       base                   >= 4.6
                        , text
                        , time 
                        , filepath
+                       , directory
                        , mtl
                        , transformers
-                       , monad-logger
-                       , conduit              >= 1.2   
-                       , conduit-extra        >= 1.1
-                       , persistent           >= 2.1
-                       , persistent-template  >= 2.1
-                       , persistent-sqlite    >= 2.1 
+                       , HDBC
+                       , template-haskell
+                       , HDBC-sqlite3
+                       , relational-record    >= 0.1
+                       , relational-query     >= 0.1
+                       , relational-query-HDBC >= 0.1
+                       , persistable-record   >= 0.1
+                       , HDBC-session         >= 0.1
 
   ghc-options:         -Wall
+
 
 executable lyco
   default-language:    Haskell2010
@@ -77,6 +88,8 @@ executable lyco
   
   -- Modules included in this executable, other than Main.
   other-modules:       Lycopene.Option
+                       Lycopene.Option.Common
+                       Lycopene.Option.Env
                        Lycopene.Option.Command
                        Lycopene.Option.Version
                        Lycopene.Option.Init
@@ -86,24 +99,17 @@ executable lyco
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
-  build-depends:       base                   >= 4.7    && < 4.8
+  build-depends:       base                   >= 4.6
                        , text
-                       , time 
                        , directory
                        , filepath
                        , mtl
                        , transformers
-                       , monad-logger
-                       , haskeline            >= 0.7.1
-                       , optparse-applicative >= 0.10   && < 0.12
-                       , conduit              >= 1.2   
-                       , conduit-extra        >= 1.1
-                       , persistent-template  >= 2.1
-                       , persistent-sqlite    >= 2.1 
                        , lycopene
+                       , optparse-applicative >= 0.10   && < 0.12
 
   -- Directories containing source files.
-  hs-source-dirs:      src
+  hs-source-dirs:      main
   
   -- Base language which the package is written in.
   default-language:    Haskell2010
@@ -114,7 +120,7 @@ test-suite spec
   type:                exitcode-stdio-1.0
   main-is:             spec.hs
   hs-source-dirs:      tests
-  build-depends:       base                   >= 4.7    && < 4.8
+  build-depends:       base                   >= 4.6
                        , hspec                >= 1.11
                        , lycopene
   

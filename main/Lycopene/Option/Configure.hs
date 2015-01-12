@@ -1,5 +1,5 @@
-module Lycopene.Option.Init
-    ( initDB
+module Lycopene.Option.Configure
+    ( configureDB
     ) where 
 
 import           Options.Applicative
@@ -7,8 +7,8 @@ import           Options.Applicative
 import           Lycopene.Core
 import           Lycopene.Option.Command
 
-initDB :: ParserInfo LycoAction
-initDB = info initP (progDesc "initialize database if it doesn't exist.")
+configureDB :: ParserInfo LycoAction
+configureDB = info initP (progDesc "initialize database if it doesn't exist.")
   where
     initP = mkAction initDatabase
 

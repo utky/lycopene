@@ -1,4 +1,10 @@
-module Lycopene.Core.Issue () where
+{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances     #-}
+module Lycopene.Core.Issue
+    ( Issue(..)
+    ) where
 
-import Lycopene.Core.Entity (Issue(..))
+import           Lycopene.Core.DataSource (defineTable)
 
+$(defineTable "issue")

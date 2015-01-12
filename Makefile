@@ -1,3 +1,4 @@
+LYCOHOME = schema
 
 .PHONY: prep submodules all quick bench clean veryclean install sdist init configure
 
@@ -5,7 +6,7 @@ all: configure
 	cabal build
 
 configure:
-	cabal configure --enable-tests --enable-benchmarks 
+	cabal configure --enable-tests --enable-benchmarks
 
 test: all
 	cabal test

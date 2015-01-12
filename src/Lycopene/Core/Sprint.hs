@@ -1,12 +1,10 @@
+{-# LANGUAGE TemplateHaskell       #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE FlexibleInstances     #-}
 module Lycopene.Core.Sprint
-    ( 
+    ( Sprint(..)
     ) where
 
-import Lycopene.Core.Entity (Project, Sprint(..))
+import           Lycopene.Core.DataSource (defineTable)
 
-
--- aquire underlying strem of sprint from project
-sprints :: Project -> [Sprint]
-sprints p = [
-              Sprint "hoge" (Just "fuga") 2 4 8
-            ]
+$(defineTable "sprint")

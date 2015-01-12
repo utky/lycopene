@@ -2,12 +2,12 @@ module Lycopene.Core.Database
         ( initDatabase
         ) where
 
-import           Database.Persist.Sqlite
-
 import           Lycopene.Core.Monad
-import           Lycopene.Core.Entity
-import           Lycopene.Core.Persist
+import           Lycopene.Core.Query
+
 
 initDatabase :: LycopeneT IO ()
-initDatabase = runDB $ runMigration migrateAll
+initDatabase = do
+  c <- getConfig
+  liftL $ runCreateTables c
 

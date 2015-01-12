@@ -5,30 +5,20 @@ module Lycopene.Core.Monad
     , LycoApp
     , runLycopeneT
     , getConfig
+    , liftL
     ) where
 
+import           Control.Monad.Trans
 import           Control.Monad.Reader
-import           Control.Monad.Logger
---import           Control.Monad.Except
 
 
 import           Lycopene.Configuration
 
--- | First intuitive definition of runner
-
-{-
--- start :: Configuration -> Session
--- run :: Configuration -> a -> either b
---   runReaderT :: Configuration -> ExceptT m error a
---   runExceptT :: ma -> m (Either error a)
---   Configuration -> 
--}
 
 data LycoError = ValidationFailure String
                | PersistentError String
                deriving Show
 
--- xcX1Hq3B
 
 type ConfigReader = ReaderT Configuration
 
@@ -41,6 +31,9 @@ type LycoApp = LycopeneT IO
 runLycopeneT :: LycopeneT m a -> Configuration -> m a
 runLycopeneT = runReaderT
 
+liftL :: Monad m => m a -> LycopeneT m a
+liftL = lift
 
 getConfig :: Monad m => LycopeneT m Configuration
 getConfig = ask
+

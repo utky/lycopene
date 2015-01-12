@@ -6,54 +6,41 @@ A command line interactive shell tracking daily task for !!! ME !!!
 
 Download the executable binary and run it.
 
-```
-$ curl -O <url of released binary>
-$ ./lyco
-lyco> 
-lyco> quit
-```
+    $ curl -O <url of released binary>
+    $ ./lyco version
+    1.0.0
+    $ ./lyco configure
+    /home/alice/.lyco
 
 ## Feature
 
 ### Initial configuration
 
-```
-$ lyco configure
-Globacl context directory path [$HOME/.lyco]: 
-configured.
-```
+    $ lyco configure
+    /home/alice/.lyco
 
 ### Creating your project
 
-```
-$ mkdir my-project
-$ cd my-project
-$ lyco init
-Project name [my-project]:
-created.
-```
+    $ mkdir my-project
+    $ cd my-project
+    $ lyco init "my-project"
+    1
+    $ lyco project
+    1	my-project
 
-This command creates some project respective configuration in .lyco.json file.
+This command creates some project respective configuration in .lyco.yml file.
 
-```
-$ cat .lyco.json
-{
-    "projectId": 1,
-    "projectName": "my-project"
-}
-```
+    $ cat .lyco
+    projectId: 1
+    projectName: "my-project"
 
 ### Sprint in project
 
 List sprints in this project.
 
-```
-$ lyco sprint
-$ lyco sprint new
-Name: Planning backlog
-Description: My boss said me to make a list of backlog.
-End on (yyyy-mm-dd) [current date]: 2014-12-31
-```
+    $ lyco sprint
+    $ lyco sprint new -n "Planning backlog" -e 2014-12-31
+    1
 
 Sprint is a iteration in terms of Agile.
 It's a milestone in a nutshell.
@@ -73,7 +60,7 @@ Let's check current sprint.
 
 ``
 $ lyco sprint
-* Planning backlog: until 2014-12-31
+Planning backlog: until 2014-12-31 *
 ```
 
 asterisk mark indicates that current sprint.
@@ -81,10 +68,10 @@ currently implementation will support only single sprint and not multiple sprint
 
 Creating new issue.
 
-```
-$ lyco issue new
-Title: 
-Description:
-Sprint [Planning backlog]:
-Point:
-```
+    $ lyco issue new -s "my first issue" -d "this is description of this issue" -p 1.0
+    1
+    $ lyco issue new -s "my second issue" -d "this is description of this issue" -p 2.0
+    2
+    # lyco issue
+    1     Planning backlog      1.0      my first issue
+    2     Planning backlog      2.0      my second issue
