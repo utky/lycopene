@@ -16,6 +16,8 @@ Download the executable binary and run it.
 
 ### Initial configuration
 
+The following command creates database and other related stuff in your $HOME directory.
+
     $ lyco configure
     /home/alice/.lyco
 
@@ -39,7 +41,7 @@ This command creates some project respective configuration in .lyco.yml file.
 List sprints in this project.
 
     $ lyco sprint
-    $ lyco sprint new -n "Planning backlog" -e 2014-12-31
+    $ lyco new sprint -n "Planning backlog" -e 2014-12-31
     1
 
 Sprint is a iteration in terms of Agile.
@@ -48,9 +50,7 @@ It's a milestone in a nutshell.
 if sprint name says something about value to be delivered to user, it's preferable.
 Describe not "what you will do" but "what value to be done"
 
-```
-Planning backlog: until 2014-12-31
-```
+    Planning backlog: until 2014-12-31
 
 The restriction above aims to support reducing overhead of multi-sprint context switch of us.
 
@@ -75,3 +75,29 @@ Creating new issue.
     # lyco issue
     1     Planning backlog      1.0      my first issue
     2     Planning backlog      2.0      my second issue
+
+### Inbox
+
+List current opened issues over any projects.
+
+    $ lyco inbox
+    1	project-1	sprint-1	1.0	this is a issue.
+    2	project-1	sprint-1	2.0	this is also a issue.
+    3	project-2	sprint-2	2.0	is this a issue? yes.
+
+### Weekly Report
+
+
+### Planning at the beginning of a day
+
+### Track yourself
+
+## Command line cheat sheat
+
+| verb | Project | Sprint | Issue | Record |
+|------|---------|--------|-------|--------|
+| ls   |         |        |       |        |
+| new  |         |        |       |        |
+| mod  |         |        |       |        |
+
+
