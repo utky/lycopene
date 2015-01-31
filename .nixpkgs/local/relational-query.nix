@@ -1,4 +1,4 @@
-{ cabal, Cabal, cabalTestCompat, dlist, namesTh, persistableRecord
+{ cabal, dlist, namesTh, persistableRecord
 , sqlWords, text, time, timeLocaleCompat, transformers
 }:
 
@@ -10,7 +10,7 @@ cabal.mkDerivation (self: {
     dlist namesTh persistableRecord sqlWords text time timeLocaleCompat
     transformers
   ];
-  testDepends = [ Cabal cabalTestCompat transformers ];
+  doCheck = false;
   meta = {
     homepage = "http://khibino.github.io/haskell-relational-record/";
     description = "Typeful, Modular, Relational, algebraic query engine";

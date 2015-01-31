@@ -72,11 +72,11 @@ library
                        , HDBC
                        , template-haskell
                        , HDBC-sqlite3
-                       , relational-record    >= 0.1
-                       , relational-query     >= 0.1
+                       , relational-record     >= 0.1
+                       , relational-query      >= 0.1
                        , relational-query-HDBC >= 0.1
-                       , persistable-record   >= 0.1
-                       , HDBC-session         >= 0.1
+                       , persistable-record    >= 0.1
+                       , HDBC-session          >= 0.1
 
   ghc-options:         -Wall
 
