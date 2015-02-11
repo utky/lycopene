@@ -1,10 +1,8 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances     #-}
-module Lycopene.Core.Record
-    ( Record(..)
-    ) where
+module Lycopene.Core.Record where
 
-import           Lycopene.Core.DataSource (defineTable)
+import           Lycopene.Core.Database.DataSource (defineTable)
 
 $(defineTable "record")
