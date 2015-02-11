@@ -1,5 +1,5 @@
 {-# LANGUAGE QuasiQuotes #-}
-module Lycopene.Core.Schema
+module Lycopene.Core.Database.Schema
                 ( schema
                 ) where
 

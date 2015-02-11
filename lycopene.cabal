@@ -50,12 +50,11 @@ library
   hs-source-dirs:      src
   exposed-modules:     Lycopene
                        Lycopene.Core
-                       Lycopene.Core.Type
-                       Lycopene.Core.Datapath
-                       Lycopene.Core.Schema
-                       Lycopene.Core.DataSource
-                       Lycopene.Core.Query
                        Lycopene.Core.Database
+                       Lycopene.Core.Database.Datapath
+                       Lycopene.Core.Database.Schema
+                       Lycopene.Core.Database.DataSource
+                       Lycopene.Core.Database.Query
                        Lycopene.Core.Project
                        Lycopene.Core.Sprint
                        Lycopene.Core.Issue
@@ -79,7 +78,6 @@ library
                        , HDBC-session          >= 0.1
 
   ghc-options:         -Wall
-
 
 executable lyco
   default-language:    Haskell2010
