@@ -3,7 +3,7 @@
 {-# LANGUAGE FlexibleInstances     #-}
 module Lycopene.Core.Project where
 
-import           Lycopene.Core.Database.DataSource (defineTable)
+import           Lycopene.Core.Database (defineTable)
 
 $(defineTable "project")
 

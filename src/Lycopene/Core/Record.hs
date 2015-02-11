@@ -3,6 +3,6 @@
 {-# LANGUAGE FlexibleInstances     #-}
 module Lycopene.Core.Record where
 
-import           Lycopene.Core.Database.DataSource (defineTable)
+import           Lycopene.Core.Database (defineTable)
 
 $(defineTable "record")
