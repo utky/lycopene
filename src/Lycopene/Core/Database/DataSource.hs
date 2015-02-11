@@ -6,7 +6,7 @@ module Lycopene.Core.Database.DataSource
       ) where
 
 import           Data.Time (Day, LocalTime)
-import           Database.HDBC (runRaw, withTransaction)
+import           Database.HDBC (runRaw)
 import           Database.HDBC.Query.TH (defineTableFromDB)
 import           Database.HDBC.Schema.Driver (typeMap)
 import           Database.HDBC.Schema.SQLite3 (driverSQLite3)
