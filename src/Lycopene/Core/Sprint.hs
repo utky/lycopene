@@ -1,8 +1,7 @@
-{-# LANGUAGE TemplateHaskell       #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances     #-}
-module Lycopene.Core.Sprint where
+module Lycopene.Core.Sprint
+    ( module Lycopene.Core.Sprint.Entity
+    , module Lycopene.Core.Sprint.Service
+    ) where
 
-import           Lycopene.Core.Database (defineTable)
-
-$(defineTable "sprint")
+import           Lycopene.Core.Sprint.Entity
+import           Lycopene.Core.Sprint.Service

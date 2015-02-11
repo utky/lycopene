@@ -1,8 +1,7 @@
-{-# LANGUAGE TemplateHaskell       #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances     #-}
-module Lycopene.Core.Record where
+module Lycopene.Core.Record
+    ( module Lycopene.Core.Record.Entity
+    , module Lycopene.Core.Record.Service
+    ) where
 
-import           Lycopene.Core.Database (defineTable)
-
-$(defineTable "record")
+import           Lycopene.Core.Record.Entity 
+import           Lycopene.Core.Record.Service

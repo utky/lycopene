@@ -2,9 +2,8 @@
 {-# LANGUAGE RankNTypes        #-}
 module Lycopene.Core.Monad
     ( LycopeneT
-    , LycoApp
     , runLycopeneT
-    , getConfig
+    , config
     , liftL
     ) where
 
@@ -14,26 +13,26 @@ import           Control.Monad.Reader
 
 import           Lycopene.Configuration
 
-
 data LycoError = ValidationFailure String
                | PersistentError String
                deriving Show
 
 
-type ConfigReader = ReaderT Configuration
 
---type LycoExcept = ExceptT LycoError
+type ConfigReader = ReaderT Configuration
 
 type LycopeneT = ConfigReader
 
-type LycoApp = LycopeneT IO
-
-runLycopeneT :: LycopeneT m a -> Configuration -> m a
+runLycopeneT :: Monad m => LycopeneT m a -> Configuration -> m a
 runLycopeneT = runReaderT
+
+
+-------------------------------------------------------------------------------
+-- Monadic Operations
 
 liftL :: Monad m => m a -> LycopeneT m a
 liftL = lift
 
-getConfig :: Monad m => LycopeneT m Configuration
-getConfig = ask
+config :: Monad m => LycopeneT m Configuration
+config = ask
 

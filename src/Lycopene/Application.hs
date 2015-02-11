@@ -1,13 +1,7 @@
-module Lycopene.Application (Lycopene) where
+module Lycopene.Application where
 
-import Control.Monad.Reader
-
-import Lycopene.Core
+import Lycopene.Core.Monad (LycopeneT, liftL)
 import Lycopene.Configuration
+import Lycopene.Database
 
-
-data LycoApp i r = LycoApp
-                 { getConfiguration :: Configuration
-                 , service :: (Lycopene i IO r)
-                 }
 
