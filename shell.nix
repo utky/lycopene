@@ -20,6 +20,9 @@ in pkgs.myEnvFun {
   name = haskellPackages.thisPackage.name;
   buildInputs = [
     haskellPackages.cabalInstall
+    haskellPackages.hlint
+    haskellPackages.ghcMod
+    haskellPackages.hasktags
     (haskellPackages.ghcWithPackages (hs: haskellPackages.thisPackage.propagatedNativeBuildInputs))
   ];
 }
