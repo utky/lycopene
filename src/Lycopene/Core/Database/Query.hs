@@ -10,9 +10,6 @@ module Lycopene.Core.Database.Query
                 ) where
 
 import           Control.Applicative
-import           Control.Monad
-import           Control.Monad.Reader (MonadReader, ask)
-import           Control.Monad.Trans
 
 import           Database.Relational.Query
 import           Database.Record.FromSql
@@ -21,10 +18,6 @@ import           Database.HDBC.Record.Query (runQuery)
 import           Database.HDBC.Record.Insert (runInsert)
 import           Database.HDBC.Record.KeyUpdate (runKeyUpdate)
 import           Database.HDBC
-import           Database.HDBC.Sqlite3
-
-import           Lycopene.Core.Database.DataSource (connect, createTables)
-import           Lycopene.Core.Database.Schema
 
 -------------------------------------------------------------------------------
 -- it could be better because `unPersist fa conn` is repeated.
@@ -37,7 +30,7 @@ instance Functor Persist where
     runner conn = fmap f (unPersist fa conn)
 
 instance Applicative Persist where
-  pure a = Persist $ \conn -> return a
+  pure a = Persist $ \_ -> return a
   f <*> fa = Persist runner where
     runner conn = iof <*> iofa where
       iof  = unPersist f conn
@@ -57,11 +50,12 @@ runPersist = unPersist
 
 -- |
 queryP :: (FromSql SqlValue a, ToSql SqlValue p) => Query p a -> p -> Persist [a]
-queryP q p = Persist $ runnableQuery q p
+queryP q p = Persist $ runnableQuery q p where
+  runnableQuery qry parameter conn = runQuery conn qry parameter
 
 -- |
 relationP :: (FromSql SqlValue a, ToSql SqlValue p) => Relation p a -> p -> Persist [a]
-relationP r p = Persist $ runnableRelation r p
+relationP r p = queryP (relationalQuery r) p
 
 -- |
 insertP :: ToSql SqlValue a => Insert a -> a -> Persist Integer
@@ -72,11 +66,5 @@ insertP i a = Persist $ runnableInsert i a where
 updateP :: ToSql SqlValue a => KeyUpdate p a -> a -> Persist Integer
 updateP k a = Persist $ runnableKeyUpdate k a where
   runnableKeyUpdate kupd entity conn = runKeyUpdate conn kupd entity
-
--------------------------------------------------------------------------------
--- | private use
-
-runnableQuery qry parameter conn = runQuery conn qry parameter
-runnableRelation relation parameter = runnableQuery (relationalQuery relation) parameter
 
 
