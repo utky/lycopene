@@ -11,5 +11,3 @@ data LycoApp i r = LycoApp
                  , service :: (Lycopene i IO r)
                  }
 
-
-
