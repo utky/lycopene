@@ -56,9 +56,17 @@ library
                        Lycopene.Core.Database.DataSource
                        Lycopene.Core.Database.Query
                        Lycopene.Core.Project
+                       Lycopene.Core.Project.Entity
+                       Lycopene.Core.Project.Service
                        Lycopene.Core.Sprint
+                       Lycopene.Core.Sprint.Entity
+                       Lycopene.Core.Sprint.Service
                        Lycopene.Core.Issue
+                       Lycopene.Core.Issue.Entity
+                       Lycopene.Core.Issue.Service
                        Lycopene.Core.Record
+                       Lycopene.Core.Record.Entity
+                       Lycopene.Core.Record.Service
                        Lycopene.Configuration
   -- other-modules:
   build-depends:       base                   >= 4.6
