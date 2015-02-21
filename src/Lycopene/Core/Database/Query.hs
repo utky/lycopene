@@ -3,6 +3,7 @@
 module Lycopene.Core.Database.Query
                 ( Persist
                 , runPersist
+                , direct
                 , queryP
                 , relationP
                 , insertP
@@ -47,6 +48,8 @@ runPersist :: IConnection conn => Persist a -> conn -> IO a
 runPersist = unPersist
 -------------------------------------------------------------------------------
 
+direct :: (forall conn. IConnection conn => conn -> IO a) -> Persist a
+direct = Persist
 
 -- |
 queryP :: (FromSql SqlValue a, ToSql SqlValue p) => Query p a -> p -> Persist [a]

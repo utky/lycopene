@@ -6,7 +6,7 @@ module Lycopene.Core.Database.DataSource
       ) where
 
 import           Data.Time (Day, LocalTime)
-import           Database.HDBC (runRaw)
+import           Database.HDBC (IConnection, runRaw)
 import           Database.HDBC.Query.TH (defineTableFromDB)
 import           Database.HDBC.Schema.Driver (typeMap)
 import           Database.HDBC.Schema.SQLite3 (driverSQLite3)
@@ -44,5 +44,5 @@ defineTable tableName =
     conn = connectSqlite3 tempDatapath
     connWithSchema = conn >>= (\c -> createTables c >> (return c))
 
-createTables :: Connection -> IO ()
-createTables c = runRaw c schema
+createTables :: IConnection conn => conn -> IO ()
+createTables = flip runRaw schema

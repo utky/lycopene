@@ -4,5 +4,5 @@ module Lycopene.Core
       ) where
 
 import Lycopene.Core.Monad
-import Lycopene.Core.Database
+import Lycopene.Core.Database (Persist, runPersist)
 
