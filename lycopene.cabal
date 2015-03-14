@@ -67,6 +67,7 @@ library
                        Lycopene.Core.Record
                        Lycopene.Core.Record.Entity
                        Lycopene.Core.Record.Service
+                       Lycopene.Environment
                        Lycopene.Configuration
   -- other-modules:
   build-depends:       base                   >= 4.6
@@ -107,11 +108,13 @@ executable lyco
   -- Other library packages from which modules are imported.
   build-depends:       base                   >= 4.6
                        , text
+                       , bytestring
                        , directory
                        , filepath
                        , mtl
                        , transformers
                        , lycopene
+                       , pipes                >= 4.1
                        , optparse-applicative >= 0.10   && < 0.12
 
   -- Directories containing source files.
