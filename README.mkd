@@ -1,8 +1,10 @@
-# Lycopene
+Lycopene
+=================
 
-A command line interactive shell tracking daily task for !!! ME !!!
+A command line tool for tracking activities with Pomodoro Technique.
 
-## Getting started
+Getting started
+-----------------
 
 Download the executable binary and run it.
 
@@ -12,14 +14,31 @@ Download the executable binary and run it.
     $ ./lyco configure
     /home/alice/.lyco
 
-## Feature
+Pomodoro Technique
+-----------------
 
-### Initial configuration
+[About Pomodoro Technique](http://pomodorotechnique.com/)
+
+### Prepare
 
 The following command creates database and other related stuff in your $HOME directory.
 
     $ lyco configure
     /home/alice/.lyco
+
+### Add your activities planned to get done
+
+
+### Choose activities that you promise getting them done TODAY
+
+### Start Pomodoro(time box)
+
+### Take a break
+
+### Report today's statistics
+
+Feature
+-----------------
 
 ### Creating your project
 
@@ -58,10 +77,8 @@ The restriction above aims to support reducing overhead of multi-sprint context 
 
 Let's check current sprint.
 
-``
-$ lyco sprint
-Planning backlog: until 2014-12-31 *
-```
+    $ lyco sprint
+    Planning backlog: until 2014-12-31 *
 
 asterisk mark indicates that current sprint.
 currently implementation will support only single sprint and not multiple sprint at the same time because we should get things done step by step.
@@ -87,8 +104,9 @@ List current opened issues over any projects.
 
 ### Weekly Report
 
+T.B.D.
 
-### Planning at the beginning of a day
+### Planning at the beginning
 
 ### Track yourself
 
