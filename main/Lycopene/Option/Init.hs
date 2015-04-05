@@ -1,4 +1,4 @@
-module Lycopene.Option.Init (initLyco) where
+module Lycopene.Option.Init (initProject) where
 
 
 import           Options.Applicative
@@ -6,17 +6,22 @@ import           System.FilePath
 import           System.Directory
 
 import           Lycopene.Core
+import           Lycopene.Core.Project
 import           Lycopene.Option.Command
 
 
 
-initLyco :: ParserInfo LycoAction
-initLyco = info initP (progDesc "Initialize a directory as Lyco base")
+initProject :: ParserInfo LycoAction
+initProject = info initP (progDesc "Initialize a directory as project base")
   where
-    initP = mkAction runInit
-    runInit = liftL initLycoDir
+    initP = mkAction . liftL initLycoDir
 
-initLycoDir :: IO FilePath
 initLycoDir = do
-  fmap (\d -> d </> ".lyco") getCurrentDirectory
+  cd <- getCurrentDirectory
+  td <- fmap (\d -> d </> ".lyco") cd
+  exists <- doesDirectoryExist td
+  case exists of
+    True  -> return td
+    False -> createDirectory td >> return td
+
 

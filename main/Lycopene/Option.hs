@@ -11,7 +11,7 @@ import Lycopene.Option.Common
 import Lycopene.Option.Command
 import Lycopene.Option.Version
 import Lycopene.Option.Configure
--- import Lycopene.Option.Init
+import Lycopene.Option.Init
 -- import Lycopene.Option.Project
 --
 
@@ -20,6 +20,7 @@ import Lycopene.Option.Configure
 --
 -- Parsed Option
 -- Env + common option -> Configuration
+--
 
 
 lycoParser :: ParserInfo LycoCommand
@@ -32,5 +33,6 @@ subcommand :: Parser LycoAction
 subcommand = subparser
            ( command "version" version
            <> command "configure" configureDB
+           <> command "init" initProject
            )
 
