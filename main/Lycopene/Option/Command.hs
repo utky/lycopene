@@ -1,6 +1,5 @@
 module Lycopene.Option.Command
     ( LycoCommand (..)
-    , LycoAction (..)
     , Command(..)
     ) where
 
@@ -15,8 +14,6 @@ import qualified Data.Text as T
 import           Lycopene.Core
 import           Lycopene.Option.Common
 import           Lycopene.Configuration
-import           Lycopene.Process
-
 
 -------------------------------------------------------------------------------
 
@@ -31,17 +28,9 @@ data Command =
              | Init FilePath
 
 
--- | Transform a description of command to runnable process
-runCommand :: Command -> ProcessM IO
-runCommand Version = undefined
-runCommand (Configure dest) = undefined
-runCommand (Init dest) = undefined
-
 -------------------------------------------------------------------------------
 
 data LycoCommand = LycoCommand CommonOption Command
-
-type LycoAction = ProcessM IO
 
 -- runLycoCommand :: LycoCommand -> IO LycoResult
 -- runLycoCommand (LycoCommand c action) = config >>= (runWithConfiguration action) where

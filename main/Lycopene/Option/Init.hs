@@ -12,7 +12,7 @@ import           Lycopene.Option.Command
 
 
 initProject :: ParserInfo Command
-initProject = info initP (progDesc "Initialize a directory as project base")
-  where
-    initP = undefined
+initProject = 
+  let initP = Init <$> strOption (long "dest" <> short 'd' <> metavar "DIR" <> value ".")
+  in info initP (progDesc "Initialize a directory as project base")
 

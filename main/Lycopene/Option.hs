@@ -2,6 +2,7 @@
 module Lycopene.Option
             ( lycoParser
             , module Lycopene.Option.Command
+            , module Lycopene.Option.Common
             ) where
 
 import Control.Applicative
@@ -35,4 +36,3 @@ subcommand = subparser
            <> command "configure" configureDB
            <> command "init" initProject
            )
-
