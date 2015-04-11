@@ -11,17 +11,8 @@ import           Lycopene.Option.Command
 
 
 
-initProject :: ParserInfo LycoAction
+initProject :: ParserInfo Command
 initProject = info initP (progDesc "Initialize a directory as project base")
   where
-    initP = mkAction . liftL initLycoDir
-
-initLycoDir = do
-  cd <- getCurrentDirectory
-  td <- fmap (\d -> d </> ".lyco") cd
-  exists <- doesDirectoryExist td
-  case exists of
-    True  -> return td
-    False -> createDirectory td >> return td
-
+    initP = undefined
 

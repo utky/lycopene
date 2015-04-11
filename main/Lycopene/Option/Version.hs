@@ -7,12 +7,10 @@ import qualified Paths_lycopene as P
 import           Data.Version (showVersion)
 
 import           Lycopene.Option.Command
+import           Lycopene.Process
 
 
 
-version :: ParserInfo LycoAction
-version = info versionP (progDesc "Print appilcation version infomation")
-  where
-    versionP = mkAction runVersion
-    runVersion = return $ showVersion P.version
+version :: ParserInfo Command
+version = info (pure Version) (progDesc "Print appilcation version infomation")
 

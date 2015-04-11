@@ -29,7 +29,7 @@ lycoParser = info (helper <*> commandParser) ( progDesc "tool belt for personal 
 commandParser :: Parser LycoCommand
 commandParser = LycoCommand <$> commonOption <*> subcommand
 
-subcommand :: Parser LycoAction
+subcommand :: Parser Command
 subcommand = subparser
            ( command "version" version
            <> command "configure" configureDB
