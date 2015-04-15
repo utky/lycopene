@@ -11,6 +11,7 @@ module Lycopene.Core.Database.Query
                 ) where
 
 import           Control.Applicative
+import           Control.Monad.IO.Class (MonadIO, liftIO)
 
 import           Database.Relational.Query
 import           Database.Record.FromSql
@@ -44,12 +45,18 @@ instance Monad Persist where
     runner conn = unwrap ffb >>= unwrap where
       unwrap = flip unPersist conn
 
+instance MonadIO Persist where
+  liftIO ia = Persist $ \_ -> ia
+
 runPersist :: IConnection conn => Persist a -> conn -> IO a
 runPersist = unPersist
 -------------------------------------------------------------------------------
 
 direct :: (forall conn. IConnection conn => conn -> IO a) -> Persist a
 direct = Persist
+
+-- Lift method
+-- ----------------------------------------------------------------
 
 -- |
 queryP :: (FromSql SqlValue a, ToSql SqlValue p) => Query p a -> p -> Persist [a]
