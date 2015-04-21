@@ -6,6 +6,8 @@ A command line tool for tracking activities with Pomodoro Technique.
 Getting started
 -----------------
 
+### Installation
+
 Download the executable binary and run it.
 
     $ curl -O <url of released binary>
@@ -13,6 +15,10 @@ Download the executable binary and run it.
     1.0.0
     $ ./lyco configure
     /home/alice/.lyco
+
+### Configuration
+
+
 
 Pomodoro Technique
 -----------------
@@ -28,14 +34,26 @@ The following command creates database and other related stuff in your $HOME dir
 
 ### Add your activities planned to get done
 
+    $ lyco add -e 1.0 "Do something"
+    1	inbox	no-sprint	1.0	Do something
+
+This means that new activity "Do something" added to `no-sprint` sprint of `inbox` project.
 
 ### Choose activities that you promise getting them done TODAY
 
+    $ 
+
 ### Start Pomodoro(time box)
+
+    $ lyco start
 
 ### Take a break
 
+for 5 - 10 min and then try next Pomodoro.
+
 ### Report today's statistics
+
+    $ lyco 
 
 Feature
 -----------------
@@ -102,15 +120,20 @@ List current opened issues over any projects.
     2	project-1	sprint-1	2.0	this is also a issue.
     3	project-2	sprint-2	2.0	is this a issue? yes.
 
-### Weekly Report
+### Reporting
 
-T.B.D.
+T.B.W.
 
 ### Planning at the beginning
 
+T.B.W.
+
 ### Track yourself
 
-## Command line cheat sheat
+T.B.W.
+
+Command line cheat sheat
+------------------------
 
 | verb | Project | Sprint | Issue | Record |
 |------|---------|--------|-------|--------|
