@@ -23,14 +23,15 @@ data Command =
              -- | version 
              Version
              -- | configure DIR
-             | Configure FilePath
+             | Configure
              -- | init DIR
              | Init FilePath
+             deriving (Show)
 
 
 -------------------------------------------------------------------------------
 
-data LycoCommand = LycoCommand CommonOption Command
+data LycoCommand = LycoCommand CommonOption Command deriving (Show)
 
 -- runLycoCommand :: LycoCommand -> IO LycoResult
 -- runLycoCommand (LycoCommand c action) = config >>= (runWithConfiguration action) where

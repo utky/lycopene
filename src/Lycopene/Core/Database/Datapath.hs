@@ -1,6 +1,5 @@
 module Lycopene.Core.Database.Datapath
-                ( mkDatapath
-                , tempDatapath
+                ( tempDatapath
                 ) where
 
 -- import           Data.Maybe (fromMaybe)
@@ -12,9 +11,6 @@ import           System.FilePath ((</>))
 
 -- defaultHome = home </> ".lyco"
 
-
-mkDatapath :: FilePath -> FilePath
-mkDatapath basedir = basedir </> "issues.db"
 
 tempDatapath :: FilePath
 tempDatapath = ":memory:"

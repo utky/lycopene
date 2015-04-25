@@ -1,12 +1,15 @@
 {-# LANGUAGE RankNTypes #-}
 module Lycopene.Process.Core
     ( ProcessM
+    , Process
     , Result(..)
     , Chunk(..)
     , LycoError(..)
     , runProcess
     , out
     , debug
+    , complete
+    , failure
     , module Control.Monad.Trans
     ) where
 
@@ -21,8 +24,9 @@ import           Control.Monad.Trans (MonadIO, liftIO)
 import qualified System.IO as IO
 import           System.Exit
 
-import           Lycopene.Core
+import           Lycopene.Core (LycopeneT, Persist)
 import qualified Lycopene.Pretty as PR
+import           Lycopene.Resource
 
 ----------------------------------------------------------------------
 --
@@ -63,19 +67,29 @@ type Chunk = Either T.Text T.Text
 
 type ProcessM m = Producer Chunk m Result 
 
+type LycoDomain = LycopeneT Persist
+
+type Process = ProcessM LycoDomain
+
 -- | Run a process 
 runProcess :: (MonadIO m) => ProcessM m -> Effect m Result
 -- runProcess process = runProcessM process >-> prettyfy >-> chunkToString >-> outputStream
 runProcess process = process >-> chunkToString >-> outputStream
 
-out' :: (MonadIO m) => (a -> Chunk) -> a -> ProcessM m
+out' :: (Monad m) => (a -> Chunk) -> a -> ProcessM m
 out' f x = mempty <$ (yield . f) x
 
-out :: (MonadIO m, Show a) => a -> ProcessM m
+out :: (Monad m, Show a) => a -> ProcessM m
 out = out' $ Right . T.pack . show
 
-debug :: (MonadIO m) => T.Text -> ProcessM m
+debug :: (Monad m) => T.Text -> ProcessM m
 debug x = out' Left x
+
+complete :: (Monad m) => ProcessM m
+complete = return mempty 
+
+failure :: (Monad m) => ProcessM m
+failure = return $ Failure [Unexpected]
 
 ----------------------------------------------------------------------
 

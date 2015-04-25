@@ -14,13 +14,13 @@ import           Database.HDBC.Sqlite3 (Connection, connectSqlite3)
 import           Database.Record.TH (derivingShow)
 import           Language.Haskell.TH (Q, Dec, TypeQ)
 
-import           Lycopene.Core.Database.Datapath (mkDatapath, tempDatapath)
+import           Lycopene.Core.Database.Datapath (tempDatapath)
 import           Lycopene.Core.Database.Schema (schema)
 import           Lycopene.Configuration
 
 -- | Connect database with specified configuration
 connect :: Configuration -> IO Connection
-connect = connectSqlite3 . mkDatapath . lycoHome
+connect = connectSqlite3 . datapath
 
 convTypes :: [(String, TypeQ)]
 convTypes =

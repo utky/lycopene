@@ -1,7 +1,6 @@
 module Lycopene.Option.Common
         ( CommonOption(..)
         , commonOption
-        , configure
         , commonOptsWithHome
         ) where
 
@@ -17,7 +16,7 @@ data CommonOption = CommonOption
                    { verbose :: Bool
                    , homeLocation :: FilePath
                    , global :: Bool
-                   }
+                   } deriving (Show)
 
 commonOption :: Parser CommonOption
 commonOption = CommonOption <$> optionP <*> lycoHomeP <*> globalP where
@@ -34,15 +33,6 @@ commonOption = CommonOption <$> optionP <*> lycoHomeP <*> globalP where
           (  short 'g'
           <> long "global"
           <> help "Use global context") 
-
-configure :: CommonOption -> Configuration
-configure co = Configuration
-               { lycoHome = home
-               , datapath = home </> "issue.db"
-               , contextName = Nothing
-               }
-  where
-    home = homeLocation co
 
 type HomePath = FilePath
 
