@@ -77,4 +77,12 @@ updateP :: ToSql SqlValue a => KeyUpdate p a -> a -> Persist Integer
 updateP k a = Persist $ runnableKeyUpdate k a where
   runnableKeyUpdate kupd entity conn = runKeyUpdate conn kupd entity
 
+-------------------------------------------------------------------------------
+-- | Transient data
+-- class Transient a where
+--   initial :: 
+--   tableDef :: Table a
 
+-- rule1 :: (a -> b) -> Pi t b -> 
+
+-- persistBase :: Insert 

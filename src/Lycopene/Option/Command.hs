@@ -1,6 +1,8 @@
 module Lycopene.Option.Command
     ( LycoCommand (..)
     , Command(..)
+    , AdminCmd(..)
+    , OperCmd(..)
     ) where
 
 import           Control.Applicative
@@ -19,19 +21,25 @@ import           Lycopene.Configuration
 
 -- | Command describes what to do for the application.
 -- This simply indicates user input from command line.
-data Command =
+data Command = Administration AdminCmd | Operation OperCmd deriving (Show)
+
+data AdminCmd = 
              -- | version 
              Version
              -- | configure DIR
              | Configure
-             -- | init DIR
-             | Init FilePath
              deriving (Show)
 
+data OperCmd = Init FilePath
+             | View
+             | Add
+             deriving (Show)
+             
 
 -------------------------------------------------------------------------------
 
 data LycoCommand = LycoCommand CommonOption Command deriving (Show)
+
 
 -- runLycoCommand :: LycoCommand -> IO LycoResult
 -- runLycoCommand (LycoCommand c action) = config >>= (runWithConfiguration action) where

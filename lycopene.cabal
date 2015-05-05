@@ -69,12 +69,30 @@ library
                        Lycopene.Core.Record.Service
                        Lycopene.Environment
                        Lycopene.Configuration
+                       Lycopene.Option
+                       Lycopene.Option.Command
+                       Lycopene.Option.Common
+                       Lycopene.Option.Configure
+                       Lycopene.Option.Env
+                       Lycopene.Option.Init
+                       Lycopene.Option.Internal
+                       Lycopene.Option.Project
+                       Lycopene.Option.Version
+                       Lycopene.Process
+                       Lycopene.Process.Configure
+                       Lycopene.Process.Core
+                       Lycopene.Process.Version
+                       Lycopene.Resource
+                       Lycopene.Logger
+                       Lycopene.Pretty
+                       Paths_lycopene
   -- other-modules:
   build-depends:       base                    >= 4.6
                        , text
                        , time 
                        , filepath
                        , directory
+                       , bytestring
                        , mtl
                        , transformers
                        , HDBC
@@ -85,6 +103,8 @@ library
                        , relational-query-HDBC >= 0.1
                        , persistable-record    >= 0.1
                        , HDBC-session          >= 0.1
+                       , pipes                >= 4.1
+                       , optparse-applicative >= 0.10   && < 0.12
 
   ghc-options:         -Wall
 
@@ -94,29 +114,16 @@ executable lyco
   main-is:             Main.hs
   
   -- Modules included in this executable, other than Main.
-  other-modules:       Lycopene.Option
-                       Lycopene.Option.Common
-                       Lycopene.Option.Env
-                       Lycopene.Option.Command
-                       Lycopene.Option.Version
-                       Lycopene.Option.Init
-                       Lycopene.Option.Project
+  other-modules:       
   
   -- LANGUAGE extensions used by modules in this package.
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
   build-depends:       base                   >= 4.6
-                       , text
-                       , pretty
-                       , bytestring
-                       , directory
                        , filepath
-                       , mtl
-                       , transformers
+                       , directory
                        , lycopene
-                       , pipes                >= 4.1
-                       , optparse-applicative >= 0.10   && < 0.12
 
   -- Directories containing source files.
   hs-source-dirs:      main
@@ -132,5 +139,7 @@ test-suite spec
   hs-source-dirs:      tests
   build-depends:       base                   >= 4.6
                        , hspec                >= 1.11
+                       , directory
+                       , filepath
                        , lycopene
   

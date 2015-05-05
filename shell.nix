@@ -1,29 +1,37 @@
-let
-  pkgs = import <nixpkgs> {};
-  haskellPackages = pkgs.haskellPackages.override {
-    extension = self : super : rec {
-      thisPackage = self.callPackage ./. {};
-
-      HDBCSession = self.callPackage ./.nixpkgs/local/HDBC-session.nix {};
-      namesTh = self.callPackage ./.nixpkgs/local/names-th.nix {};
-      relationalRecord = self.callPackage ./.nixpkgs/local/relational-record.nix {};
-      relationalQuery = self.callPackage ./.nixpkgs/local/relational-query.nix {};
-      relationalQueryHDBC = self.callPackage ./.nixpkgs/local/relational-query-HDBC.nix {};
-      persistableRecord = self.callPackage ./.nixpkgs/local/persistable-record.nix {};
-      cabalTestCompat = self.callPackage ./.nixpkgs/local/cabal-test-compat.nix {};
-      sqlWords = self.callPackage ./.nixpkgs/local/sql-words.nix {};
-      timeLocaleCompat = self.callPackage ./.nixpkgs/local/time-locale-compat.nix {};
-      relationalSchemas = self.callPackage ./.nixpkgs/local/relational-schemas.nix {};
+with (import <nixpkgs> {}).pkgs;
+let 
+    haskellngPackages' = haskellngPackages.override {
+      overrides = self: super: {
+        sql-words = super.sql-words.override {
+          mkDerivation = (attrs: self.mkDerivation (attrs // { doCheck = false; }));
+        };
+        relational-query = super.relational-query.override {
+          mkDerivation = (attrs: self.mkDerivation (attrs // { doCheck = false; }));
+        };
+      };
     };
-  };
-in pkgs.myEnvFun {
-  name = haskellPackages.thisPackage.name;
-  buildInputs = [
-    haskellPackages.cabalInstall
-    haskellPackages.hlint
-    haskellPackages.ghcMod
-    haskellPackages.hasktags
-    (haskellPackages.ghcWithPackages (hs: haskellPackages.thisPackage.propagatedNativeBuildInputs))
-  ];
-}
-
+    pkg = haskellngPackages'.callPackage
+            ({ mkDerivation, base, bytestring, directory, filepath, HDBC
+             , HDBC-session, HDBC-sqlite3, hspec, mtl, optparse-applicative
+             , persistable-record, pipes, pretty, relational-query
+             , relational-query-HDBC, relational-record, stdenv
+             , template-haskell, text, time, transformers
+             }:
+             mkDerivation {
+               pname = "lycopene";
+               version = "0.1.0.0";
+               src = ./.;
+               isLibrary = true;
+               isExecutable = true;
+               buildDepends = [
+                 base bytestring directory filepath HDBC HDBC-session HDBC-sqlite3
+                 mtl optparse-applicative persistable-record pipes pretty
+                 relational-query relational-query-HDBC relational-record
+                 template-haskell text time transformers
+               ];
+               testDepends = [ base hspec ];
+               description = "A command line tool which provides pomodoro techniques";
+               license = stdenv.lib.licenses.asl20;
+             }) {};
+in
+  pkg.env

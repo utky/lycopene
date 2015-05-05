@@ -2,34 +2,24 @@ module Main
         ( main
         ) where
 
-import Options.Applicative (execParser)
-import Lycopene.Option as Op
-import Lycopene.Process as Ps
-import Lycopene.Resource
-import Lycopene.Core (runLycopene)
-import System.Exit 
-import Pipes (runEffect)
+import           Lycopene.Option (parseLycoCommand)
+import           Lycopene.Process (runProcess', processCommand)
+import           Lycopene.Resource (configResource)
+import           Lycopene.Core (runLycopene)
+import           System.Exit 
 
-
--- build :: LycoCommand -> IO (Configure, Process)
--- runEffect . runProcess :: Process -> LycoepeneT Persist Result
--- flip . runLycopeneT $ Configure :: 
 
 main :: IO ()
 main = do
-  let parseLycoCommand = execParser Op.lycoParser
-      exitF = exitWith . mapExit
-      runCommand = runEffect . Ps.runProcess . Ps.processCommand
-      allocateConfig = allocate . configResource
+  let runCommand = runProcess' . processCommand
   cmd <- parseLycoCommand
-  eitherConfig <- allocateConfig cmd
+  cfg <- configResource cmd
   case eitherConfig of
-    Right cfg -> runLycopene (runCommand cmd) cfg >>= exitF
+    Right cfg -> runCommand cfg cmd >>= exitWith . mapExit
     Left e    -> putStrLn "resource error" >> exitFailure
-
 
 -- | TODO: vary exit code
 mapExit :: Ps.Result -> ExitCode
 mapExit Ps.Success = ExitSuccess
-mapExit _       = ExitFailure 1
+mapExit _          = ExitFailure 1
 

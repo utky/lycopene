@@ -10,4 +10,4 @@ import           Lycopene.Option.Command
 
 configureDB :: ParserInfo Command
 configureDB = info initP (progDesc "initialize database if it doesn't exist.") where
-  initP = pure Configure
+  initP = pure $ Administration Configure

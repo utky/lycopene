@@ -1,11 +1,13 @@
 {-# LANGUAGE RankNTypes #-}
 module Lycopene.Process.Core
     ( ProcessM
-    , Process
+    , ProcessR
     , Result(..)
     , Chunk(..)
     , LycoError(..)
     , runProcess
+    , runProcess'
+    , runDomain
     , out
     , debug
     , complete
@@ -20,11 +22,13 @@ import qualified Data.Text as T
 import qualified Data.Text.Encoding as E
 import qualified Data.ByteString as B
 import           Control.Applicative
+import           Control.Monad.Reader (ReaderT, ask)
 import           Control.Monad.Trans (MonadIO, liftIO)
 import qualified System.IO as IO
 import           System.Exit
 
-import           Lycopene.Core (LycopeneT, Persist)
+import           Lycopene.Core (LycopeneT, Persist, runLycopene)
+import           Lycopene.Configuration (Configuration)
 import qualified Lycopene.Pretty as PR
 import           Lycopene.Resource
 
@@ -32,6 +36,7 @@ import           Lycopene.Resource
 --
 data LycoError = Unexpected
                | FileNotFound String -- file path
+               deriving (Eq, Show)
 
 type Trace = [LycoError]
 
@@ -53,7 +58,44 @@ type Trace = [LycoError]
 -- >   info b -- emit chunk(Left)
 -- >   identity
 
-data Result = Success | Failure Trace
+
+--------------------------------------------
+
+-- 
+data PsIO a = PsIO
+           { psIn  :: Producer a IO ()
+           , psOut :: Consumer a IO ()
+           , psErr :: Consumer a IO ()
+           }
+
+-- | Process IO environment with standard in/out/err
+stdPsIO :: PsIO String
+stdPsIO = PsIO
+          { psIn = PP.stdinLn
+          , psOut = PP.stdoutLn
+          , psErr = PP.toHandle IO.stderr
+          }
+
+type Process' = ReaderT (PsIO String)
+
+choiceOut :: (Monad m) => Consumer a m r -> Consumer b m r -> Consumer (Either a b) m r
+choiceOut ca cb = do
+  e <- await
+  case e of
+    Left  a -> undefined
+    Right b -> undefined
+
+--------------------------------------------
+
+-- |
+-- domainData :: Lycopene Persist a
+-- runDomain domainData :: Action
+data Action a = AdminAction (IO a)
+              | OperAction (ReaderT Configuration IO a)
+
+--------------------------------------------
+
+data Result = Success | Failure Trace deriving (Eq, Show)
 
 instance Monoid Result where
   mempty = Success
@@ -67,14 +109,22 @@ type Chunk = Either T.Text T.Text
 
 type ProcessM m = Producer Chunk m Result 
 
-type LycoDomain = LycopeneT Persist
-
-type Process = ProcessM LycoDomain
+type ProcessR m = ProcessM (ReaderT Configuration m)
 
 -- | Run a process 
 runProcess :: (MonadIO m) => ProcessM m -> Effect m Result
 -- runProcess process = runProcessM process >-> prettyfy >-> chunkToString >-> outputStream
 runProcess process = process >-> chunkToString >-> outputStream
+
+runProcess' :: (MonadIO m) => ProcessM m -> m Result
+runProcess' = runEffect . runProcess
+
+runDomain' :: (MonadIO m) => LycopeneT Persist a -> ReaderT Configuration m a
+runDomain' l = ask >>= (liftIO . runLycopene l)
+
+runDomain :: (MonadIO m) =>  LycopeneT Persist a -> Producer Chunk (ReaderT Configuration m) a
+runDomain = lift . runDomain'
+
 
 out' :: (Monad m) => (a -> Chunk) -> a -> ProcessM m
 out' f x = mempty <$ (yield . f) x

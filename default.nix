@@ -8,7 +8,7 @@
 cabal.mkDerivation (self: {
   pname = "lycopene";
   version = "0.1.0.0";
-  sha256 = "nil";
+  src = ./.;
   isLibrary = true;
   isExecutable = true;
   buildDepends = [
