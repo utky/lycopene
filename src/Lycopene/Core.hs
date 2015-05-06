@@ -4,9 +4,9 @@ module Lycopene.Core
       , runLycopene
       ) where
 
-import Lycopene.Core.Monad
-import Lycopene.Core.Database (Persist, runPersist, connect)
-import Lycopene.Configuration
+import          Lycopene.Core.Monad
+import          Lycopene.Core.Database (Persist, runPersist, connect)
+import          Lycopene.Configuration
 
 runLycopene :: LycopeneT Persist a -> Configuration -> IO a
 runLycopene t c = 

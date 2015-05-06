@@ -10,7 +10,6 @@ module Lycopene.Core.Database.Query
                 , updateP
                 ) where
 
-import           Control.Applicative
 import           Control.Monad.IO.Class (MonadIO, liftIO)
 
 import           Database.Relational.Query
@@ -21,11 +20,13 @@ import           Database.HDBC.Record.Insert (runInsert)
 import           Database.HDBC.Record.KeyUpdate (runKeyUpdate)
 import           Database.HDBC
 
+
+
 -------------------------------------------------------------------------------
 -- it could be better because `unPersist fa conn` is repeated.
 -- there is some misconception.
 
-newtype Persist a = Persist { unPersist :: IConnection conn => conn -> IO a }
+newtype Persist a = Persist { unPersist :: forall conn. IConnection conn => conn -> IO a }
 
 instance Functor Persist where
   f `fmap` fa = Persist runner where
@@ -49,7 +50,7 @@ instance MonadIO Persist where
   liftIO ia = Persist $ \_ -> ia
 
 runPersist :: IConnection conn => Persist a -> conn -> IO a
-runPersist = unPersist
+runPersist p c = withTransaction c (unPersist p)
 -------------------------------------------------------------------------------
 
 direct :: (forall conn. IConnection conn => conn -> IO a) -> Persist a

@@ -10,7 +10,6 @@ import           Control.Monad.IO.Class
 import           Data.Maybe (fromMaybe)
 import           Options.Applicative
 import           System.Directory
-import           System.Environment (lookupEnv)
 import qualified Data.Text as T
 
 import           Lycopene.Core
@@ -30,9 +29,10 @@ data AdminCmd =
              | Configure
              deriving (Show)
 
-data OperCmd = Init FilePath
-             | View
-             | Add
+data OperCmd = Init (Maybe String) (Maybe String) FilePath
+             | New String (Maybe String)
+             | Ls Bool
+             | Run (Maybe Integer)
              deriving (Show)
              
 

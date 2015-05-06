@@ -3,17 +3,28 @@
 {-# LANGUAGE FlexibleInstances     #-}
 module Lycopene.Core.Project.Entity where
 
+import           Database.HDBC.Query.TH (makeRecordPersistableDefault)
 import           Database.Relational.Query
 import           Lycopene.Core.Database (defineTable)
 
 $(defineTable "project")
 
--- ここはもう少しhigher orderにできる entity -> tuple 
--- piTransient :: (entity -> tuple) -> Pi entity tuple
--- insertTransient :: Table entity -> Pi entity tuple -> Insert tuple
+selectByName :: Relation String Project
+selectByName = relation' . placeholder $ \ph -> do
+  p <- query project
+  wheres $ p ! name' .=. ph
+  return p
 
-piTransient :: Pi Project (String, (Maybe String))
-piTransient = name' >< description'
+data ProjectV = ProjectV
+              { vName :: String
+              , vDescription :: Maybe String
+              }
 
-insertTransient :: Insert (String, Maybe String)
-insertTransient = typedInsert tableOfProject piTransient
+$(makeRecordPersistableDefault ''ProjectV)
+
+piProjectV :: Pi Project ProjectV
+piProjectV = ProjectV |$| name'
+                      |*| description'
+
+insertProjectV :: Insert ProjectV
+insertProjectV = typedInsert tableOfProject piProjectV

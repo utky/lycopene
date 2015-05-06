@@ -71,3 +71,7 @@ expandHome :: FilePath -> FilePath -> FilePath
 expandHome home ('~':xs) = home ++ xs
 expandHome home path     = path
 
+expandCurrent :: FilePath -> FilePath -> FilePath
+expandCurrent current ('.':xs) = current ++ xs
+expandCurrent current path     = path
+

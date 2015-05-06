@@ -51,8 +51,8 @@ spec = do
   describe "init" $ do
     it "create a local config" $ withConfig $ \c -> do 
       pendingWith "not implemented"
-    it "create a new project" $ do 
-      pendingWith "not implemented"
+    it "create a new project" $ withConfig $ \c -> do 
+      runCommand c (LycoCommand (cfg2co c) (Operation (Init Nothing Nothing "."))) `shouldReturn` Success
     it "create a backlog sprint" $ do 
       pendingWith "not implemented"
 

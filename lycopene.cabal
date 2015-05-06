@@ -75,6 +75,8 @@ library
                        Lycopene.Option.Configure
                        Lycopene.Option.Env
                        Lycopene.Option.Init
+                       Lycopene.Option.Ls
+                       Lycopene.Option.New
                        Lycopene.Option.Internal
                        Lycopene.Option.Project
                        Lycopene.Option.Version
@@ -82,6 +84,9 @@ library
                        Lycopene.Process.Configure
                        Lycopene.Process.Core
                        Lycopene.Process.Version
+                       Lycopene.Process.Init
+                       Lycopene.Process.Ls
+                       Lycopene.Process.New
                        Lycopene.Resource
                        Lycopene.Logger
                        Lycopene.Pretty
