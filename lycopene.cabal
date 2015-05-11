@@ -80,6 +80,7 @@ library
                        Lycopene.Option.Internal
                        Lycopene.Option.Project
                        Lycopene.Option.Version
+                       Lycopene.Option.Run
                        Lycopene.Process
                        Lycopene.Process.Configure
                        Lycopene.Process.Core

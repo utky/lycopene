@@ -5,16 +5,8 @@ module Lycopene.Option.Command
     , OperCmd(..)
     ) where
 
-import           Control.Applicative
-import           Control.Monad.IO.Class
-import           Data.Maybe (fromMaybe)
-import           Options.Applicative
-import           System.Directory
-import qualified Data.Text as T
 
-import           Lycopene.Core
-import           Lycopene.Option.Common
-import           Lycopene.Configuration
+import           Lycopene.Option.Common (CommonOption(..))
 
 -------------------------------------------------------------------------------
 
@@ -31,8 +23,11 @@ data AdminCmd =
 
 data OperCmd = Init (Maybe String) (Maybe String) FilePath
              | New String (Maybe String)
+             | Mod (Maybe String) (Maybe String)
              | Ls Bool
-             | Run (Maybe Integer)
+             | Pj
+             | Sp
+             | Run (Maybe Integer) (Maybe Int)
              deriving (Show)
              
 
