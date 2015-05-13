@@ -1,3 +1,5 @@
+{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances    #-}
 module Lycopene.Print where
 
 import           Data.Monoid
@@ -34,6 +36,9 @@ infixr 6 <&>
 
 instance Print Char where
   printA c = [c]
+
+instance Print String where
+  printA = id
 
 instance Print Int where
   printA = show

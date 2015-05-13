@@ -17,7 +17,7 @@ configure target = do
   -- debug $ T.pack target
   exists <- liftIO $ createParentIfMissing target >> doesFileExist target
   case exists of
-    True  -> (debug $ T.pack ("already exists: " ++ target)) >> failure
+    True  -> (debug $ "already exists: " ++ target) >> failure
     False -> runDomain setupSchema >> (out $ T.pack target)
 
 setupSchema :: LycopeneT Persist ()

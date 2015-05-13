@@ -29,7 +29,7 @@ processCommand cfg (LycoCommand cmn (Operation oper)) = do
   ec <- liftIO $ aquire cfg
   case ec of
     Right c -> runReaderP c (processOper cmn oper)
-    Left s -> debug (T.pack s) >> failure
+    Left s -> debug s >> failure
   
 
 processAdmin :: (MonadIO m) => CommonOption -> AdminCmd -> ProcessR m
