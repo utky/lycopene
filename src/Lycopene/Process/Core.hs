@@ -29,7 +29,7 @@ import           System.Exit
 
 import           Lycopene.Core (LycopeneT, Persist, runLycopene)
 import           Lycopene.Configuration (Configuration)
-import qualified Lycopene.Pretty as PR
+import qualified Lycopene.Print as PR
 import           Lycopene.Resource
 
 ----------------------------------------------------------------------
@@ -105,7 +105,7 @@ instance Monoid Result where
   Success `mappend` Success = Success
 
 -- | Data chunk to be output into STDERR and STDOUT
-type Chunk = Either T.Text T.Text
+type Chunk = Either String String
 
 type ProcessM m = Producer Chunk m Result 
 
@@ -114,7 +114,7 @@ type ProcessR m = ProcessM (ReaderT Configuration m)
 -- | Run a process 
 runProcess :: (MonadIO m) => ProcessM m -> Effect m Result
 -- runProcess process = runProcessM process >-> prettyfy >-> chunkToString >-> outputStream
-runProcess process = process >-> chunkToString >-> outputStream
+runProcess process = process >-> outputStream
 
 runProcess' :: (MonadIO m) => ProcessM m -> m Result
 runProcess' = runEffect . runProcess
@@ -129,10 +129,10 @@ runDomain = lift . runDomain'
 out' :: (Monad m) => (a -> Chunk) -> a -> ProcessM m
 out' f x = mempty <$ (yield . f) x
 
-out :: (Monad m, Show a) => a -> ProcessM m
-out = out' $ Right . T.pack . show
+out :: (Monad m, PR.Print a) => a -> ProcessM m
+out = out' $ Right . PR.printA
 
-debug :: (Monad m) => T.Text -> ProcessM m
+debug :: (Monad m) => String -> ProcessM m
 debug x = out' Left x
 
 complete :: (Monad m) => ProcessM m
@@ -146,12 +146,7 @@ failure = return $ Failure [Unexpected]
 -- | Transform pretty printable element into data chunk.
 prettyfy :: (Monad m, Show a) => Pipe a Chunk m Result
 prettyfy = await >>= (\a -> mempty <$ process a) where
-  process = yield . Right . T.pack . show
-
-chunkToString :: (Monad m) => Pipe Chunk (Either String String) m Result
-chunkToString = mempty <$ (await >>= yield . chunkToString') where
-  chunkToString' (Left logStr)  = (Left . T.unpack) logStr
-  chunkToString' (Right msg) = (Right . T.unpack) msg
+  process = yield . Right . show
 
 outputStream :: (MonadIO m) => Consumer (Either String String) m Result
 outputStream = mempty <$ consumeEither PP.stdoutLn (PP.toHandle IO.stderr)

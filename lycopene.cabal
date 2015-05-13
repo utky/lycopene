@@ -90,7 +90,7 @@ library
                        Lycopene.Process.New
                        Lycopene.Resource
                        Lycopene.Logger
-                       Lycopene.Pretty
+                       Lycopene.Print
                        Paths_lycopene
   -- other-modules:
   build-depends:       base                    >= 4.6
