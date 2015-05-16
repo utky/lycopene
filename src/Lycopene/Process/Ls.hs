@@ -3,7 +3,7 @@ module Lycopene.Process.Ls where
 import           Control.Monad.Trans (lift, liftIO)
 import           Control.Monad.Reader (ask)
 import qualified Data.Text as T
-import           Lycopene.Process.Core (ProcessR, out, MonadIO, complete, runDomain)
+import           Lycopene.Process.Core (ProcessR, eachP, MonadIO, runDomain)
 import           Lycopene.Configuration
 import           Lycopene.Core.Issue as Issue
 
@@ -18,7 +18,5 @@ listIssues :: (MonadIO m) => Bool -> ProcessR m
 listIssues showAll  = do
   projectId <- targetProject `fmap` lift ask
   issues <- runDomain $ Issue.listOpenIssues projectId
-  mapM_ (out . toTsv) issues
-  -- liftIO $ mapM_ (putStrLn . T.unpack . toTsv) issues
-  complete
+  eachP issues
 

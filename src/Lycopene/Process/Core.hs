@@ -9,6 +9,7 @@ module Lycopene.Process.Core
     , runProcess'
     , runDomain
     , out
+    , eachP
     , debug
     , complete
     , failure
@@ -132,6 +133,9 @@ out' f x = mempty <$ (yield . f) x
 out :: (Monad m, PR.Print a) => a -> ProcessM m
 out = out' $ Right . PR.printA
 
+eachP :: (Monad m, PR.Print a) => [a] -> ProcessM m
+eachP xs = complete <* mapM_ out xs
+
 debug :: (Monad m) => String -> ProcessM m
 debug x = out' Left x
 
@@ -149,21 +153,21 @@ prettyfy = await >>= (\a -> mempty <$ process a) where
   process = yield . Right . show
 
 outputStream :: (MonadIO m) => Consumer (Either String String) m Result
-outputStream = mempty <$ consumeEither PP.stdoutLn (PP.toHandle IO.stderr)
+outputStream = mempty <$ consumeEither
 
 -- handleEither :: Either String String -> Consumer' (Either String String) m ()
 -- handleEither (Right r) = (return r) >~ PP.stdoutLn
 -- handleEither (Left l)  = (return l) >~ (PP.toHandle IO.stderr)
 
-consumeEither :: (MonadIO m) => Consumer' String m () -> Consumer' String m () -> Consumer' (Either String String) m Result
-consumeEither stdoutC stderrC = do
+consumeEither :: (MonadIO m) => Consumer (Either String String) m Result
+consumeEither = do
   let ok a = Success <$ yield a
   eitherS <- await
   case eitherS of
     -- (Left l)  -> (return l) >~ stderrC
     -- (Right r) -> (return r) >~ stdoutC
-    (Left l)  -> for (ok l) (\a -> liftIO . (IO.hPutStrLn IO.stderr) $ a)
-    (Right r) -> for (ok r) (\a -> liftIO . putStrLn $ a)
+    (Left l)  -> for (ok l) (\a -> liftIO . (IO.hPutStrLn IO.stderr) $ a) >> consumeEither
+    (Right r) -> for (ok r) (\a -> liftIO . putStrLn $ a) >> consumeEither
     -- (Left l)  -> do { (ok l) >-> (PP.toHandle IO.stderr); consumeEither}
     -- (Right r) -> do { (ok r) >-> (PP.stdoutLn); consumeEither}
 
