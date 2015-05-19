@@ -1,5 +1,5 @@
 module Lycopene.Logger
-    ( Log (..)
+    ( Log
     , LogMessage (..)
     , LogLevel (..)
     , formatLog
@@ -17,7 +17,6 @@ module Lycopene.Logger
 import Prelude hiding (log, error)
 import qualified Data.Text as T
 import qualified Control.Monad.Writer as W
-import qualified Data.Monoid as M
 
 -----------------------------------------------------------------------------
 
@@ -33,22 +32,18 @@ instance Show LogLevel where
 
 -----------------------------------------------------------------------------
 
-newtype LogMessage = LogMessage T.Text
+data LogMessage = LogMessage LogLevel T.Text
 
 instance Show LogMessage where
-  show (LogMessage t) = show t
+  show (LogMessage l t) = (show l) ++ " " ++ (T.unpack t)
 
 -----------------------------------------------------------------------------
 
-data Log = Log [(LogLevel, LogMessage)] deriving (Show)
-
-instance M.Monoid Log where
-  mempty = Log M.mempty
-  (Log a) `mappend` (Log b) = Log (a `M.mappend` b)
+type Log = [LogMessage]
 
 formatLog :: Log -> [T.Text]
-formatLog (Log ls) = map formatEntry ls where
-  formatEntry (lvl, LogMessage msg) = T.concat [T.pack $ show lvl, T.pack " ", msg]
+formatLog ls = map formatEntry ls where
+  formatEntry (LogMessage lvl msg) = T.concat [T.pack $ show lvl, T.pack " ", msg]
 
 -----------------------------------------------------------------------------
 
@@ -63,7 +58,7 @@ execLoggerT = W.execWriterT
 -----------------------------------------------------------------------------
 
 log :: (Monad m) => LogLevel -> T.Text -> LoggerT m ()
-log lvl msg = W.tell $ Log $ return (lvl, (LogMessage msg))
+log l t = W.tell . return $ LogMessage l t
 
 debug :: (Monad m) => T.Text -> LoggerT m ()
 debug = log Debug
