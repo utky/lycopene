@@ -1,6 +1,6 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances    #-}
-module Lycopene.Print where
+module Lycopene.Print (Print(..)) where
 
 import           Data.Monoid
 import           Data.Maybe (fromMaybe)
