@@ -13,7 +13,7 @@ let
     pkg = haskellngPackages'.callPackage
             ({ mkDerivation, base, bytestring, directory, filepath, HDBC
              , HDBC-session, HDBC-sqlite3, hspec, mtl, optparse-applicative
-             , persistable-record, pipes, pretty, relational-query
+             , persistable-record, pipes, pretty, QuickCheck, relational-query
              , relational-query-HDBC, relational-record, stdenv
              , template-haskell, text, time, transformers
              }:
@@ -29,7 +29,7 @@ let
                  relational-query relational-query-HDBC relational-record
                  template-haskell text time transformers
                ];
-               testDepends = [ base hspec ];
+               testDepends = [ base directory filepath hspec mtl QuickCheck ];
                description = "A command line tool which provides pomodoro techniques";
                license = stdenv.lib.licenses.asl20;
              }) {};

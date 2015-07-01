@@ -1,16 +1,15 @@
 module Lycopene.Core
-      ( module Lycopene.Core.Monad
+      ( module Lycopene.Core.Context
+      , module Lycopene.Core.Monad
       , module Lycopene.Core.Database
-      , runLycopene
+      , module Lycopene.Core.Free
+      , module Lycopene.Core.Resource
       ) where
 
+import          Lycopene.Core.Context
 import          Lycopene.Core.Monad
-import          Lycopene.Core.Database (Persist, runPersist, connect)
-import          Lycopene.Configuration
+import          Lycopene.Core.Free
+import          Lycopene.Core.Resource
+import          Lycopene.Core.Database
 
-runLycopene :: LycopeneT Persist a -> Configuration -> IO a
-runLycopene t c = 
-  let p = runLycopeneT t c
-      runM = runPersist p
-  in  connect c >>= runM
 

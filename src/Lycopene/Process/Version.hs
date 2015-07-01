@@ -2,8 +2,8 @@ module Lycopene.Process.Version where
 
 import qualified Paths_lycopene as P
 import           Data.Version (showVersion)
-import           Lycopene.Process.Core (ProcessR, out)
+import           Lycopene.Action
 
 
-version :: (Monad m) => ProcessR m
-version = out . showVersion $ P.version
+version :: Action String
+version = return . showVersion $ P.version

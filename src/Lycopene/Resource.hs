@@ -1,13 +1,12 @@
 module Lycopene.Resource where
 
-import           Lycopene.Option (LycoCommand(..), CommonOption(..), Command(..), commonOptsWithHome)
+import           Lycopene.Option (LycoCommand(..), CommonOption(..), Command(..))
 import           Lycopene.Configuration (Configuration(..))
-import           Control.Applicative ((<$>), (<*>))
-import           Control.Monad.Trans (lift, liftIO)
-import           Control.Monad.Trans.Error (ErrorT(..), Error(..))
 import           System.FilePath
 import           System.Directory (doesFileExist, doesDirectoryExist, getCurrentDirectory, getHomeDirectory)
 import           Data.Char (isDigit)
+
+
 
 
 configResource :: LycoCommand -> IO Configuration
@@ -52,8 +51,8 @@ here = getCurrentDirectory
 home :: IO FilePath
 home =  getHomeDirectory
 
-aquire :: Configuration -> IO (Either String Configuration)
-aquire cfg = do
+acquire :: Configuration -> IO (Either String Configuration)
+acquire cfg = do
   let home = lycoHome cfg
       dp = datapath cfg
   homeExists        <- doesDirectoryExist home

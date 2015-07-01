@@ -7,7 +7,7 @@ import           Lycopene.Option.Command
 
 initProject :: ParserInfo Command
 initProject = 
-  let initP = (\a b c -> Operation $ Init a b c)
+  let initP = Init
         <$> optional (strOption (long "name" <> short 'n' <> metavar "NAME"))
         <*> optional (strOption (long "description" <> short 'd' <> metavar "DESC"))
         <*> strOption (long "path" <> short 'p' <> metavar "DIR" <> value ".")

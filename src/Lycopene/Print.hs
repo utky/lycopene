@@ -9,6 +9,7 @@ import qualified Lycopene.Core.Project as P
 import qualified Lycopene.Core.Sprint as S
 import qualified Lycopene.Core.Issue as I
 import qualified Lycopene.Core.Record as R
+import           Lycopene.Logger (LogMessage)
 
 option :: (Monoid a) => Maybe a -> a
 option ma = fromMaybe mempty ma
@@ -86,3 +87,5 @@ instance Print R.Record where
          <&> option . fmap show . R.startOn
          <&> option . fmap show . R.endOn
 
+instance Print LogMessage where
+  printA = show

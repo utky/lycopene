@@ -1,38 +1,39 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE RankNTypes        #-}
 module Lycopene.Core.Monad
-    ( LycopeneT
-    , runLycopeneT
-    , config
-    , liftL
+    ( Lycopene(..)
+    , LycoError(..)
+    , context
+    , runLycopene
     ) where
 
 import           Control.Monad.Trans
 import           Control.Monad.Reader
+import           Control.Monad.Except
 
-
-import           Lycopene.Configuration
+import           Lycopene.Core.Context
 
 data LycoError = ValidationFailure String
                | PersistentError String
-               deriving Show
+               deriving (Show)
 
+newtype Lycopene a = Lyco { unLyco :: ReaderT Context (ExceptT LycoError IO) a }
 
+instance Functor Lycopene where
+  fmap f x = Lyco $ fmap f $ unLyco x
 
-type ConfigReader = ReaderT Configuration
+instance Applicative Lycopene where
+  pure = Lyco . lift . return
+  f <*> x = Lyco $ unLyco f <*> unLyco x
 
-type LycopeneT = ConfigReader
+instance Monad Lycopene where
+  return = pure
+  x >>= k = Lyco $ (unLyco x) >>= unLyco . k
 
-runLycopeneT :: Monad m => LycopeneT m a -> Configuration -> m a
-runLycopeneT = runReaderT
+instance MonadIO Lycopene where
+  liftIO = Lyco . lift . liftIO
 
+context :: Lycopene Context
+context = Lyco ask
 
--------------------------------------------------------------------------------
--- Monadic Operations
-
-liftL :: Monad m => m a -> LycopeneT m a
-liftL = lift
-
-config :: Monad m => LycopeneT m Configuration
-config = ask
+runLycopene :: Lycopene a -> Context -> IO (Either LycoError a)
+runLycopene lyco ctx = runExceptT (runReaderT (unLyco lyco) ctx)
 

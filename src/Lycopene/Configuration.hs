@@ -1,5 +1,6 @@
 module Lycopene.Configuration 
     ( Configuration(..)
+    , defaultConfiguration
     ) where
 
 data Configuration = Configuration
@@ -7,3 +8,10 @@ data Configuration = Configuration
                    , datapath :: String
                    , targetProject :: Integer
                    }
+
+defaultConfiguration :: Configuration
+defaultConfiguration = Configuration
+                     { lycoHome = "."
+                     , datapath = ":memory:"
+                     , targetProject = 0
+                     }

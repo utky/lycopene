@@ -12,16 +12,16 @@ data IssueRequest = IssueRequest
                   , irProjectId :: Integer
                   }
 
-newIssue :: IssueRequest -> LycopeneT Persist Integer
+newIssue :: IssueRequest -> Lycopene Integer
 newIssue ir = do
   sprint <- fromMaybe 0 `fmap` Sprint.getBacklogSprint (irProjectId ir)
-  liftL $ insertP E.insertIssueV E.IssueV
+  runPersist $ insertP E.insertIssueV E.IssueV
                                  { E.vTitle = irTitle ir
                                  , E.vDescription = irDescription ir
                                  , E.vSprintId = sprint
                                  , E.vStatus = E.openStatus
                                  }
 
-listOpenIssues :: Integer -> LycopeneT Persist [E.IssueR]
-listOpenIssues pjId = liftL $ relationP E.openIssues (pjId, E.openStatus)
+listOpenIssues :: Integer -> Lycopene [E.IssueR]
+listOpenIssues pjId = runPersist $ relationP E.openIssues (pjId, E.openStatus)
 

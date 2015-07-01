@@ -16,7 +16,7 @@ module Lycopene.Logger
 
 import Prelude hiding (log, error)
 import qualified Data.Text as T
-import qualified Control.Monad.Writer as W
+import qualified Control.Monad.Writer.Strict as W
 
 -----------------------------------------------------------------------------
 

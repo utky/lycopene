@@ -7,7 +7,7 @@ import qualified Lycopene.Core.Project as Project
 
 -- | Aggregation of use-case "create project and backlog sprint"
 -- It returns created project ID
-newProjectAndSprint :: String -> (Maybe String) -> LycopeneT Persist (Integer, Integer)
+newProjectAndSprint :: String -> (Maybe String) -> Lycopene (Integer, Integer)
 newProjectAndSprint n d = do
   let sprintname = "backlog"
   _ <- Project.newProject (Project.ProjectV n d)
@@ -19,21 +19,21 @@ newProjectAndSprint n d = do
                             , E.vEndOn = Nothing
                             })
   sprintId <- (E.sprintId . head) `fmap` sprintByProjectAndName projectId sprintname
-  _ <- liftL $ insertP E.insertBacklogSprint (E.BacklogSprint projectId sprintId)
+  _ <- runPersist $ insertP E.insertBacklogSprint (E.BacklogSprint projectId sprintId)
   return (projectId, sprintId)
   
 
-newSprint :: E.SprintV -> LycopeneT Persist Integer
-newSprint sv = liftL $ insertP E.insertSprintV sv
+newSprint :: E.SprintV -> Lycopene Integer
+newSprint sv = runPersist $ insertP E.insertSprintV sv
 
-sprintByProjectAndName :: Integer -> String -> LycopeneT Persist [E.Sprint]
-sprintByProjectAndName pj nm = liftL $ relationP E.selectByProjectAndName (pj, nm)
+sprintByProjectAndName :: Integer -> String -> Lycopene [E.Sprint]
+sprintByProjectAndName pj nm = runPersist $ relationP E.selectByProjectAndName (pj, nm)
 
-inboxBacklog :: LycopeneT Persist Integer
-inboxBacklog = liftL $ insertP E.insertBacklogSprint (E.BacklogSprint 0 0)
+inboxBacklog :: Lycopene Integer
+inboxBacklog = runPersist $ insertP E.insertBacklogSprint (E.BacklogSprint 0 0)
 
-inboxDefault :: LycopeneT Persist Integer
-inboxDefault = liftL $ insertP E.insertSprint E.Sprint
+inboxDefault :: Lycopene Integer
+inboxDefault = runPersist $ insertP E.insertSprint E.Sprint
                                               { E.sprintId = 0
                                               , E.name = "backlog"
                                               , E.description = Just "inbox-backlog"
@@ -43,7 +43,7 @@ inboxDefault = liftL $ insertP E.insertSprint E.Sprint
                                               }
 
 -- | projectId -> sprintId (as backlog)
-getBacklogSprint :: Integer -> LycopeneT Persist (Maybe Integer)
-getBacklogSprint projectId = liftL $ fmap headId (relationP E.selectBacklogByProject projectId) where
+getBacklogSprint :: Integer -> Lycopene (Maybe Integer)
+getBacklogSprint projectId = runPersist $ fmap headId (relationP E.selectBacklogByProject projectId) where
   headId (id':_) = Just id'
   headId []     = Nothing

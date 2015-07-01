@@ -7,5 +7,5 @@ import           Lycopene.Option.Command
 
 
 version :: ParserInfo Command
-version = info (pure (Administration Version)) (progDesc "Print appilcation version infomation")
+version = info (pure Version) (progDesc "Print appilcation version infomation")
 

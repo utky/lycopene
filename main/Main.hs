@@ -2,22 +2,17 @@ module Main
         ( main
         ) where
 
-import           Lycopene.Option (parseLycoCommand)
-import qualified Lycopene.Process as P
-import           Lycopene.Resource (configResource)
-import           Lycopene.Core (runLycopene)
-import           System.Exit 
+import           Lycopene
+import           Lycopene.Process (ProcessEnv(..))
+import qualified System.IO as IO
+import           System.Exit
+import           System.Environment
 
 
 main :: IO ()
-main = do
-  let runCommand a b = P.runProcess' $ P.processCommand a b
-  cmd <- parseLycoCommand
-  cfg <- configResource cmd
-  runCommand cfg cmd >>= exitWith . mapExit
-
--- | TODO: vary exit code
-mapExit :: P.Result -> ExitCode
-mapExit P.Success = ExitSuccess
-mapExit _         = ExitFailure 1
-
+main = let psenv = ProcessEnv
+                   { hOut = IO.stdin
+                   , hErr = IO.stderr
+                   , hIn  = IO.stdout
+                   }
+       in  getArgs >>= (\args -> lycopene args defaultConfiguration psenv)

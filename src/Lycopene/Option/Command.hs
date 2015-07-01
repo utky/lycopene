@@ -1,8 +1,6 @@
 module Lycopene.Option.Command
     ( LycoCommand (..)
     , Command(..)
-    , AdminCmd(..)
-    , OperCmd(..)
     ) where
 
 
@@ -12,16 +10,12 @@ import           Lycopene.Option.Common (CommonOption(..))
 
 -- | Command describes what to do for the application.
 -- This simply indicates user input from command line.
-data Command = Administration AdminCmd | Operation OperCmd deriving (Show)
-
-data AdminCmd = 
+data Command = 
              -- | version 
              Version
              -- | configure DIR
              | Configure
-             deriving (Show)
-
-data OperCmd = Init (Maybe String) (Maybe String) FilePath
+             | Init (Maybe String) (Maybe String) FilePath
              | New String (Maybe String)
              | Mod (Maybe String) (Maybe String)
              | Ls Bool
@@ -29,7 +23,6 @@ data OperCmd = Init (Maybe String) (Maybe String) FilePath
              | Sp
              | Run (Maybe Integer) (Maybe Int)
              deriving (Show)
-             
 
 -------------------------------------------------------------------------------
 

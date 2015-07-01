@@ -3,56 +3,44 @@ module CommandSpec (spec) where
 import           Test.Hspec
 import           System.Directory (getCurrentDirectory, createDirectoryIfMissing, removeDirectory, removeDirectoryRecursive, removeFile, doesFileExist)
 import           System.FilePath ((</>))
+import           Lycopene.Core
 import           Lycopene.Option
-import           Lycopene.Process (runProcess', processCommand, Result(..))
+import           Lycopene.Process
 import           Lycopene.Configuration
 import           Control.Exception (bracket)
 import           Control.Applicative ((<|>))
-
+{-
 runCommand :: Configuration -> LycoCommand -> IO Result
 runCommand cfg cmd = runProcess' $ processCommand cfg cmd
 
 specHome :: FilePath -> FilePath
 specHome = (</>".lyco-spec")
+-}
 
-config :: FilePath -> Configuration
-config home = Configuration
-       { lycoHome = home
-       , datapath = ":memory:"
-       , targetProject = 0
-       }
+config :: Configuration
+config = Configuration "dummy" ":memory:" 0
 
-withConfig :: (Configuration -> IO a) -> IO a
-withConfig = 
-  let tmp = do
-        cd <- getCurrentDirectory
-        let home = specHome cd
-        createDirectoryIfMissing True home
-        return $ config home
-      rmtmp cfg = do
-        let home = lycoHome cfg
-        removeDirectoryRecursive home
-  in bracket tmp rmtmp
-
-cfg2co :: Configuration -> CommonOption
-cfg2co cfg = CommonOption False (lycoHome cfg) False
-
+commonOpt :: CommonOption
+commonOpt = CommonOption False (lycoHome config) False
 
 spec :: Spec
 spec = do
   describe "version" $ do
-    it "succeeds" $ withConfig $ \c -> do 
-      runCommand c (LycoCommand (cfg2co c) (Administration Version)) `shouldReturn` Success
+    it "succeeds" $ do 
+      (runPure $ buildProcess (LycoCommand commonOpt Version) config) `shouldReturn` []
+      pendingWith "not implemented"
 
   describe "configure" $ do
-    it "generate the schema" $ withConfig $ \c -> do 
-      runCommand c (LycoCommand (cfg2co c) (Administration Configure)) `shouldReturn` Success
+    it "generate the schema" $ do 
+      -- runCommand c (LycoCommand (cfg2co c) (Administration Configure)) `shouldReturn` Success
+      pendingWith "not implemented"
 
   describe "init" $ do
-    it "create a local config" $ withConfig $ \c -> do 
+    it "create a local config" $ do 
       pendingWith "not implemented"
-    it "create a new project" $ withConfig $ \c -> do 
-      runCommand c (LycoCommand (cfg2co c) (Operation (Init Nothing Nothing "."))) `shouldReturn` Success
+    it "create a new project" $ do 
+      -- runCommand c (LycoCommand (cfg2co c) (Operation (Init Nothing Nothing "."))) `shouldReturn` Success
+      pendingWith "not implemented"
     it "create a backlog sprint" $ do 
       pendingWith "not implemented"
 

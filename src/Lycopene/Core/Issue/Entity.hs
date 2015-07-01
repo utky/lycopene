@@ -58,5 +58,8 @@ piIssueV = IssueV |$| title'
 insertIssueV :: Insert IssueV
 insertIssueV = typedInsert tableOfIssue piIssueV
 
+closeStatus :: Integer
 closeStatus = 0
+
+openStatus :: Integer
 openStatus = 1

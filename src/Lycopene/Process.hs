@@ -1,46 +1,50 @@
 {-# LANGUAGE RankNTypes #-}
 module Lycopene.Process
-    ( processCommand
-    , module Lycopene.Process.Core
-    , module Lycopene.Process.Version
-    , module Lycopene.Process.Configure
+    ( buildProcess
+    , runProcess
+    , Chunk
+    , module Lycopene.Process.Internal
     ) where
 
-import qualified Data.Text as T
-import           Pipes.Lift (runReaderP)
-import           Control.Monad.Trans (lift, liftIO)
-import           Control.Monad.Reader (ask)
-import           Lycopene.Option (LycoCommand(..), CommonOption(..), Command(..), AdminCmd(..), OperCmd(..))
-import           Lycopene.Process.Core (LycoError(..), Result(..), Chunk, ProcessR, ProcessM, runProcess, runProcess', out, debug, MonadIO, failure)
-import           Lycopene.Process.Version (version)
+
+import           Lycopene.Option (LycoCommand(..), CommonOption(..), Command(..))
+import           Lycopene.Process.Internal
+
+import           Lycopene.Configuration (Configuration)
+import           Lycopene.Print (Print)
+
+import           Lycopene.Action
+import           Lycopene.Process.Version   (version)
 import           Lycopene.Process.Configure (configure)
-import           Lycopene.Process.Init (initialize)
-import           Lycopene.Process.Ls (listIssues)
-import           Lycopene.Process.New (newIssue)
-import           Lycopene.Resource (aquire)
-import           Lycopene.Configuration (Configuration(..))
-import           Lycopene.Core (config)
+import           Lycopene.Process.Init      (initialize)
+import           Lycopene.Process.Ls        (listIssues)
+import           Lycopene.Process.New       (newIssue)
+
 import           System.FilePath ((</>))
 
+processAction :: Action a -> Configuration -> Process' a
+processAction action cfg = 
+  do e <- liftIO . handleResult $ runAction action cfg
+     case e of
+       (Left err) -> fatal "やばいよー" -- FIXME
+       (Right x)  -> yield x
 
-processCommand :: (MonadIO m) => Configuration -> LycoCommand -> ProcessM m
-processCommand cfg (LycoCommand cmn (Administration admin)) = runReaderP cfg (processAdmin cmn admin)
-processCommand cfg (LycoCommand cmn (Operation oper)) = do
-  ec <- liftIO $ aquire cfg
-  case ec of
-    Right c -> runReaderP c (processOper cmn oper)
-    Left s -> debug s >> failure
-  
 
-processAdmin :: (MonadIO m) => CommonOption -> AdminCmd -> ProcessR m
-processAdmin cmn Version = version
-processAdmin cmn Configure = lift ask >>= (\cfg -> configure (datapath cfg))
+process :: (Print a) => Action a -> Configuration -> Process' String
+process action cfg = printer <-< processAction action cfg
 
-processOper :: (MonadIO m) => CommonOption -> OperCmd -> ProcessR m
-processOper cmn (Init mName mDesc path) = initialize mName mDesc path
-processOper cmn (Ls all) = listIssues all
-processOper cmn (New title mDesc) = newIssue title mDesc
-processOper cmn (Mod mTitle mDesc) = undefined
-processOper cmn (Run mi md) = undefined
-processOper cmn (Pj) = undefined
-processOper cmn (Sp) = undefined
+type Chunk = Either String String
+
+buildProcess :: LycoCommand -> Configuration -> Producer Chunk IO ()
+buildProcess (LycoCommand commonOpt cmd) cfg = runWriterPs $ mkPs cmd cfg where
+  mkPs Version   = process version
+  mkPs Configure = process configure
+  mkPs (Init mName mDesc path) = process (initialize mName mDesc path)
+  mkPs _         = \_ -> fatal "No command specified"
+
+runProcess :: Producer Chunk IO () -> ProcessEnv -> Effect IO ()
+runProcess ps (ProcessEnv hout herr hin) =
+                    let cOut = handleOut hout
+                        cErr = handleOut herr
+                        out  = choice cErr cOut
+                    in  ps >-> out

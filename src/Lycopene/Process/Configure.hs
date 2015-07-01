@@ -1,29 +1,24 @@
 module Lycopene.Process.Configure where
 
-import qualified Data.Text as T
-import           System.FilePath (dropFileName)
-import           System.Directory (createDirectoryIfMissing, doesFileExist)
-import           Lycopene.Process.Core (ProcessR, out, MonadIO, liftIO, debug, failure, runDomain)
+import           Lycopene.Action
 import           Lycopene.Environment (createDatabase)
 import           Lycopene.Core
+import           Lycopene.Configuration (datapath)
 import           Lycopene.Core.Project as Project
 import           Lycopene.Core.Sprint as Sprint
 
+-- createParentAndCheckTarget :: (MonadIO m) => FilePath -> Producer Bool m ()
+-- createParentAndCheckTarget target = 
+--   let createParentIfMissing = (createDirectoryIfMissing True) . dropFileName
+--   in liftIO (createParentIfMissing target >> doesFileExist target) >>= yield
 
-configure :: (MonadIO m) => FilePath -> ProcessR m
-configure target = do
-  let createParentIfMissing = (createDirectoryIfMissing True) . dropFileName
-  -- FIXME: debug print
-  -- debug $ T.pack target
-  exists <- liftIO $ createParentIfMissing target >> doesFileExist target
-  case exists of
-    True  -> (debug $ "already exists: " ++ target) >> failure
-    False -> runDomain setupSchema >> (out $ T.pack target)
+-- | Attempt to create fresh database.
+configure :: Action String
+configure = domain setupSchema
 
-setupSchema :: LycopeneT Persist ()
-setupSchema = do
-  createDatabase
-  _ <- Project.inbox
-  _ <- Sprint.inboxDefault
-  _ <- Sprint.inboxBacklog
-  return ()
+setupSchema :: Lycopene String
+setupSchema = createDatabase
+            >> Project.inbox
+            >> Sprint.inboxDefault
+            >> Sprint.inboxBacklog
+            >> return "hogehoge" -- FIXME

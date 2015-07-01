@@ -50,11 +50,14 @@ library
   hs-source-dirs:      src
   exposed-modules:     Lycopene
                        Lycopene.Core
+                       Lycopene.Core.Context
+                       Lycopene.Core.Free
                        Lycopene.Core.Database
-                       Lycopene.Core.Database.Datapath
-                       Lycopene.Core.Database.Schema
                        Lycopene.Core.Database.DataSource
+                       Lycopene.Core.Database.Datapath
+                       Lycopene.Core.Database.Persist
                        Lycopene.Core.Database.Query
+                       Lycopene.Core.Database.Schema
                        Lycopene.Core.Project
                        Lycopene.Core.Project.Entity
                        Lycopene.Core.Project.Service
@@ -67,13 +70,16 @@ library
                        Lycopene.Core.Record
                        Lycopene.Core.Record.Entity
                        Lycopene.Core.Record.Service
+                       Lycopene.Core.Resource
+                       Lycopene.Action
+                       Lycopene.Action.Domain
+                       Lycopene.Action.FileSystem
                        Lycopene.Environment
                        Lycopene.Configuration
                        Lycopene.Option
                        Lycopene.Option.Command
                        Lycopene.Option.Common
                        Lycopene.Option.Configure
-                       Lycopene.Option.Env
                        Lycopene.Option.Init
                        Lycopene.Option.Ls
                        Lycopene.Option.New
@@ -82,8 +88,9 @@ library
                        Lycopene.Option.Version
                        Lycopene.Option.Run
                        Lycopene.Process
+                       Lycopene.Process.Internal
+                       Lycopene.Process.Internal.Core
                        Lycopene.Process.Configure
-                       Lycopene.Process.Core
                        Lycopene.Process.Version
                        Lycopene.Process.Init
                        Lycopene.Process.Ls
@@ -144,8 +151,9 @@ test-suite spec
   main-is:             spec.hs
   hs-source-dirs:      tests
   build-depends:       base                   >= 4.6
+                       , mtl
                        , hspec                >= 1.11
+                       , QuickCheck
                        , directory
                        , filepath
                        , lycopene
-  

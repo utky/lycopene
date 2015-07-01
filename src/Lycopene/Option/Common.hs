@@ -6,7 +6,6 @@ module Lycopene.Option.Common
 
 import           System.FilePath
 import           Options.Applicative
-import           Lycopene.Configuration
 
 home :: FilePath
 home = "~" ++ [pathSeparator]

@@ -1,12 +1,11 @@
 -- | Includes functions providing command line I/O
 module Lycopene.Option
             ( lycoParser
-            , parseLycoCommand
+            , execParserWithArgs
             , module Lycopene.Option.Command
             , module Lycopene.Option.Common
             ) where
 
-import Control.Applicative
 import Options.Applicative
 
 import Lycopene.Option.Common
@@ -27,7 +26,10 @@ import Lycopene.Option.Run
 -- Env + common option -> Configuration
 --
 
-parseLycoCommand = execParser lycoParser
+type Arguments = [String]
+
+execParserWithArgs :: ParserInfo a -> Arguments -> IO a
+execParserWithArgs parser args = handleParseResult $ execParserPure (prefs idm) parser args
 
 lycoParser :: ParserInfo LycoCommand
 lycoParser = info (helper <*> commandParser) ( progDesc "tool belt for personal task management." )

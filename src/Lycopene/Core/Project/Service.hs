@@ -5,17 +5,17 @@ import           Lycopene.Core.Database
 import qualified Lycopene.Core.Project.Entity as E
 
 
-allProjects :: LycopeneT Persist [E.Project]
-allProjects = liftL $ relationP E.project ()
+allProjects :: Lycopene [E.Project]
+allProjects = runPersist $ relationP E.project ()
 
-newProject :: E.ProjectV -> LycopeneT Persist Integer
-newProject p = liftL $ insertP E.insertProjectV p
+newProject :: E.ProjectV -> Lycopene Integer
+newProject p = runPersist $ insertP E.insertProjectV p
 
-projectByName :: String -> LycopeneT Persist [E.Project]
-projectByName name = liftL $ relationP E.selectByName name
+projectByName :: String -> Lycopene [E.Project]
+projectByName name = runPersist $ relationP E.selectByName name
 
-inbox :: LycopeneT Persist Integer
-inbox = liftL $ insertP E.insertProject E.Project
+inbox :: Lycopene Integer
+inbox = runPersist $ insertP E.insertProject E.Project
                                         { E.projectId = 0
                                         , E.name = "inbox"
                                         , E.description = Just "The global default project."
