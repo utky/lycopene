@@ -10,11 +10,13 @@ module Lycopene.Process.Internal.Core
   , yieldWriter
   , printer
   , choice
+  , serialize
   , debug
   , info
   , warn
   , error
   , fatal
+  , printStdOut
   , module Pipes
   ) where
 
@@ -61,17 +63,24 @@ yieldWriter
   :: (Monad m, Monoid w)
   => Proxy a' a () b (W.WriterT w m) r
   -> Proxy a' a () (Either w b) m r
-yieldWriter p = let right = P.map Right
-                    wp    = runWriterP p
-                    writtenP = fmap snd wp
-                    valueP = fmap fst wp
-                in (writtenP >-> P.drain) >>= (yield . Left) >> (valueP >-> right)
+yieldWriter p = do
+  let right = P.map Right
+  --    wp    = runWriterP p
+  --    writtenP = fmap snd wp
+  --    valueP = fmap fst wp
+  --in (writtenP >-> P.drain) >>= (yield . Left) >> (valueP >-> right)
+  (r, w) <- runWriterP (p >-> right)
+  yield $ Left w
+  return r
 
 printer :: (Monad m, PR.Print a) => Pipe a String m ()
 printer = P.map PR.printA
 
 eitherPrinter :: (Monad m, PR.Print a, PR.Print b) => Pipe (Either a b) (Either String String) m ()
 eitherPrinter = P.map (either (Left . PR.printA) (Right . PR.printA))
+
+printStdOut ::  MonadIO m => Consumer String m ()
+printStdOut = P.stdoutLn
 
 choice :: (Monad m) =>
           Consumer String m () -- Left type consumer
@@ -93,6 +102,9 @@ eachLeft = do
 
 left' :: (Monad m) => (a -> b) -> Pipe (Either a c) (Either b c) m ()
 left' f = P.map (either (Left . f) Right)
+
+serialize :: (Monad m) => Pipe (Either String String) String m ()
+serialize = P.map (either id id)
 
 runWriterPs
   :: (Monad m, Foldable f, Monoid (f a), PR.Print b, PR.Print a) =>

@@ -18,7 +18,10 @@ data IssueR = IssueR
              , rSprintName :: String
              , rStatus :: String
              , rTitle :: String
-             }
+             } deriving (Show)
+
+instance Eq IssueR where
+  x == y = rIssueId x == rIssueId y
 
 $(makeRecordPersistableDefault ''IssueR)
 

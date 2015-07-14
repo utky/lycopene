@@ -31,8 +31,8 @@ lycopene :: Arguments ->  Configuration -> ProcessEnv -> IO ()
 lycopene args conf psenv = let cmd = execParserWithArgs lycoParser args
                                runProcess' = flip runProcess psenv
                                buildProcess' = flip buildProcess conf
-                               execCmd = runEffect . runProcess' . buildProcess'
-                           in cmd >>= execCmd
+                               -- execCmd = runEffect . runProcess' . buildProcess'
+                           in cmd >>= runCommand conf
 
 
 

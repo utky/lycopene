@@ -14,6 +14,7 @@ import Lycopene.Option.Version
 import Lycopene.Option.Configure
 import Lycopene.Option.Init
 import Lycopene.Option.Ls
+import Lycopene.Option.Project
 import Lycopene.Option.New
 import Lycopene.Option.Run
 -- import Lycopene.Option.Project
@@ -44,5 +45,6 @@ subcommand = subparser
            <> command "init" initProject
            <> command "ls" listIssues
            <> command "new" newIssue
+           <> command "pj" listProjects
            <> command "run" runTimer
            )

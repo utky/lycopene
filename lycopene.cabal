@@ -50,6 +50,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     Lycopene
                        Lycopene.Core
+                       Lycopene.Core.Monad
                        Lycopene.Core.Context
                        Lycopene.Core.Free
                        Lycopene.Core.Database
@@ -71,9 +72,6 @@ library
                        Lycopene.Core.Record.Entity
                        Lycopene.Core.Record.Service
                        Lycopene.Core.Resource
-                       Lycopene.Action
-                       Lycopene.Action.Domain
-                       Lycopene.Action.FileSystem
                        Lycopene.Environment
                        Lycopene.Configuration
                        Lycopene.Option
@@ -90,11 +88,15 @@ library
                        Lycopene.Process
                        Lycopene.Process.Internal
                        Lycopene.Process.Internal.Core
-                       Lycopene.Process.Configure
-                       Lycopene.Process.Version
-                       Lycopene.Process.Init
-                       Lycopene.Process.Ls
-                       Lycopene.Process.New
+                       Lycopene.Action
+                       Lycopene.Action.Domain
+                       Lycopene.Action.FileSystem
+                       Lycopene.Action.Configure
+                       Lycopene.Action.Version
+                       Lycopene.Action.Init
+                       Lycopene.Action.Ls
+                       Lycopene.Action.Pj
+                       Lycopene.Action.New
                        Lycopene.Resource
                        Lycopene.Logger
                        Lycopene.Print

@@ -1,4 +1,4 @@
-module Lycopene.Process.Init where
+module Lycopene.Action.Init where
 
 import           System.FilePath (splitFileName, (</>))
 import           System.Directory (getCurrentDirectory)
@@ -9,8 +9,7 @@ import qualified Lycopene.Core.Sprint as Sprint
 
 
 initialize :: Maybe String -> Maybe String -> FilePath -> Action Integer
-initialize n d p = domain newProjectId where
-  newProjectId = do
+initialize n d p = domain $ do
     path <- liftIO $ flip expandCurrent p <$> getCurrentDirectory
     let (_, dirname) = splitFileName path
         name = case n of

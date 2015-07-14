@@ -11,9 +11,9 @@ import           Control.Monad.Except
 
 import           Lycopene.Core.Context
 
-data LycoError = ValidationFailure String
-               | PersistentError String
-               deriving (Show)
+data LycoError = ValidationFailure !String
+               | PersistentError !String
+               deriving (Show, Eq)
 
 newtype Lycopene a = Lyco { unLyco :: ReaderT Context (ExceptT LycoError IO) a }
 

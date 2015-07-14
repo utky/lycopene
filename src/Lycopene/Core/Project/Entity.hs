@@ -9,6 +9,9 @@ import           Lycopene.Core.Database (defineTable)
 
 $(defineTable "project")
 
+instance Eq Project where
+  x == y = projectId x == projectId y
+
 selectByName :: Relation String Project
 selectByName = relation' . placeholder $ \ph -> do
   p <- query project

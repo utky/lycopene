@@ -1,5 +1,5 @@
 module Lycopene.Core.Resource
-    ( Resource
+    ( Resource(..)
     , runResource
     , file
     , connection

@@ -5,12 +5,12 @@ module Lycopene.Action.FileSystem where
 import           System.Directory (doesDirectoryExist, doesFileExist, createDirectoryIfMissing)
 
 -- | Action over file system.
-data FsAction a = IsDir !FilePath (Bool -> a)
-                | IsFile !FilePath (Bool -> a)
-                | Read !FilePath (String -> a)
-                | Write !FilePath String a
-                | Append !FilePath String a
-                | MkDir !FilePath a
+data FsAction a = IsDir FilePath (Bool -> a)
+                | IsFile FilePath (Bool -> a)
+                | Read FilePath (String -> a)
+                | Write FilePath String a
+                | Append FilePath String a
+                | MkDir FilePath a
 
 runFsAction :: FsAction a -> IO a
 runFsAction (IsDir  p fb ) = fb <$> doesDirectoryExist p

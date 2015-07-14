@@ -1,4 +1,4 @@
-module PersistSpec (spec) where
+module Lycopene.PersistSpec (spec) where
 
 import Test.Hspec
 
@@ -26,9 +26,6 @@ spec = do
 
     it "should insert bulk Project" $ do
       runP' insert1 `shouldReturn` 1
-
-    it "should insert value ProjectV" $ do
-      pendingWith "not implemented"
 
     it "should query Project" $ do
       let projects = relationP Project.project ()

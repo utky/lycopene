@@ -1,3 +1,9 @@
 #!/bin/sh
 
-rm -rf ${HOME}/.lyco && cp ./dist/build/lyco/lyco ${HOME}/bin && ${HOME}/bin/lyco configure
+lycohome="${HOME}/.lyco"
+
+if [ -d ${lycohome} ] ; then
+    rm -r ${lycohome}
+fi
+
+./dist/build/lyco/lyco configure

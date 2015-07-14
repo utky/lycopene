@@ -6,6 +6,7 @@ import           Lycopene.Core.Database
 import qualified Lycopene.Core.Issue.Entity as E
 import qualified Lycopene.Core.Sprint as Sprint
 
+
 data IssueRequest = IssueRequest
                   { irTitle :: String
                   , irDescription :: Maybe String

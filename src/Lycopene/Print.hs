@@ -74,6 +74,7 @@ instance Print I.Issue where
          <&> I.title
          <&> option . I.description
 
+
 instance Print I.IssueR where
   printA =   show . I.rIssueId
          <&> I.rProjectName
@@ -89,3 +90,7 @@ instance Print R.Record where
 
 instance Print LogMessage where
   printA = show
+
+instance Print () where
+  printA _ = ""
+
