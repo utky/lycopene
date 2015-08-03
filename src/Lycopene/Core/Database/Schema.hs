@@ -19,8 +19,8 @@ CREATE TABLE sprint (
   name TEXT NOT NULL,
   description TEXT,
   project_id INTEGER NOT NULL,
-  start_on INTEGER,
-  end_on INTEGER,
+  start_on TIMESTAMP,
+  end_on TIMESTAMP,
   UNIQUE (name, project_id),
   FOREIGN KEY(project_id) REFERENCES project(project_id)
 );
@@ -45,8 +45,8 @@ CREATE TABLE issue (
 CREATE TABLE record (
   record_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   issue_id INTEGER NOT NULL,
-  start_on INTEGER,
-  end_on INTEGER,
+  start_on TIMESTAMP NOT NULL,
+  end_on TIMESTAMP,
   FOREIGN KEY(issue_id) REFERENCES issue(issue_id)
 );
 

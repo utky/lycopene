@@ -15,7 +15,6 @@ spec = do
   describe "Configure" $ do
     it "return created inbox" $ do
       let exp = Project 0 inboxProjectName (Just inboxProjectDesc)
-          actionBody = configure >> domain allProjects
-          action = runAction config actionBody
-      handleResult action `shouldSuccess` [exp]
+          action = configure >> domain allProjects
+      action `shouldSuccess` [exp]
 

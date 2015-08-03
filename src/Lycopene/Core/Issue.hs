@@ -5,3 +5,4 @@ module Lycopene.Core.Issue
 
 import           Lycopene.Core.Issue.Entity
 import           Lycopene.Core.Issue.Service
+

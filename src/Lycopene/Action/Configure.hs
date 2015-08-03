@@ -2,7 +2,6 @@ module Lycopene.Action.Configure where
 
 import           Lycopene.Action
 import           Lycopene.Environment (createDatabase)
-import           Lycopene.Core
 import           Lycopene.Core.Project as Project
 import           Lycopene.Core.Sprint as Sprint
 

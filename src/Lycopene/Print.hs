@@ -5,14 +5,19 @@ module Lycopene.Print (Print(..)) where
 import           Data.Monoid
 import           Data.Maybe (fromMaybe)
 import qualified Data.Text as T
+import           Data.Time.Format (formatTime, FormatTime, defaultTimeLocale)
 import qualified Lycopene.Core.Project as P
 import qualified Lycopene.Core.Sprint as S
 import qualified Lycopene.Core.Issue as I
 import qualified Lycopene.Core.Record as R
 import           Lycopene.Logger (LogMessage)
 
+formatAsTime :: FormatTime t => t -> String
+formatAsTime = formatTime defaultTimeLocale  "%Y-%m-%d %H:%M:%S"
+
+
 option :: (Monoid a) => Maybe a -> a
-option ma = fromMaybe mempty ma
+option = fromMaybe mempty
 
 sep :: String
 sep = "\t"
@@ -64,8 +69,8 @@ instance Print S.Sprint where
          <&> option . S.description
          <&> show . S.projectId
          -- FIXME: Date like 2015-04-23
-         <&> option . fmap show . S.startOn
-         <&> option . fmap show . S.endOn
+         <&> option . fmap formatAsTime . S.startOn
+         <&> option . fmap formatAsTime . S.endOn
 
 instance Print I.Issue where
   printA =   show . I.issueId
@@ -85,8 +90,9 @@ instance Print I.IssueR where
 instance Print R.Record where
   printA =   show . R.recordId
          <&> show . R.issueId
-         <&> option . fmap show . R.startOn
-         <&> option . fmap show . R.endOn
+         -- <&> formatTime . posixSecondsToUTCTime . R.startOn
+         <&> formatAsTime . R.startOn
+         <&> option . fmap formatAsTime . R.endOn
 
 instance Print LogMessage where
   printA = show

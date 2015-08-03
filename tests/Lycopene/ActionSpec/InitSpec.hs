@@ -12,6 +12,6 @@ spec :: Spec
 spec = do
   describe "Init" $ do
     it "create project and return new project id 1" $ do
-      runWithDB (initialize (Just "new-project") Nothing ".") `shouldSuccess` 1
+      initialize (Just "new-project") Nothing "." `shouldSuccess` 1
 
 

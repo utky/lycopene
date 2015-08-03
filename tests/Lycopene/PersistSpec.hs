@@ -6,7 +6,7 @@ import           Lycopene.Core.Database
 import qualified Lycopene.Core.Project as Project
 import           Lycopene.Configuration
 
-config = Configuration "blah" ":memory:" 0
+config = defaultConfiguration
 
 runP :: Persist a -> IO a
 runP p = connect config >>= unPersist p

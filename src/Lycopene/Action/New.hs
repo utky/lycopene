@@ -6,10 +6,10 @@ import           Lycopene.Core.Issue as Issue
 
 
 newIssue :: String -> Maybe String -> Action ()
-newIssue title mDesc = domain $ do
+newIssue _title mDesc = domain $ do
   pjId <- targetProject `fmap` context 
   _ <- Issue.newIssue IssueRequest 
-                      { irTitle = title
+                      { irTitle = _title
                       , irDescription = mDesc
                       , irProjectId = pjId
                       }

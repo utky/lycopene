@@ -4,7 +4,6 @@ import           Lycopene.Core
 import           Lycopene.Configuration
 import           Control.Monad.Except (ExceptT(..), runExceptT)
 import           Control.Monad.Reader (ReaderT(..))
-import           Database.HDBC (withTransaction)
 
 import           Lycopene.Action.Domain
 import qualified Lycopene.Action.FileSystem as FS
@@ -40,8 +39,7 @@ runWithContext ctx action =
 
 runAction :: Configuration -> Action a -> ActionResult a
 runAction cfg action = 
-  let handleFree = (>>= runAction cfg)
-  in case action of
+  case action of
        (Pure x)               -> actionResult . return . Right $ x
        (Free (MkFsAction f))  -> runAction cfg =<< actionResult (fmap Right (FS.runFsAction f))
        (Free (MkDomain d))    -> let ctxrs = fetchResource cfg

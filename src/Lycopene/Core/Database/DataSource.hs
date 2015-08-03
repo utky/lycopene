@@ -45,6 +45,7 @@ convTypes =
         [ ("float", [t|Double|])
         , ("date", [t|Day|])
         , ("datetime", [t|LocalTime|])
+        , ("timestamp", [t|LocalTime|])
         , ("double", [t|Double|])
         , ("varchar", [t|String|])
         , ("integer", [t|Integer|])

@@ -26,3 +26,8 @@ newIssue ir = do
 listOpenIssues :: Integer -> Lycopene [E.IssueR]
 listOpenIssues pjId = runPersist $ relationP E.openIssues (pjId, E.openStatus)
 
+
+closeIssue :: Integer -> Lycopene Integer
+closeIssue i = runPersist $ updateP E.toggleIssue (E.closeStatus, i)
+
+

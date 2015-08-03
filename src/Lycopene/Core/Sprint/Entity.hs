@@ -3,6 +3,7 @@
 {-# LANGUAGE FlexibleInstances     #-}
 module Lycopene.Core.Sprint.Entity where
 
+import           Data.Time.LocalTime
 import           Database.HDBC.Query.TH (makeRecordPersistableDefault)
 import           Database.Relational.Query
 import           Lycopene.Core.Database (defineTable)
@@ -10,6 +11,13 @@ import           Lycopene.Core.Database (defineTable)
 $(defineTable "sprint")
 
 $(defineTable "backlog_sprint")
+
+selectByProject :: Relation Integer Sprint
+selectByProject = relation' . placeholder $ \ph -> do  
+  s <- query sprint
+  wheres $ s ! projectId' .=. ph
+  return s
+
 
 selectByProjectAndName :: Relation (Integer, String) Sprint
 selectByProjectAndName = relation' . placeholder $ \ph -> do  
@@ -28,8 +36,8 @@ data SprintV = SprintV
              { vName :: String
              , vDescription :: Maybe String
              , vProjectId :: Integer
-             , vStartOn :: Maybe Integer
-             , vEndOn :: Maybe Integer}
+             , vStartOn :: Maybe LocalTime
+             , vEndOn :: Maybe LocalTime}
 
 $(makeRecordPersistableDefault ''SprintV)
 

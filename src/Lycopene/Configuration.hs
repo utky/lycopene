@@ -6,12 +6,18 @@ module Lycopene.Configuration
 data Configuration = Configuration
                    { lycoHome :: FilePath
                    , datapath :: String
-                   , targetProject :: Integer
+                   , projectConf :: FilePath
+                   , pomodoroMinutes :: Int
+                   , shortBreakMinutes :: Int
+                   , longBreakMinutes :: Int
                    }
 
 defaultConfiguration :: Configuration
 defaultConfiguration = Configuration
                      { lycoHome = "."
                      , datapath = ":memory:"
-                     , targetProject = 0
+                     , projectConf = ".lyco.conf"
+                     , pomodoroMinutes = 25
+                     , shortBreakMinutes = 5
+                     , longBreakMinutes = 15
                      }

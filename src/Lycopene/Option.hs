@@ -15,8 +15,12 @@ import Lycopene.Option.Configure
 import Lycopene.Option.Init
 import Lycopene.Option.Ls
 import Lycopene.Option.Project
+import Lycopene.Option.Sp
+import Lycopene.Option.Hs
 import Lycopene.Option.New
 import Lycopene.Option.Run
+import Lycopene.Option.Done
+import Lycopene.Configuration
 -- import Lycopene.Option.Project
 --
 
@@ -32,19 +36,22 @@ type Arguments = [String]
 execParserWithArgs :: ParserInfo a -> Arguments -> IO a
 execParserWithArgs parser args = handleParseResult $ execParserPure (prefs idm) parser args
 
-lycoParser :: ParserInfo LycoCommand
-lycoParser = info (helper <*> commandParser) ( progDesc "tool belt for personal task management." )
+lycoParser :: Configuration -> ParserInfo LycoCommand
+lycoParser conf = info (helper <*> commandParser conf) ( progDesc "tool belt for personal task management." )
 
-commandParser :: Parser LycoCommand
-commandParser = LycoCommand <$> commonOption <*> subcommand
+commandParser :: Configuration ->  Parser LycoCommand
+commandParser conf = LycoCommand <$> commonOption <*> subcommand conf
 
-subcommand :: Parser Command
-subcommand = subparser
-           ( command "version" version
+subcommand :: Configuration -> Parser Command
+subcommand conf = subparser
+           (  command "version" version
            <> command "configure" configureDB
-           <> command "init" initProject
+           <> command "init" (initProject conf)
            <> command "ls" listIssues
            <> command "new" newIssue
            <> command "pj" listProjects
+           <> command "sp" listSprints
+           <> command "hs" recordHistory
            <> command "run" runTimer
+           <> command "done" doneIssue
            )

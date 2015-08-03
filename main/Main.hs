@@ -3,23 +3,19 @@ module Main
         ) where
 
 import           Lycopene
-import           Lycopene.Process (ProcessEnv(..))
-import qualified System.IO as IO
-import           System.Exit
 import           System.Environment
 import           System.FilePath
-import           System.Directory (getHomeDirectory)
+import           System.Directory (getHomeDirectory, getCurrentDirectory)
 
 
 main :: IO ()
-main = let psenv     = ProcessEnv
-                       { hOut = IO.stdout
-                       , hErr = IO.stderr
-                       , hIn  = IO.stdin
-                       }
-           conf home = Configuration
-                       { lycoHome = home </> ".lyco"
-                       , datapath = home </> ".lyco" </> "issues.db"
-                       , targetProject = 0
-                       }
-       in  (,) <$> getArgs <*> getHomeDirectory >>= (\(args, home) -> lycopene args (conf home) psenv)
+main = let conf home cd = defaultConfiguration
+                        { lycoHome = home </> ".lyco"
+                        , datapath = home </> ".lyco" </> "issues.db"
+                        , projectConf = cd </> ".lyco.conf"
+                        }
+       in do
+         args <- getArgs
+         home <- getHomeDirectory
+         cd   <- getCurrentDirectory
+         lycopene args (conf home cd)

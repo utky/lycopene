@@ -10,9 +10,17 @@ import           Lycopene.Core
 import           Debug.Trace (trace)
 
 config :: Configuration
-config = Configuration "." ":memory:" 0
+config = defaultConfiguration
+         { datapath = ":memory:"
+         }
+
+withDB :: Action a -> Action a
+withDB = (>>) configure
 
 runWithDB :: Action a -> IO (Either LycoError a)
-runWithDB x = handleResult $ runAction config (configure >> x) 
+runWithDB x = handleResult $ runAction config (withDB x) 
 
-x `shouldSuccess` y = x `shouldReturn` Right y
+shouldSuccess :: (Eq a, Show a) => Action a -> a -> Expectation
+fa `shouldSuccess` a = do
+  e <- handleResult $ runAction config (fmap (`shouldBe` a) fa)
+  either (\_ -> expectationFailure "hahaha") id e

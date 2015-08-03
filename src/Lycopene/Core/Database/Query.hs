@@ -5,6 +5,7 @@ module Lycopene.Core.Database.Query
                 , relationP
                 , insertP
                 , updateP
+                , kupdateP
                 , module Lycopene.Core.Database.Persist
                 ) where
 
@@ -12,13 +13,18 @@ module Lycopene.Core.Database.Query
 import           Database.Relational.Query
 import           Database.Record.FromSql
 import           Database.Record.ToSql
-import           Database.HDBC.Record.Query (runQuery)
-import           Database.HDBC.Record.Insert (runInsert)
-import           Database.HDBC.Record.KeyUpdate (runKeyUpdate)
+import           Database.HDBC.Record
+-- import           Database.HDBC.Record.Query (runQuery)
+-- import           Database.HDBC.Record.Insert (runInsert)
+-- import           Database.HDBC.Record.KeyUpdate (runKeyUpdate)
 import           Database.HDBC
 import           Lycopene.Core.Database.Persist
 
 
+instance ShowConstantTermsSQL Integer where
+  showConstantTermsSQL' = let f :: Integer -> Int
+                              f = fromInteger
+                          in showConstantTermsSQL' . f
 
 -- Lift method
 -- ----------------------------------------------------------------
@@ -30,7 +36,7 @@ queryP q p = Persist $ runnableQuery q p where
 
 -- |
 relationP :: (FromSql SqlValue a, ToSql SqlValue p) => Relation p a -> p -> Persist [a]
-relationP r p = queryP (relationalQuery r) p
+relationP r = queryP (relationalQuery r)
 
 -- |
 insertP :: ToSql SqlValue a => Insert a -> a -> Persist Integer
@@ -38,9 +44,13 @@ insertP i a = Persist $ runnableInsert i a where
   runnableInsert ins entity conn = runInsert conn ins entity
 
 -- |
-updateP :: ToSql SqlValue a => KeyUpdate p a -> a -> Persist Integer
-updateP k a = Persist $ runnableKeyUpdate k a where
+kupdateP :: ToSql SqlValue a => KeyUpdate p a -> a -> Persist Integer
+kupdateP k a = Persist $ runnableKeyUpdate k a where
   runnableKeyUpdate kupd entity conn = runKeyUpdate conn kupd entity
+
+updateP :: ToSql SqlValue p => Update p -> p -> Persist Integer
+updateP u p = Persist $ \c -> runUpdate c u p
+
 
 -------------------------------------------------------------------------------
 -- | Transient data

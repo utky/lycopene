@@ -1,6 +1,7 @@
 module Lycopene.Action.Domain where
 
 
+import           System.Directory (doesFileExist)
 import           Database.HDBC.Sqlite3 (connectSqlite3)
 import           Control.Monad.Reader (ReaderT(..))
 
@@ -23,8 +24,18 @@ mapDomain l = ReaderT $ runLycopene l
 connectDataSource :: Configuration -> Resource DataSource
 connectDataSource = (fmap mkDataSource) . connection . connectSqlite3 . datapath
 
+readProjectId :: String -> Integer
+readProjectId = read
+
+readFileR :: FilePath -> Resource Integer
+readFileR path = Resource $ do
+  exists <- doesFileExist path
+  if exists
+    then (fmap readProjectId . readFile) path >>= (\c -> return (c, return()))
+    else return (0, return())
+
 fetchResource :: Configuration -> Resource Context
 fetchResource cfg = Context
-                    <$> return 0 -- FIXME
+                    <$> (readFileR . projectConf) cfg
                     <*> connectDataSource cfg
 

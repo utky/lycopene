@@ -17,11 +17,14 @@ data Command =
              | Configure
              | Init (Maybe String) (Maybe String) FilePath
              | New String (Maybe String)
-             | Mod (Maybe String) (Maybe String)
+             | Rd Integer
+             | Mod Integer (Maybe String) (Maybe String)
+             | Done Integer
              | Ls Bool
              | Pj
              | Sp
-             | Run (Maybe Integer) (Maybe Int)
+             | Hs Integer
+             | Run Integer (Maybe Int) (Maybe String)
              deriving (Show)
 
 -------------------------------------------------------------------------------

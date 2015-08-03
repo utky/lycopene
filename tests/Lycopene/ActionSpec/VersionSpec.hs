@@ -14,4 +14,4 @@ spec :: Spec
 spec = do
   describe "Version" $ do
     it "return version" $ do
-      runWithDB version `shouldSuccess` showVersion P.version
+      version `shouldSuccess` showVersion P.version

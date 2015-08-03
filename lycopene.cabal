@@ -83,8 +83,12 @@ library
                        Lycopene.Option.New
                        Lycopene.Option.Internal
                        Lycopene.Option.Project
+                       Lycopene.Option.Sp
                        Lycopene.Option.Version
+                       Lycopene.Option.Rd
                        Lycopene.Option.Run
+                       Lycopene.Option.Hs
+                       Lycopene.Option.Done
                        Lycopene.Process
                        Lycopene.Process.Internal
                        Lycopene.Process.Internal.Core
@@ -96,7 +100,12 @@ library
                        Lycopene.Action.Init
                        Lycopene.Action.Ls
                        Lycopene.Action.Pj
+                       Lycopene.Action.Rd
+                       Lycopene.Action.Sp
                        Lycopene.Action.New
+                       Lycopene.Action.Run
+                       Lycopene.Action.Hs
+                       Lycopene.Action.Done
                        Lycopene.Resource
                        Lycopene.Logger
                        Lycopene.Print

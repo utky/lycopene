@@ -10,7 +10,7 @@ import qualified Lycopene.Core.Project as P
 import qualified Lycopene.Core.Sprint as S
 
 config :: Configuration
-config = Configuration "bla" ":memory:" 0
+config = defaultConfiguration
 
 context' :: IO Context
 context' = connect config >>= \c ->

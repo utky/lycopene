@@ -1,7 +1,6 @@
 module Lycopene.Action.Pj where
 
 import           Lycopene.Action
-import           Lycopene.Core
 import qualified Lycopene.Core.Project as Project
 
 

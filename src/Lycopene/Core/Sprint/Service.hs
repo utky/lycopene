@@ -1,6 +1,7 @@
 module Lycopene.Core.Sprint.Service where
 
 import           Lycopene.Core.Monad
+import           Lycopene.Core.Context
 import           Lycopene.Core.Database
 import qualified Lycopene.Core.Sprint.Entity as E
 import qualified Lycopene.Core.Project as Project
@@ -30,6 +31,11 @@ newSprint sv = runPersist $ insertP E.insertSprintV sv
 
 sprintByProjectAndName :: Integer -> String -> Lycopene [E.Sprint]
 sprintByProjectAndName pj nm = runPersist $ relationP E.selectByProjectAndName (pj, nm)
+
+sprintByProject :: Lycopene [E.Sprint]
+sprintByProject = do
+  pj <- fmap targetProject context
+  runPersist $ relationP E.selectByProject pj
 
 inboxBacklog :: Lycopene Integer
 inboxBacklog = runPersist $ insertP E.insertBacklogSprint (E.BacklogSprint 0 0)
