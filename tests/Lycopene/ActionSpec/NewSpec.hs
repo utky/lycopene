@@ -23,5 +23,5 @@ spec = do
              , rStatus = "open"
              , rTitle = "issue title"
              }
-      (newIssue (rTitle expected) Nothing >> listIssues True) `shouldSuccess` [expected]
+      withDB (newIssue (rTitle expected) Nothing >> listIssues True) `shouldSuccess` [expected]
 

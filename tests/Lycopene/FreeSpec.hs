@@ -1,4 +1,4 @@
-module Lycopene.FreeSpec (spec) where
+module Lycopene.FreeSpec (main, spec) where
 
 
 import           Test.Hspec
@@ -41,6 +41,8 @@ prop_applicative_interchange_law x =
 
 prop_identity_for_foldF :: Int -> Bool
 prop_identity_for_foldF x = x == foldF runIdentity (liftPure x)
+
+main = hspec spec
 
 spec :: Spec
 spec = do

@@ -59,6 +59,7 @@ library
                        Lycopene.Core.Database.Persist
                        Lycopene.Core.Database.Query
                        Lycopene.Core.Database.Schema
+                       Lycopene.Core.Database.Type
                        Lycopene.Core.Project
                        Lycopene.Core.Project.Entity
                        Lycopene.Core.Project.Service
@@ -111,24 +112,25 @@ library
                        Lycopene.Print
                        Paths_lycopene
   -- other-modules:
-  build-depends:       base                    >= 4.6
+  build-depends:       base
                        , text
                        , time 
                        , filepath
                        , directory
                        , bytestring
                        , mtl
+                       , free
                        , transformers
                        , HDBC
                        , template-haskell
                        , HDBC-sqlite3
-                       , relational-record     >= 0.1
-                       , relational-query      >= 0.1
-                       , relational-query-HDBC >= 0.1
-                       , persistable-record    >= 0.1
-                       , HDBC-session          >= 0.1
-                       , pipes                >= 4.1
-                       , optparse-applicative >= 0.10   && < 0.12
+                       , relational-record
+                       , relational-query
+                       , relational-query-HDBC
+                       , persistable-record
+                       , HDBC-session
+                       , pipes
+                       , optparse-applicative
 
   ghc-options:         -Wall
 
@@ -144,7 +146,7 @@ executable lyco
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
-  build-depends:       base                   >= 4.6
+  build-depends:       base
                        , filepath
                        , directory
                        , lycopene
@@ -161,9 +163,9 @@ test-suite spec
   type:                exitcode-stdio-1.0
   main-is:             spec.hs
   hs-source-dirs:      tests
-  build-depends:       base                   >= 4.6
+  build-depends:       base
                        , mtl
-                       , hspec                >= 1.11
+                       , hspec
                        , QuickCheck
                        , directory
                        , filepath

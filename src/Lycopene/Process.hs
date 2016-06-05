@@ -35,11 +35,11 @@ runCommand :: Configuration -> LycoCommand -> IO ()
 runCommand cfg (LycoCommand commonOpt cmd) =
   let execAction :: Action () -> IO ()
       execAction = (>>= either print return) . handleResult . runAction cfg
-      subcmd Version                 = execAction $ version >>= send
-      subcmd Configure               = execAction $ (prepareConfigure (datapath cfg) >> configure >> return (datapath cfg)) >>= send
-      subcmd (Init mName mDesc path) = execAction $ initialize mName mDesc path >>= send
+      subcmd Version                 = execAction (version >>= send)
+      subcmd Configure               = execAction ((prepareConfigure (datapath cfg) >> configure >> return (datapath cfg)) >>= send)
+      subcmd (Init mName mDesc path) = execAction (initialize mName mDesc path >>= send)
       subcmd (Ls showAll)            = execAction (listIssues showAll >>= mapM_ send)
-      subcmd (New iTitle mDesc)      = execAction $ newIssue iTitle mDesc >>= send
+      subcmd (New iTitle mDesc)      = execAction (newIssue iTitle mDesc >>= send)
       subcmd Pj                      = execAction (listProjects >>= mapM_ send)
       subcmd Sp                      = execAction (listSprints >>= mapM_ send)
       subcmd (Hs i)                  = execAction (listHistories i >>= mapM_ send)

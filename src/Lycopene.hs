@@ -12,5 +12,7 @@ import           Lycopene.Process
 type Arguments = [String]
 
 lycopene :: Arguments ->  Configuration -> IO ()
-lycopene args conf = execParserWithArgs (lycoParser conf) args >>= runCommand conf
+lycopene args conf = do
+  cmd <- execParserWithArgs (lycoParser conf) args
+  runCommand conf cmd
 

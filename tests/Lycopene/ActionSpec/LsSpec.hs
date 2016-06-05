@@ -13,4 +13,4 @@ spec :: Spec
 spec = do
   describe "Ls" $ do
     it "returns empty list when there is no issue." $ do
-      listIssues True `shouldSuccess` []
+      withDB (listIssues True) `shouldSuccess` []
