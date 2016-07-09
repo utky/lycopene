@@ -1,7 +1,13 @@
-module Lycopene.Core.Record
-    ( module Lycopene.Core.Record.Entity
-    , module Lycopene.Core.Record.Service
-    ) where
+module Lycopene.Core.Record where
 
-import           Lycopene.Core.Record.Entity 
-import           Lycopene.Core.Record.Service
+import           Lycopene.Core.Scalar
+
+data Record
+    = Record
+    { recordId :: !Identifier
+    , recordStartOn :: !DateTime
+    , recordEndOn :: !DateTime
+    } deriving (Show)
+
+instance Eq Record where
+    x == y = (recordId x) == (recordId y)

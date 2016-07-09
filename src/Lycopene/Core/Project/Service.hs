@@ -1,8 +1,8 @@
 module Lycopene.Core.Project.Service where
 
 import           Lycopene.Core.Monad
-import           Lycopene.Core.Database
-import qualified Lycopene.Core.Project.Entity as E
+import           Lycopene.Database
+import qualified Lycopene.Core.Project as E
 
 inboxProjectName :: String
 inboxProjectName = "inbox"

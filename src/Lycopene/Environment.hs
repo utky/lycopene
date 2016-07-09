@@ -1,6 +1,6 @@
 module Lycopene.Environment where
 
-import           Lycopene.Core.Database
+import           Lycopene.Database
 import           Lycopene.Core.Monad
 
 createDatabase :: Lycopene ()

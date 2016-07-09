@@ -2,8 +2,8 @@ module Lycopene.Core.Issue.Service where
 
 import           Data.Maybe (fromMaybe)
 import           Lycopene.Core.Monad
-import           Lycopene.Core.Database
-import qualified Lycopene.Core.Issue.Entity as E
+import           Lycopene.Database
+import qualified Lycopene.Core.Issue as E
 import qualified Lycopene.Core.Sprint as Sprint
 
 

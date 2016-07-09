@@ -3,7 +3,7 @@ module Lycopene.Core.Sprint.Service where
 import           Lycopene.Core.Monad
 import           Lycopene.Core.Context
 import           Lycopene.Core.Database
-import qualified Lycopene.Core.Sprint.Entity as E
+import qualified Lycopene.Core.Sprint as E
 import qualified Lycopene.Core.Project as Project
 
 defaultSprintName :: String

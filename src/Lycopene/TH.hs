@@ -1,4 +1,4 @@
-module Lycopene.Core.TH
+module Lycopene.TH
       ( str
       ) where
 

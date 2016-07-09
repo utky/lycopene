@@ -5,7 +5,7 @@ import           Data.Time.Clock (getCurrentTime)
 import           Data.Time.LocalTime (utcToLocalTime, getCurrentTimeZone, LocalTime)
 import           Lycopene.Core.Monad
 import           Lycopene.Core.Database
-import qualified Lycopene.Core.Record.Entity as E
+import qualified Lycopene.Core.Record as E
 
 newRecord :: Integer -> LocalTime -> Lycopene Integer
 newRecord i st = do

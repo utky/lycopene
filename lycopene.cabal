@@ -49,78 +49,30 @@ library
   default-language:    Haskell2010
   hs-source-dirs:      src
   exposed-modules:     Lycopene
+                       Lycopene.Freer
                        Lycopene.Core
-                       Lycopene.Core.Monad
-                       Lycopene.Core.Context
-                       Lycopene.Core.Free
-                       Lycopene.Core.Database
-                       Lycopene.Core.Database.DataSource
-                       Lycopene.Core.Database.Datapath
-                       Lycopene.Core.Database.Persist
-                       Lycopene.Core.Database.Query
-                       Lycopene.Core.Database.Schema
-                       Lycopene.Core.Database.Type
+                       Lycopene.Core.Pure
                        Lycopene.Core.Project
-                       Lycopene.Core.Project.Entity
-                       Lycopene.Core.Project.Service
                        Lycopene.Core.Sprint
-                       Lycopene.Core.Sprint.Entity
-                       Lycopene.Core.Sprint.Service
                        Lycopene.Core.Issue
-                       Lycopene.Core.Issue.Entity
-                       Lycopene.Core.Issue.Service
                        Lycopene.Core.Record
-                       Lycopene.Core.Record.Entity
-                       Lycopene.Core.Record.Service
-                       Lycopene.Core.Resource
-                       Lycopene.Environment
-                       Lycopene.Configuration
-                       Lycopene.Option
-                       Lycopene.Option.Command
-                       Lycopene.Option.Common
-                       Lycopene.Option.Configure
-                       Lycopene.Option.Init
-                       Lycopene.Option.Ls
-                       Lycopene.Option.New
-                       Lycopene.Option.Internal
-                       Lycopene.Option.Project
-                       Lycopene.Option.Sp
-                       Lycopene.Option.Version
-                       Lycopene.Option.Rd
-                       Lycopene.Option.Run
-                       Lycopene.Option.Hs
-                       Lycopene.Option.Done
-                       Lycopene.Process
-                       Lycopene.Process.Internal
-                       Lycopene.Process.Internal.Core
-                       Lycopene.Action
-                       Lycopene.Action.Domain
-                       Lycopene.Action.FileSystem
-                       Lycopene.Action.Configure
-                       Lycopene.Action.Version
-                       Lycopene.Action.Init
-                       Lycopene.Action.Ls
-                       Lycopene.Action.Pj
-                       Lycopene.Action.Rd
-                       Lycopene.Action.Sp
-                       Lycopene.Action.New
-                       Lycopene.Action.Run
-                       Lycopene.Action.Hs
-                       Lycopene.Action.Done
-                       Lycopene.Resource
-                       Lycopene.Logger
-                       Lycopene.Print
                        Paths_lycopene
-  -- other-modules:
+  other-modules:       Lycopene.Core.Identifier
+                       Lycopene.Core.Scalar
+                       Lycopene.Core.Store
+                       Lycopene.Coyoneda
+                       Lycopene.Lens
   build-depends:       base
                        , text
                        , time 
                        , filepath
                        , directory
                        , bytestring
+                       , uuid
                        , mtl
                        , free
                        , transformers
+                       , containers
                        , HDBC
                        , template-haskell
                        , HDBC-sqlite3

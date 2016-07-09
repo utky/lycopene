@@ -1,6 +1,6 @@
 module Lycopene.Core.Context where
 
-import           Lycopene.Core.Database.DataSource (DataSource)
+import           Lycopene.Database.DataSource (DataSource)
 
 data Context = Context
              { targetProject :: Integer
