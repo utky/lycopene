@@ -41,13 +41,15 @@ data Project
   }
   deriving (Show)
 
--- Minimal lenses for Project
-_projectStatus :: Lens Project ProjectStatus
-_projectStatus = field projectStatus (\a s -> s { projectStatus = a })
-
 -- Project is identified by `projectId`
 instance Eq Project where
   x == y = (projectId x) == (projectId y)
+
+-- Minimal lenses for Project
+-- ==================================================================
+
+_projectStatus :: Lens Project ProjectStatus
+_projectStatus = field projectStatus (\a s -> s { projectStatus = a })
 
 -- Use cases of Project
 -- =======================================
@@ -76,12 +78,17 @@ data ProjectEvent a where
 
 -- | 
 processProjectEvent :: ProjectEvent a -> ProjectM a
-processProjectEvent (NewProject n d) = fmap projectId $ newProject n d
-processProjectEvent (FetchProject i) = fetchByIdProject i
+processProjectEvent (NewProject n d) =
+  (fmap projectId . addProject) $ newProject n d
+processProjectEvent (FetchProject i) =
+  fetchByIdProject i
 -- FIXME: eliminate in-memory filtering
-processProjectEvent ActiveProject= fmap (filter ((== Active) . projectStatus)) fetchAllProject
-processProjectEvent AllProjectEvent = fetchAllProject
-processProjectEvent (DeactivateProject i) = () <$ deactivateProject (fetchByIdProject i)
+processProjectEvent ActiveProject =
+  fmap (filter ((== Active) . projectStatus)) fetchAllProject
+processProjectEvent AllProjectEvent =
+  fetchAllProject
+processProjectEvent (DeactivateProject i) =
+  () <$ deactivateProject (fetchByIdProject i)
 
 -- | Operational primitives of Project
 --
@@ -98,6 +105,12 @@ processProjectEvent (DeactivateProject i) = () <$ deactivateProject (fetchByIdPr
 -- :>>= :: (a -> m b) -> m a -> m b
 -- :>> :: m a -> m b -> m b
 -- :<< :: m a -> m b -> m a
+-- いやここはADTではなく関数でやればいいけどそのためには
+-- ADTがMonadを要求するので結局Freerとかを使うことになる
+--
+-- が、仮に eval :: Monad m => f a -> m a
+-- であればADTがMonad則を満たしていなくてもよいかも。
+-- bind, joinなどは m a に委譲すればいいので。
 --
 -- ((Remove (Update f (Add (New n d)))) :>> (Fetch n))
 -- (f :<$> (Fetch n d))

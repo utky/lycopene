@@ -17,18 +17,18 @@ import           Lycopene.Core.Pure
 -- | A set of domain specific operation which emit value @a@.
 data Lycopene a
   = LProject (ProjectM a)
-  | LSprint  (SprintM a)
+--  | LSprint  (SprintM a)
 
 -- | 
 data Event a
   = EProject (ProjectEvent a)
-  | ESprint (SprintEvent a)
+--  | ESprint (SprintEvent a)
 
 -- | Entry point of domain.
 -- `process` returns commands of domain
 process :: Event a -> Lycopene a
 process (EProject x) = LProject $ processProjectEvent x
-process (ESprint x) = LSprint $ processSprintEvent x
+-- process (ESprint x) = LSprint $ processSprintEvent x
 
 feedback :: (a -> Event b) -> Lycopene a -> Event b
 feedback = undefined
