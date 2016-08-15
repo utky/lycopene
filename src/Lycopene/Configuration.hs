@@ -1,23 +1,11 @@
 module Lycopene.Configuration 
-    ( Configuration(..)
-    , defaultConfiguration
+    ( module Lycopene.Configuration.Data
+    , loadConfig
     ) where
 
-data Configuration = Configuration
-                   { lycoHome :: FilePath
-                   , datapath :: String
-                   , projectConf :: FilePath
-                   , pomodoroMinutes :: Int
-                   , shortBreakMinutes :: Int
-                   , longBreakMinutes :: Int
-                   }
+import           Lycopene.Configuration.Data (Configuration(..))
+import           Data.Yaml (decodeEither, ParseException(..))
+import qualified Data.ByteString as B
 
-defaultConfiguration :: Configuration
-defaultConfiguration = Configuration
-                     { lycoHome = "."
-                     , datapath = ":memory:"
-                     , projectConf = ".lyco.conf"
-                     , pomodoroMinutes = 25
-                     , shortBreakMinutes = 5
-                     , longBreakMinutes = 15
-                     }
+loadConfig :: FilePath -> IO (Either String Configuration)
+loadConfig p = fmap decodeEither $ B.readFile p

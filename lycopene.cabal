@@ -57,6 +57,10 @@ library
                        Lycopene.Core.Issue
                        Lycopene.Core.Record
                        Lycopene.Database.HDBC
+                       Lycopene.Option
+                       Lycopene.Option.Common
+                       Lycopene.Option.Command
+                       Lycopene.Option.Parser
                        --Lycopene.Database
                        --Lycopene.Database.DataSource
                        --Lycopene.Database.TH
@@ -95,6 +99,12 @@ library
                        , HDBC-session
                        , pipes
                        , optparse-applicative
+                       -- , aeson
+                       -- , attoparsec
+                       -- , servant
+                       -- , servant-server
+                       -- , wai
+                       -- , warp
 
   ghc-options:         -Wall
 

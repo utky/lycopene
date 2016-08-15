@@ -15,5 +15,4 @@ toProject = undefined
 -- |
 -- 'SELECT a, b, c FROM table WHERE x = ? AND y = ?'
 -- Select (x, y) (a, b, c)
-data Select a b = Select a b
 

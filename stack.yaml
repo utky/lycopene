@@ -2,7 +2,7 @@
 # For more information, see: http://docs.haskellstack.org/en/stable/yaml_configuration/
 
 # Specifies the GHC version and set of packages available (e.g., lts-3.5, nightly-2015-09-21, ghc-7.10.2)
-resolver: nightly-2015-07-30
+resolver: lts-6.6
 
 # Local packages, usually specified by relative directory name
 packages:
@@ -19,20 +19,21 @@ extra-deps:
 #  - sql-words-0.1.4.0
 #  - persistable-types-HDBC-pg-0.0.1.3
 #  - text-postgresql-0.0.2.0
-  - HDBC-2.4.0.1
-  - HDBC-session-0.1.0.1
-  - HDBC-sqlite3-2.3.3.1
-  - persistable-record-0.4.0.2
-  - relational-query-0.8.3.0
-  - relational-query-HDBC-0.6.0.2
-  - relational-record-0.1.5.0
-  - names-th-0.2.0.2
-  - persistable-types-HDBC-pg-0.0.1.4
-  - relational-schemas-0.1.3.1
-  - sql-words-0.1.4.1
-  - th-data-compat-0.0.2.2
-  - th-reify-compat-0.0.1.1
-  - text-postgresql-0.0.2.1
+#
+#  - HDBC-2.4.0.1
+#  - HDBC-session-0.1.0.1
+#  - HDBC-sqlite3-2.3.3.1
+#  - persistable-record-0.4.0.2
+#  - relational-query-0.8.3.0
+#  - relational-query-HDBC-0.6.0.2
+#  - relational-record-0.1.5.0
+#  - names-th-0.2.0.2
+#  - persistable-types-HDBC-pg-0.0.1.4
+#  - relational-schemas-0.1.3.1
+#  - sql-words-0.1.4.1
+#  - th-data-compat-0.0.2.2
+#  - th-reify-compat-0.0.1.1
+#  - text-postgresql-0.0.2.1
 
 
 # Override default flag values for local packages and extra-deps
@@ -61,4 +62,4 @@ extra-package-dbs: []
 
 nix:
   enable: true
-  packages: [ sqlite, perl, gmp ]
+  packages: [ sqlite, zlib ]

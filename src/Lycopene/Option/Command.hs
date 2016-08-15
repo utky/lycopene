@@ -15,16 +15,6 @@ data Command =
              Version
              -- | configure DIR
              | Configure
-             | Init (Maybe String) (Maybe String) FilePath
-             | New String (Maybe String)
-             | Rd Integer
-             | Mod Integer (Maybe String) (Maybe String)
-             | Done Integer
-             | Ls Bool
-             | Pj
-             | Sp
-             | Hs Integer
-             | Run Integer (Maybe Int) (Maybe String)
              deriving (Show)
 
 -------------------------------------------------------------------------------

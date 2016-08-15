@@ -2,14 +2,19 @@ module Main
         ( main
         ) where
 
--- import           Lycopene
-import           System.Environment
-import           System.FilePath
-import           System.Directory (getHomeDirectory, getCurrentDirectory)
-
+-- import           Lycopene (Lycopene)
+import           Lycopene.Option (execParserWithArgs, lycoParser)
+import           System.Environment (getArgs)
 
 main :: IO ()
-main = putStrLn "Hello world"
+main = do
+  args <- getArgs
+  cmd <- execParserWithArgs lycoParser args
+  putStrLn $ show cmd
+  -- result <- runApp config $ runCommand cmd
+  -- handleResult result
+  -- putStrLn "Hello world"
+
 -- main = let conf home cd = defaultConfiguration
 --                         { lycoHome = home </> ".lyco"
 --                         , datapath = home </> ".lyco" </> "issues.db"
