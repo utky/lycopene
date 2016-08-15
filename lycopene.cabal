@@ -57,12 +57,18 @@ library
                        Lycopene.Core.Issue
                        Lycopene.Core.Record
                        Lycopene.Database.HDBC
+                       Lycopene.Directory
+                       Lycopene.Environment
+                       Lycopene.Command
+                       Lycopene.Configuration
+                       Lycopene.Configuration.Data
                        Lycopene.Option
                        Lycopene.Option.Common
                        Lycopene.Option.Command
                        Lycopene.Option.Parser
-                       --Lycopene.Database
-                       --Lycopene.Database.DataSource
+                       Lycopene.Database
+                       Lycopene.Database.DataSource
+                       Lycopene.Database.Persist
                        --Lycopene.Database.TH
                        --Lycopene.Database.Datapath
                        -- Lycopene.Database.Query
@@ -99,6 +105,7 @@ library
                        , HDBC-session
                        , pipes
                        , optparse-applicative
+                       , yaml
                        -- , aeson
                        -- , attoparsec
                        -- , servant

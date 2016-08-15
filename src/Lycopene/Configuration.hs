@@ -4,7 +4,7 @@ module Lycopene.Configuration
     ) where
 
 import           Lycopene.Configuration.Data (Configuration(..))
-import           Data.Yaml (decodeEither, ParseException(..))
+import           Data.Yaml (decodeEither)
 import qualified Data.ByteString as B
 
 loadConfig :: FilePath -> IO (Either String Configuration)

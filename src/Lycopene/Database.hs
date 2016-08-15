@@ -1,7 +1,7 @@
 module Lycopene.Database
-        ( module Lycopene.Database.Query
-        , module Lycopene.Database.DataSource
+        ( module Lycopene.Database.DataSource
+        , module Lycopene.Database.Persist
         ) where
 
-import Lycopene.Database.Query
+import Lycopene.Database.Persist
 import Lycopene.Database.DataSource

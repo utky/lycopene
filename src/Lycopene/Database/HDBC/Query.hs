@@ -41,6 +41,3 @@ deletePersist d p = Persist (\conn -> runDelete conn d p)
 -- Apply query parameter @p@ to 'Relation'
 selectPersist :: (ToSql SqlValue p, FromSql SqlValue a) => Relation p a -> p -> Persist [a]
 selectPersist q p = Persist (\conn -> runQuery conn (relationalQuery q) p)
-
-persist :: Lycopene a -> Persist a
-persist (LProject p) = persistProject p

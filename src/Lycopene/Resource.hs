@@ -3,10 +3,11 @@ module Lycopene.Resource where
 import           Lycopene.Core (Resource(..))
 import           Lycopene.Option (LycoCommand(..), CommonOption(..), Command(..))
 import           Lycopene.Configuration (Configuration(..))
+import           Lycopene.Environment
+
 import           System.FilePath
 import           System.Directory (doesFileExist, doesDirectoryExist, getCurrentDirectory, getHomeDirectory)
 import           Data.Char (isDigit)
-
 
 
 

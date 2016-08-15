@@ -2,7 +2,7 @@
 module Lycopene.Database.Persist where
 
 
-import           Control.Monad.IO.Class (liftIO)
+import           Control.Monad.IO.Class (liftIO, MonadIO)
 import           Database.HDBC (IConnection, runRaw, withTransaction)
 
 -------------------------------------------------------------------------------
