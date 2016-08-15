@@ -5,9 +5,18 @@ module Lycopene.Database.Project where
 
 import           Database.HDBC.Query.TH (makeRecordPersistableDefault)
 import           Database.Relational.Query
-import           Lycopene.Database (defineTable)
+import           Lycopene.Database.TH
 
-$(defineTable "project")
+$(defineRelation
+  "project"
+  [ varchar "project_id"
+  , varchar "name"
+  , varchar "description"
+  , integer "status"
+  ]
+  [0]
+  (Just 0)
+  )
 
 instance Eq Project where
   x == y = projectId x == projectId y

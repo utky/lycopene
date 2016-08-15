@@ -56,16 +56,18 @@ library
                        Lycopene.Core.Sprint
                        Lycopene.Core.Issue
                        Lycopene.Core.Record
-                       Lycopene.Database
-                       Lycopene.Database.DataSource
-                       Lycopene.Database.Datapath
-                       Lycopene.Database.Query
-                       Lycopene.Database.Schema
-                       Lycopene.Database.Persist
-                       Lycopene.Database.Project
-                       Lycopene.Database.Sprint
-                       Lycopene.Database.Issue
-                       Lycopene.Database.Record
+                       Lycopene.Database.HDBC
+                       --Lycopene.Database
+                       --Lycopene.Database.DataSource
+                       --Lycopene.Database.TH
+                       --Lycopene.Database.Datapath
+                       -- Lycopene.Database.Query
+                       --Lycopene.Database.Schema
+                       --Lycopene.Database.Persist
+                       --Lycopene.Database.Project
+                       --Lycopene.Database.Sprint
+                       --Lycopene.Database.Issue
+                       --Lycopene.Database.Record
                        Paths_lycopene
   other-modules:       Lycopene.Core.Identifier
                        Lycopene.Core.Scalar

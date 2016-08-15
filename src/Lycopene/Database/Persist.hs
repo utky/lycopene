@@ -3,14 +3,7 @@ module Lycopene.Database.Persist where
 
 
 import           Control.Monad.IO.Class (liftIO)
-import           Database.HDBC (IConnection, runRaw, SqlValue, withTransaction, getTables)
-import           Database.Relational.Query
-import           Database.Record (ToSql, FromSql)
-import           Database.HDBC.Record
-
-import           Lycopene.Core.Monad
-import           Lycopene.Core.Context
-import           Lycopene.Database.DataSource (withDataSource)
+import           Database.HDBC (IConnection, runRaw, withTransaction)
 
 -------------------------------------------------------------------------------
 -- it could be better because `unPersist fa conn` is repeated.
@@ -40,41 +33,6 @@ instance Monad Persist where
 -- | Run database middleware and gain result with side-effect.
 runPersist :: ( IConnection conn , MonadIO m) => Persist r -> conn -> m r
 runPersist p conn = liftIO (withTransaction conn (unPersist p))
-
-
--- Lift method
--- ----------------------------------------------------------------
-
-
--- | Lift 'relational-record' 'Insert' DSL into Persist monad
--- Integer means count of record inserted
-insertPersist :: (ToSql SqlValue p) => Insert p -> p -> Persist Integer
-insertPersist i p = Persist (\conn -> runInsert conn i p)
-
--- | Lift 'relational-record' 'InsertQuery' DSL into Persist monad
--- Integer means count of record inserted
-insertQueryPersist :: (ToSql SqlValue p) => InsertQuery p -> p -> Persist Integer
-insertQueryPersist i p = Persist (\conn -> runInsertQuery conn i p)
-
--- | Lift 'relational-record' 'Update' DSL into Persist monad
--- Integer means count of record updated
-updatePersist :: (ToSql SqlValue p) => Update p -> p -> Persist Integer
-updatePersist u p = Persist (\conn -> runUpdate conn u p)
-
--- | Lift 'relational-record' 'KeyUpdate' DSL into Persist monad
--- Integer means count of record updated
-kupdatePersist :: (ToSql SqlValue a) => KeyUpdate p a -> a -> Persist Integer
-kupdatePersist u k = Persist (\conn -> runKeyUpdate conn u k)
-
--- | Lift 'relational-record' 'Delete' DSL into Persist monad
--- Integer means count of record deleted
-deletePersist :: (ToSql SqlValue p) => Delete p -> p -> Persist Integer
-deletePersist d p = Persist (\conn -> runDelete conn d p)
-
--- | Lift 'relational-record' 'Relation' DSL into Persist monad.
--- Apply query parameter @p@ to 'Relation'
-selectPersist :: (ToSql SqlValue p, FromSql SqlValue a) => Relation p a -> p -> Persist [a]
-selectPersist q p = Persist (\conn -> runQuery conn (relationalQuery q) p)
 
 rawPersist :: String -> Persist ()
 rawPersist sql = Persist (\conn -> runRaw conn sql)
