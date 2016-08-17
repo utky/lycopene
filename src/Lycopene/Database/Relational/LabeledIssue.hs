@@ -4,7 +4,7 @@
 module Lycopene.Database.LabeledIssue where
 
 import           Database.Relational.Query
-import           Lycopene.Database (defineTable)
+import           Lycopene.Database.Relational.TH (defineRelationFromDB)
 
-$(defineTable "labeled_issue")
+$(defineRelationFromDB "labeled_issue")
 

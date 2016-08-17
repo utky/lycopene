@@ -15,7 +15,6 @@ import           Lycopene.Logger (LogMessage)
 formatAsTime :: FormatTime t => t -> String
 formatAsTime = formatTime defaultTimeLocale  "%Y-%m-%d %H:%M:%S"
 
-
 option :: (Monoid a) => Maybe a -> a
 option = fromMaybe mempty
 
@@ -39,6 +38,9 @@ infixr 6 <&>
 
 (<&>) :: Printer a -> Printer a -> Printer a
 (<&>) = pappend
+
+instance (Print a) => Print [a] where
+  printA = foldl (\a b -> a ++ (printA b) ++ "\n") ""
 
 instance Print Char where
   printA c = [c]
@@ -100,3 +102,6 @@ instance Print LogMessage where
 instance Print () where
   printA _ = ""
 
+instance (Print a, Print b) => Print (Either a b) where
+  printA (Left x) = printA x
+  printA (Right y) = printA y

@@ -1,28 +1,30 @@
 {-# LANGUAGE TemplateHaskell #-}
-module Lycopene.Database.TH where
+module Lycopene.Database.Relational.TH where
 
-import           Data.Time (Day, LocalTime)
+import           Lycopene.Database.DataSource (connect)
+import           Lycopene.Database.Relational.Schema (schema)
+import           Data.Time (UTCTime, Day, LocalTime)
+import           Database.HDBC (runRaw)
 import           Database.HDBC.Schema.Driver (typeMap)
+import           Database.HDBC.Schema.SQLite3 (driverSQLite3)
 import           Database.Relational.Query (defaultConfig)
-import           Database.Relational.Query.TH (defineTable)
+import           Database.HDBC.Query.TH (defineTableFromDB)
 import           Database.Record.TH (derivingShow)
 import           Language.Haskell.TH (Q, Dec, TypeQ)
 
-defineRelation
+defineRelationFromDB
   :: String	-- ^ Table name
-  -> [(String, TypeQ)] -- ^ List of column name and type
-  -> [Int] -- ^ Primary key index
-  -> Maybe Int -- ^ Not null key index
   -> Q [Dec]
-defineRelation tableName columns prim notnull =
-  defineTable
-    defaultConfig
+defineRelationFromDB tableName =
+  defineTableFromDB
+    connWithSchema
+    (driverSQLite3 { typeMap = convTypes })
     "main"
     tableName
-    columns
-    [derivingShow]
-    prim
-    notnull
+    [''Show]
+  where
+    conn = connect ":memory:"
+    connWithSchema = conn >>= (\c -> runRaw c schema >> (return c))
 
 type Column = (String, TypeQ)
 
@@ -30,8 +32,8 @@ convTypes :: [Column]
 convTypes =
         [ ("float", [t|Double|])
         , ("date", [t|Day|])
-        , ("datetime", [t|LocalTime|])
-        , ("timestamp", [t|LocalTime|])
+        , ("datetime", [t|UTCTime|])
+        , ("timestamp", [t|UTCTime|])
         , ("double", [t|Double|])
         , ("varchar", [t|String|])
         , ("integer", [t|Integer|])

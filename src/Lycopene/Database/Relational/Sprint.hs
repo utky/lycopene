@@ -1,32 +1,32 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances     #-}
-module Lycopene.Database.Sprint where
+module Lycopene.Database.Relational.Sprint where
 
-import           Data.Time.LocalTime
+import           Data.Time (UTCTime)
 import           Database.HDBC.Query.TH (makeRecordPersistableDefault)
 import           Database.Relational.Query
-import           Lycopene.Database (defineTable)
+import           Lycopene.Database.Relational.TH (defineRelationFromDB)
 
-$(defineTable "sprint")
+$(defineRelationFromDB "sprint")
 
-$(defineTable "backlog_sprint")
+$(defineRelationFromDB "backlog_sprint")
 
-selectByProject :: Relation Integer Sprint
+selectByProject :: Relation String Sprint
 selectByProject = relation' . placeholder $ \ph -> do  
   s <- query sprint
   wheres $ s ! projectId' .=. ph
   return s
 
 
-selectByProjectAndName :: Relation (Integer, String) Sprint
+selectByProjectAndName :: Relation (String, String) Sprint
 selectByProjectAndName = relation' . placeholder $ \ph -> do  
   s <- query sprint
   wheres $ s ! projectId' .=. ph ! fst'
   wheres $ s ! name' .=. ph ! snd'
   return s
 
-selectBacklogByProject :: Relation Integer Integer
+selectBacklogByProject :: Relation String String
 selectBacklogByProject = relation' . placeholder $ \ph -> do 
   a <- query backlogSprint
   wheres $ a ! backlogProjectId' .=. ph
@@ -35,9 +35,9 @@ selectBacklogByProject = relation' . placeholder $ \ph -> do
 data SprintV = SprintV
              { vName :: String
              , vDescription :: Maybe String
-             , vProjectId :: Integer
-             , vStartOn :: Maybe LocalTime
-             , vEndOn :: Maybe LocalTime}
+             , vProjectId :: String
+             , vStartOn :: Maybe UTCTime 
+             , vEndOn :: Maybe UTCTime}
 
 $(makeRecordPersistableDefault ''SprintV)
 

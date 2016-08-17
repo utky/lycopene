@@ -1,15 +1,11 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RankNTypes       #-}
-module Lycopene.Database.Query
-                ( queryP
-                , relationP
-                , insertP
-                , updateP
-                , kupdateP
-                , module Lycopene.Database.Persist
+{-# LANGUAGE GADTs            #-}
+module Lycopene.Database.Relational.Query
+                ( persist
                 ) where
 
-
+import           Control.Monad.Except (throwError)
 import           Database.Relational.Query
 import           Database.Record.FromSql
 import           Database.Record.ToSql
@@ -19,12 +15,14 @@ import           Database.HDBC.Record
 -- import           Database.HDBC.Record.KeyUpdate (runKeyUpdate)
 
 import           Database.HDBC
-import           Lycopene.Core (Lycopene(..), ProjectF(..))
-import           Lycopene.Database.Persist
-import           Lycopene.Database.Project
 import           Database.Relational.Query
 import           Database.HDBC.Record
 import           Database.Record (ToSql, FromSql)
+import           Lycopene.Core (Lycopene(..), ProjectF(..))
+import           Lycopene.Database.Persist
+import qualified Lycopene.Database.Relational.Project as Pj
+import           Lycopene.Database.Relational.Decode
+import           Lycopene.Freer (foldFreer)
 
 
 instance ShowConstantTermsSQL Integer where
@@ -67,16 +65,21 @@ deletePersist d p = Persist (\conn -> runDelete conn d p)
 selectPersist :: (ToSql SqlValue p, FromSql SqlValue a) => Relation p a -> p -> Persist [a]
 selectPersist q p = Persist (\conn -> runQuery conn (relationalQuery q) p)
 
+persist :: Lycopene a -> DB a
+persist (LProject p) = foldFreer persistProject p
 
+fromEntity :: (Decoder a b) => a -> DB b
+fromEntity = handleE . decode
+  where
+    handleE (Right x) = return x
+    handleE (Left e) = throwError $ DecodeE e
 
-persist :: Lycopene a -> Persist a
-persist (LProject p) = persistProject p
-
-persistProject :: ProjectF a -> Persist a
+persistProject :: ProjectF a -> DB a
 persistProject (NewProjectF n d) = undefined
 persistProject (AddProjectF p) = undefined
 persistProject (RemoveProjectF p) = undefined
 persistProject (UpdateProjectF f p) = undefined
 persistProject (FetchByIdProjectF i) = undefined
 persistProject (FetchByNameProjectF n) = undefined
-persistProject FetchAllProjectF =
+persistProject FetchAllProjectF
+  = mapM fromEntity =<< db (selectPersist Pj.project ())

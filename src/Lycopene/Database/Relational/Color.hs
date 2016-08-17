@@ -1,11 +1,11 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances     #-}
-module Lycopene.Database.Color where
+module Lycopene.Database.Relational.Color where
 
 import           Database.Relational.Query
-import           Lycopene.Database (defineTable)
+import           Lycopene.Database.Relational.TH (defineRelationFromDB)
 
-$(defineTable "color")
+$(defineRelationFromDB "color")
 
 

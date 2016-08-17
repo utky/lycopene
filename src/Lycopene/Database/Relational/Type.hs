@@ -1,6 +1,6 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-module Lycopene.Database.Type where
+module Lycopene.Database.Relational.Type where
 
 import           Control.Monad.Free (Free, liftF)
 

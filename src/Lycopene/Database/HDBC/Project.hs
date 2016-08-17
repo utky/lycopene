@@ -1,5 +1,7 @@
+{-# LANGUAGE GADTs #-}
 module Lycopene.Database.HDBC.Project where
 
+import           Lycopene.Database (Persist)
 import           Lycopene.Core ( ProjectF(..)
                                , Project(..))
 
@@ -23,6 +25,7 @@ import           Lycopene.Core ( ProjectF(..)
 -- まとめて最初にStatementを作っておくのは難しいな
 --
 
+-- TODO: 
 persistProject :: ProjectF a -> Persist a
 persistProject (NewProjectF n d) = undefined
 persistProject (AddProjectF p) = undefined

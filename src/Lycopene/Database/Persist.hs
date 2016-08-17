@@ -1,14 +1,33 @@
 {-# LANGUAGE RankNTypes       #-}
 module Lycopene.Database.Persist where
 
-
+import           Data.Typeable
+import           Control.Exception (Exception)
+import           Control.Monad.Except (ExceptT, runExceptT)
+import           Control.Monad.Trans (lift)
 import           Control.Monad.IO.Class (liftIO, MonadIO)
-import           Database.HDBC (IConnection, runRaw, withTransaction)
+import           Database.HDBC (IConnection, runRaw, withTransaction, SqlError, catchSql)
+import           Lycopene.Database.Relational.Decode (DecodeError(..))
 
 -------------------------------------------------------------------------------
 -- it could be better because `unPersist fa conn` is repeated.
 -- there is some misconception.
 
+type DB = ExceptT DBException Persist
+
+db :: Persist a -> DB a
+db = lift
+
+data DBException
+  = SqlE SqlError
+  | DecodeE DecodeError
+  deriving (Typeable)
+
+instance Exception DBException
+
+instance Show DBException where
+  show (SqlE e) = "SqlException: " ++ (show e)
+  show (DecodeE e) = "DecodeException: " ++ (show e)
 
 newtype Persist a = Persist { unPersist :: forall conn. IConnection conn => conn -> IO a }
 
@@ -30,10 +49,21 @@ instance Monad Persist where
     runner conn = unwrap ffb >>= unwrap where
       unwrap = flip unPersist conn
 
--- | Run database middleware and gain result with side-effect.
-runPersist :: ( IConnection conn , MonadIO m) => Persist r -> conn -> m r
-runPersist p conn = liftIO (withTransaction conn (unPersist p))
+runDB :: (IConnection conn , MonadIO m)
+      => DB r -> conn -> m (Either DBException r)
+runDB db conn = liftIO $
+  (runPersist (runExceptT db) conn)
+    `catchSql` (return . Left . SqlE)
 
+-- | Run database middleware and gain result with side-effect.
+-- This operation may fail.
+runPersist :: (IConnection conn) => Persist r -> conn -> IO r
+runPersist (Persist p) conn = withTransaction conn p
+
+-- | Construct persistent operation with raw sql statements.
 rawPersist :: String -> Persist ()
 rawPersist sql = Persist (\conn -> runRaw conn sql)
+
+rawDB :: String -> DB ()
+rawDB = lift . rawPersist
 

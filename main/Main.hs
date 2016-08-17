@@ -22,17 +22,3 @@ main = do
   case cfgE of
     (Left errMsg) -> putStrLnErr errMsg
     (Right cfg) -> runCommand cfg cmd
-  -- result <- runApp config $ runCommand cmd
-  -- handleResult result
-  -- putStrLn "Hello world"
-
--- main = let conf home cd = defaultConfiguration
---                         { lycoHome = home </> ".lyco"
---                         , datapath = home </> ".lyco" </> "issues.db"
---                         , projectConf = cd </> ".lyco.conf"
---                         }
---        in do
---          args <- getArgs
---          home <- getHomeDirectory
---          cd   <- getCurrentDirectory
---          lycopene args (conf home cd)

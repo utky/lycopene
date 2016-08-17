@@ -1,5 +1,8 @@
 module Lycopene.Core
-      ( module Lycopene.Core.Project
+      ( Lycopene(..)
+      , Event (..)
+      , process
+      , module Lycopene.Core.Project
       , module Lycopene.Core.Sprint
       , module Lycopene.Core.Issue
       , module Lycopene.Core.Record

@@ -1,19 +1,35 @@
-module Lycopene.Command where
+module Lycopene.Command 
+  ( runCommand
+  ) where
 
-import           Lycopene.Option.Command
-import qualified Lycopene.Configuration as C
+import           Control.Monad.Trans (MonadIO, liftIO)
+import qualified Lycopene.Option.Command as Cmd
+import qualified Lycopene.Configuration as Cfg
+import qualified Lycopene.Core as Core
 import           Lycopene.Environment (dataPath)
-import           Lycopene.Database (Persist, DataSource, connect, runPersist, rawPersist)
+import           Lycopene.Database (DB, connect, runDB, rawDB, DBException(..))
+import           Lycopene.Database.Relational (persist, schema)
 
-runCommand :: C.Configuration -> LycoCommand -> IO ()
-runCommand cfg (LycoCommand comm subcmd) = runSubcommand subcmd
+runCommand :: Cfg.Configuration -> Cmd.LycoCommand -> IO ()
+runCommand cfg (Cmd.LycoCommand comm subcmd) = runSubcommand subcmd
   where
-    runSubcommand :: Command -> IO ()
-    runSubcommand Version   = putStrLn "dummy version"
-    runSubcommand Configure = runPersist' $ rawPersist (C.schema cfg)
+    runSubcommand :: Cmd.Command -> IO ()
+    runSubcommand Cmd.Version   =
+      putStrLn "dummy version"
+    runSubcommand Cmd.Configure =
+      handleResult =<< runDatabse (rawDB schema)
+    runSubcommand Cmd.Projects =
+      handleResult =<< processEvent (Core.EProject Core.AllProject)
 
-runPersist' :: Persist a -> IO a
-runPersist' ps = do
-  dpath <- dataPath
-  ds <- connect dpath
-  runPersist ps ds
+handleResult :: (Show a) => Either DBException a -> IO ()
+handleResult = putStrLn . show
+
+processEvent :: (MonadIO m) => Core.Event a -> m (Either DBException a)
+processEvent = runDatabse . persist . Core.process
+
+runDatabse :: (MonadIO m) => DB a -> m (Either DBException a)
+runDatabse d = do
+  dpath <- liftIO dataPath
+  ds <- liftIO $ connect dpath
+  runDB d ds
+

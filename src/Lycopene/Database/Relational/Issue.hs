@@ -1,13 +1,13 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances     #-}
-module Lycopene.Database.Issue where
+module Lycopene.Database.Relational.Issue where
 
 import           Database.HDBC.Query.TH (makeRecordPersistableDefault)
 import           Database.Relational.Query
-import           Lycopene.Database (defineTable)
-import qualified Lycopene.Core.Sprint as Sprint
-import qualified Lycopene.Core.Project as Project
+import           Lycopene.Database.Relational.TH (defineRelationFromDB)
+import qualified Lycopene.Database.Relational.Sprint as Sprint
+import qualified Lycopene.Database.Relational.Project as Project
 
 closeStatus :: Integer
 closeStatus = 0
@@ -21,10 +21,10 @@ notReady = 0
 ready :: Integer
 ready = 1
 
-$(defineTable "issue")
-$(defineTable "issue_status")
+$(defineRelationFromDB "issue")
+$(defineRelationFromDB "issue_status")
 
-toggleIssue :: Update (Integer, Integer)
+toggleIssue :: Update (Integer, String)
 toggleIssue = typedUpdate tableOfIssue . updateTarget' $ \proj -> do
     fmap fst $ placeholder (\ph -> do
       status' <-# ph ! fst'
@@ -33,7 +33,7 @@ toggleIssue = typedUpdate tableOfIssue . updateTarget' $ \proj -> do
 
 -- | Row representation
 data IssueR = IssueR
-             { rIssueId :: Integer
+             { rIssueId :: String
              , rProjectName :: String
              , rSprintName :: String
              , rStatus :: String
@@ -46,7 +46,7 @@ instance Eq IssueR where
 $(makeRecordPersistableDefault ''IssueR)
 
 
-openIssues :: Relation (Integer, Integer) IssueR
+openIssues :: Relation (String, Integer) IssueR
 openIssues = relation' . placeholder $ \ph -> do
   i <- query issue
   s <- query Sprint.sprint
@@ -66,7 +66,7 @@ openIssues = relation' . placeholder $ \ph -> do
 data IssueV = IssueV
              { vTitle :: String
              , vDescription :: Maybe String
-             , vSprintId :: Integer
+             , vSprintId :: String
              , vStatus :: Integer
              }
 

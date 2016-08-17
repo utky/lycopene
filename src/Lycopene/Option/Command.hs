@@ -15,6 +15,7 @@ data Command =
              Version
              -- | configure DIR
              | Configure
+             | Projects
              deriving (Show)
 
 -------------------------------------------------------------------------------

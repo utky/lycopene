@@ -1,4 +1,6 @@
 LYCOHOME = schema
+STACK = stack
+LYCO = ${STACK} exec lyco --
 XDG_DATA_HOME := $(shell pwd)/.local/share
 XDG_CONFIG_HOME := $(shell pwd)/.config
 
@@ -7,14 +9,24 @@ XDG_CONFIG_HOME := $(shell pwd)/.config
 all: build
 
 build:
-	stack build
+	@${STACK} build
 
 watch-build:
-	stack build --file-watch
+	@${STACK} build --file-watch
+
+test:
+	@${STACK} test
 
 clean:
-	stack clean
-	rm -rf ${XDG_DATA_HOME}/lycopene/issues.db
+	@${STACK} clean
+	@rm -rf ${XDG_DATA_HOME}/lycopene/issues.db
+
+version: build
+	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- version
 
 configure: build
-	XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" stack exec lyco -- configure
+	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- configure
+
+project: build
+	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- project
+

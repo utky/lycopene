@@ -3,6 +3,7 @@ module Lycopene.Core.Project
   ( ProjectEvent(..)
   , processProjectEvent
   , Project(..)
+  , ProjectStatus(..)
   , ProjectId
   , ProjectF(..)
   , ProjectM
@@ -28,8 +29,8 @@ import           Lycopene.Lens (Lens, set, field)
 type ProjectId = Identifier
 
 data ProjectStatus 
-  = Inactive -- ^ Indicate a project not proceeding or completed.
-  | Active -- ^ Indicate a project is working in progress.
+  = ProjectInactive -- ^ Indicate a project not proceeding or completed.
+  | ProjectActive -- ^ Indicate a project is working in progress.
   deriving (Eq, Ord, Show)
 
 data Project
@@ -64,7 +65,7 @@ data ProjectEvent a where
   -- | Fetch list of active project
   ActiveProject :: ProjectEvent [Project]
   -- | Fetch list of all project regardless of its status.
-  AllProjectEvent :: ProjectEvent [Project]
+  AllProject :: ProjectEvent [Project]
   -- |
   DeactivateProject :: ProjectId -> ProjectEvent ()
   -- |
@@ -84,8 +85,8 @@ processProjectEvent (FetchProject i) =
   fetchByIdProject i
 -- FIXME: eliminate in-memory filtering
 processProjectEvent ActiveProject =
-  fmap (filter ((== Active) . projectStatus)) fetchAllProject
-processProjectEvent AllProjectEvent =
+  fmap (filter ((== ProjectActive) . projectStatus)) fetchAllProject
+processProjectEvent AllProject =
   fetchAllProject
 processProjectEvent (DeactivateProject i) =
   () <$ deactivateProject (fetchByIdProject i)
@@ -151,10 +152,10 @@ fetchAllProject :: ProjectM [Project]
 fetchAllProject = liftR FetchAllProjectF
 
 activateProject :: ProjectM Project -> ProjectM Project
-activateProject = (>>= (liftR . UpdateProjectF (set _projectStatus Active)))
+activateProject = (>>= (liftR . UpdateProjectF (set _projectStatus ProjectActive)))
 
 deactivateProject :: ProjectM Project -> ProjectM Project
-deactivateProject = (>>= (liftR . UpdateProjectF (set _projectStatus Inactive)))
+deactivateProject = (>>= (liftR . UpdateProjectF (set _projectStatus ProjectInactive)))
 
 -- | Translate AST into State manipulations
 runPure' :: ProjectF a -> VStore ProjectId Project a
@@ -182,5 +183,5 @@ newProject' n d =
         { projectId   = next
         , projectName = n
         , projectDescription = d
-        , projectStatus = Active
+        , projectStatus = ProjectActive
         }

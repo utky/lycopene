@@ -1,25 +1,25 @@
 {-# LANGUAGE TemplateHaskell       #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE FlexibleInstances     #-}
-module Lycopene.Database.Record where
+module Lycopene.Database.Relational.Record where
 
-import           Data.Time.LocalTime
+import           Data.Time (UTCTime)
 import           Database.HDBC.Query.TH (makeRecordPersistableDefault)
 import           Database.Relational.Query
-import           Lycopene.Database (defineTable)
+import           Lycopene.Database.Relational.TH (defineRelationFromDB)
 
-$(defineTable "record")
+$(defineRelationFromDB "record")
 
-selectRecordByIssue :: Relation Integer Record
+selectRecordByIssue :: Relation String Record
 selectRecordByIssue = relation' . placeholder $ \ph -> do
   r <- query record
   wheres $ r ! issueId' .=. ph
   return r
 
 data RecordV = RecordV
-             { vIssueId :: Integer
-             , vStartOn :: LocalTime
-             , vEndOn :: Maybe LocalTime
+             { vIssueId :: String
+             , vStartOn :: UTCTime
+             , vEndOn :: Maybe UTCTime
              } 
 
 $(makeRecordPersistableDefault ''RecordV)
