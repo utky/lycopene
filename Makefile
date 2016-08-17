@@ -1,51 +1,20 @@
 LYCOHOME = schema
+XDG_DATA_HOME := $(shell pwd)/.local/share
+XDG_CONFIG_HOME := $(shell pwd)/.config
 
-.PHONY: prep submodules all quick bench clean veryclean install sdist init configure
+.PHONY: all quick bench clean veryclean install sdist init configure
 
-all: configure
-	cabal build
+all: build
 
-configure:
-	cabal configure --enable-tests --enable-benchmarks
+build:
+	stack build
 
-test: all
-	cabal test
-
-prof:
-	cabal configure --disable-tests --enable-library-profiling --enable-executable-profiling && cabal build
-
-deps: 
-	cabal install --only-dependencies --enable-library-profiling --enable-tests --enable-benchmarks
-
-init: prep
-
-prep: submodules
-	#(cabal --version || (cabal update && cabal install cabal-dev)) && 
-	cabal sandbox init && \
-	cabal update && \
-	cabal install --only-dependencies --enable-library-profiling --enable-tests --enable-benchmarks
-
-submodules:
-	git submodule update --init
-
-quick:
-	cabal configure --enable-tests --disable-optimization && cabal build
-
-relocatable:
-	cabal configure -fembed_data_files && cabal build
-
-bench:
-	cabal configure --enable-benchmarks && cabal build
-
-sdist:
-	dist/setup/setup sdist
-	# cabal sdist won't work, see https://github.com/haskell/cabal/issues/403
+watch-build:
+	stack build --file-watch
 
 clean:
-	cabal clean
+	stack clean
+	rm -rf ${XDG_DATA_HOME}/lycopene/issues.db
 
-veryclean: clean
-	rm -rf dist .cabal-sandbox cabal.sandbox.config
-
-install:
-	cabal install --enable-tests
+configure: build
+	XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" stack exec lyco -- configure
