@@ -27,7 +27,7 @@ import           Lycopene.Core ( ProjectF(..)
 
 -- TODO: 
 persistProject :: ProjectF a -> Persist a
-persistProject (NewProjectF n d) = undefined
+persistProject (NewProjectF i n d) = undefined
 persistProject (AddProjectF p) = undefined
 persistProject (RemoveProjectF p) = undefined
 persistProject (UpdateProjectF f p) = undefined

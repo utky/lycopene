@@ -2,7 +2,7 @@
 module Lycopene.Core.Project
   ( ProjectEvent(..)
   , processProjectEvent
-  , Project(..)
+  , Project(Project)
   , ProjectStatus(..)
   , ProjectId
   , ProjectF(..)
@@ -19,12 +19,13 @@ module Lycopene.Core.Project
   , runProjectPure
   ) where
 
+import           Prelude hiding (id)
 import           Lycopene.Core.Scalar
 import           Lycopene.Freer (Freer, liftR, foldFreer)
 import           Lycopene.Core.Store (Change)
 import           Lycopene.Core.Identifier (generate, nameIdGen)
 import           Lycopene.Core.Pure (VStore, VResult, runVStore, initial, values, save, fetch, remove, catch)
-import           Lycopene.Lens (Lens, set, field)
+import           Lycopene.Lens (Lens, set, get, field)
 
 type ProjectId = Identifier
 
@@ -35,22 +36,28 @@ data ProjectStatus
 
 data Project
   = Project
-  { projectId   :: !ProjectId
-  , projectName :: !Name
-  , projectDescription :: Description
-  , projectStatus :: !ProjectStatus
+  { id   :: !ProjectId
+  , name :: !Name
+  , description :: Description
+  , status :: !ProjectStatus
   }
   deriving (Show)
 
 -- Project is identified by `projectId`
 instance Eq Project where
-  x == y = (projectId x) == (projectId y)
+  x == y = (id x) == (id y)
 
 -- Minimal lenses for Project
 -- ==================================================================
 
-_projectStatus :: Lens Project ProjectStatus
-_projectStatus = field projectStatus (\a s -> s { projectStatus = a })
+_id :: Lens Project ProjectId
+_id = field id (\a s -> s { id = a })
+
+_name :: Lens Project Name
+_name = field name (\a s -> s { name = a })
+
+_status :: Lens Project ProjectStatus
+_status = field status (\a s -> s { status = a })
 
 -- Use cases of Project
 -- =======================================
@@ -80,12 +87,12 @@ data ProjectEvent a where
 -- | 
 processProjectEvent :: ProjectEvent a -> ProjectM a
 processProjectEvent (NewProject n d) =
-  (fmap projectId . addProject) $ newProject n d
+  (fmap id . addProject) $ newProject n d
 processProjectEvent (FetchProject i) =
   fetchByIdProject i
 -- FIXME: eliminate in-memory filtering
 processProjectEvent ActiveProject =
-  fmap (filter ((== ProjectActive) . projectStatus)) fetchAllProject
+  fmap (filter ((== ProjectActive) . (get _status))) fetchAllProject
 processProjectEvent AllProject =
   fetchAllProject
 processProjectEvent (DeactivateProject i) =
@@ -117,11 +124,10 @@ processProjectEvent (DeactivateProject i) =
 -- (f :<$> (Fetch n d))
 -- (Update f (Fetch (Name "hoge")))
 data ProjectF a where
-  NewProjectF :: Name -> Description -> ProjectF Project
+  NewProjectF :: ProjectId -> Name -> Description -> ProjectF Project
   AddProjectF :: Project -> ProjectF Project
   RemoveProjectF :: Project -> ProjectF Project
   UpdateProjectF :: Change Project -> Project -> ProjectF Project
-  -- | 取れない場合はエラーなのでここでは考慮しない
   FetchByIdProjectF :: ProjectId -> ProjectF Project
   FetchByNameProjectF :: Name -> ProjectF Project
   FetchAllProjectF :: ProjectF [Project]
@@ -131,7 +137,9 @@ type ProjectM = Freer ProjectF
 -- Lifting boiler plate
 
 newProject :: Name -> Description -> ProjectM Project
-newProject n d = liftR $ NewProjectF n d
+newProject n d =
+  let next = generate nameIdGen ("project", n)
+  in  liftR $ NewProjectF next n d
 
 addProject :: ProjectM Project -> ProjectM Project
 addProject = (>>= (liftR . AddProjectF))
@@ -152,25 +160,24 @@ fetchAllProject :: ProjectM [Project]
 fetchAllProject = liftR FetchAllProjectF
 
 activateProject :: ProjectM Project -> ProjectM Project
-activateProject = (>>= (liftR . UpdateProjectF (set _projectStatus ProjectActive)))
+activateProject = (>>= (liftR . UpdateProjectF (set _status ProjectActive)))
 
 deactivateProject :: ProjectM Project -> ProjectM Project
-deactivateProject = (>>= (liftR . UpdateProjectF (set _projectStatus ProjectInactive)))
+deactivateProject = (>>= (liftR . UpdateProjectF (set _status ProjectInactive)))
 
 -- | Translate AST into State manipulations
 runPure' :: ProjectF a -> VStore ProjectId Project a
-runPure' (NewProjectF n d) = return $ newProject' n d 
-runPure' (AddProjectF x) = fmap (const x) (save (projectId x) x)
+runPure' (NewProjectF i n d) = return $ Project i n d ProjectActive
+runPure' (AddProjectF x) = fmap (const x) (save (id x) x)
 runPure' FetchAllProjectF = values
 runPure' (UpdateProjectF f x) = return $ f x
 runPure' (FetchByIdProjectF i) = fetch i
 runPure' (FetchByNameProjectF n) = 
-    let nameEq = (== n) . projectName
+    let nameEq = (== n) . name
         headMaybe [] = Nothing
         headMaybe (x:xs) = Just x
     in values >>= (catch . headMaybe . filter nameEq)
-runPure' (RemoveProjectF x) = (remove (projectId x)) >> (return x)
-
+runPure' (RemoveProjectF x) = (remove (id x)) >> (return x)
 
 runProjectPure :: ProjectM a -> VResult a
 runProjectPure = runVStore initial . foldFreer runPure'
@@ -179,9 +186,4 @@ runProjectPure = runVStore initial . foldFreer runPure'
 newProject' :: Name -> Description -> Project
 newProject' n d =
   let next = generate nameIdGen ("project", n)
-  in  Project
-        { projectId   = next
-        , projectName = n
-        , projectDescription = d
-        , projectStatus = ProjectActive
-        }
+  in  Project next n d ProjectActive

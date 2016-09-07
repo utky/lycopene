@@ -75,7 +75,7 @@ fromEntity = handleE . decode
     handleE (Left e) = throwError $ DecodeE e
 
 persistProject :: ProjectF a -> DB a
-persistProject (NewProjectF n d) = undefined
+persistProject (NewProjectF i n d) = undefined
 persistProject (AddProjectF p) = undefined
 persistProject (RemoveProjectF p) = undefined
 persistProject (UpdateProjectF f p) = undefined

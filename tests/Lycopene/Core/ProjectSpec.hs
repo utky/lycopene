@@ -30,7 +30,7 @@ prop_addFetch :: Name -> Description -> Bool
 prop_addFetch n d =
   let new = newProject n d
       added = addProject new
-      fetched = added >>= (fetchByIdProject . projectId)
+      fetched = added >>= (fetchByIdProject . _Id)
   in runResult $ runProjectPure $ (==) <$> (return n) <*> (fmap projectName fetched)
 
 prop_removeFetch :: Name -> Description -> Bool
