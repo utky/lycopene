@@ -4,7 +4,7 @@ LYCO = ${STACK} exec lyco --
 XDG_DATA_HOME := $(shell pwd)/.local/share
 XDG_CONFIG_HOME := $(shell pwd)/.config
 
-.PHONY: all quick bench clean veryclean install sdist init configure
+.PHONY: all quick bench clean veryclean install sdist init configure start
 
 all: build
 
@@ -29,4 +29,7 @@ configure: build
 
 project: build
 	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- project
+
+start: build
+	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- start
 

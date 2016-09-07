@@ -33,6 +33,7 @@ subcommand =
     (  command "version" version
     <> command "configure" configure
     <> command "project" projects
+    <> command "start" start
     )
 
 ---------------------------------------------------------------------
@@ -55,3 +56,9 @@ projects =
   info
     (pure Projects)
     (progDesc "List projects.")
+
+start :: ParserInfo Command
+start =
+  info
+    (pure (Start 8080))
+    (progDesc "Start web server.")

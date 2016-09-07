@@ -9,6 +9,7 @@ import qualified Lycopene.Core as Core
 import           Lycopene.Environment (dataPath)
 import           Lycopene.Database (DB, connect, runDB, rawDB, DBException(..))
 import           Lycopene.Database.Relational (persist, schema)
+import           Lycopene.Web (startServer)
 
 runCommand :: Cfg.Configuration -> Cmd.LycoCommand -> IO ()
 runCommand cfg (Cmd.LycoCommand comm subcmd) = runSubcommand subcmd
@@ -20,6 +21,8 @@ runCommand cfg (Cmd.LycoCommand comm subcmd) = runSubcommand subcmd
       handleResult =<< runDatabse (rawDB schema)
     runSubcommand Cmd.Projects =
       handleResult =<< processEvent (Core.EProject Core.AllProject)
+    runSubcommand (Cmd.Start p) =
+      startServer p
 
 handleResult :: (Show a) => Either DBException a -> IO ()
 handleResult = putStrLn . show

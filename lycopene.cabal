@@ -71,6 +71,7 @@ library
                        Lycopene.Database.DataSource
                        Lycopene.Database.Persist
                        Lycopene.Database.Datapath
+                       Lycopene.Database.Relational
                        Lycopene.Database.Relational.Query
                        Lycopene.Database.Relational.Schema
                        Lycopene.Database.Relational.Project
@@ -78,6 +79,7 @@ library
                        Lycopene.Database.Relational.Issue
                        Lycopene.Database.Relational.Record
                        Lycopene.Database.Relational.Decode
+                       Lycopene.Web
                        Paths_lycopene
   other-modules:       Lycopene.Core.Identifier
                        Lycopene.Core.Scalar
@@ -89,7 +91,9 @@ library
                        Lycopene.Database.HDBC.Query
                        Lycopene.Database.Relational.TH
                        Lycopene.Database.Relational.Decode.Prim
+                       Lycopene.Database.Relational.Decode.Class
                        Lycopene.Database.Relational.Decode.Project
+                       Lycopene.Web.Api
 
   build-depends:       base
                        , text
@@ -113,12 +117,12 @@ library
                        , pipes
                        , optparse-applicative
                        , yaml
-                       -- , aeson
-                       -- , attoparsec
-                       -- , servant
-                       -- , servant-server
-                       -- , wai
-                       -- , warp
+                       , aeson
+                       , attoparsec
+                       , servant
+                       , servant-server
+                       , wai
+                       , warp
 
   ghc-options:         -Wall
 
