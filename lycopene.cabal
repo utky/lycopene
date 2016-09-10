@@ -79,6 +79,7 @@ library
                        Lycopene.Database.Relational.Issue
                        Lycopene.Database.Relational.Record
                        Lycopene.Database.Relational.Decode
+                       Lycopene.Application
                        Lycopene.Web
                        Paths_lycopene
   other-modules:       Lycopene.Core.Identifier

@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GADTs #-}
 module Lycopene.Core.Project
   ( ProjectEvent(..)
@@ -20,6 +21,9 @@ module Lycopene.Core.Project
   ) where
 
 import           Prelude hiding (id)
+import           GHC.Generics
+import           Data.Aeson (ToJSON, FromJSON, toJSON, parseJSON)
+import           Data.Aeson.Types (typeMismatch, Value(..), Parser)
 import           Lycopene.Core.Scalar
 import           Lycopene.Freer (Freer, liftR, foldFreer)
 import           Lycopene.Core.Store (Change)
@@ -30,9 +34,22 @@ import           Lycopene.Lens (Lens, set, get, field)
 type ProjectId = Identifier
 
 data ProjectStatus 
-  = ProjectInactive -- ^ Indicate a project not proceeding or completed.
+  = ProjectInactive -- ^ Indicate that a project is not proceeding or completed.
   | ProjectActive -- ^ Indicate a project is working in progress.
   deriving (Eq, Ord, Show)
+
+instance ToJSON ProjectStatus where
+  toJSON ProjectInactive = toJSON (0 :: Int)
+  toJSON ProjectActive = toJSON (1 :: Int)
+
+instance FromJSON ProjectStatus where
+  parseJSON j@(Number x) = 
+    let withInteger :: Integer -> Parser ProjectStatus
+        withInteger 0 = return ProjectInactive
+        withInteger 1 = return ProjectActive
+        withInteger y = typeMismatch "0 or 1" j
+    in  parseJSON j >>= withInteger
+  parseJSON invalid = typeMismatch "Integer" invalid
 
 data Project
   = Project
@@ -41,7 +58,10 @@ data Project
   , description :: Description
   , status :: !ProjectStatus
   }
-  deriving (Show)
+  deriving (Show, Generic)
+
+instance ToJSON Project
+instance FromJSON Project
 
 -- Project is identified by `projectId`
 instance Eq Project where

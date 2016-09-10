@@ -6,9 +6,10 @@ import           Control.Monad.Trans (MonadIO, liftIO)
 import qualified Lycopene.Option.Command as Cmd
 import qualified Lycopene.Configuration as Cfg
 import qualified Lycopene.Core as Core
+import           Lycopene.Application (defaultEngine)
 import           Lycopene.Environment (dataPath)
-import           Lycopene.Database (DB, connect, runDB, rawDB, DBException(..))
-import           Lycopene.Database.Relational (persist, schema)
+import           Lycopene.Database (connect, runDB, rawDB, DBException(..))
+import           Lycopene.Database.Relational (schema)
 import           Lycopene.Web (startServer)
 
 runCommand :: Cfg.Configuration -> Cmd.LycoCommand -> IO ()
@@ -18,21 +19,9 @@ runCommand cfg (Cmd.LycoCommand comm subcmd) = runSubcommand subcmd
     runSubcommand Cmd.Version   =
       putStrLn "dummy version"
     runSubcommand Cmd.Configure =
-      handleResult =<< runDatabse (rawDB schema)
-    runSubcommand Cmd.Projects =
-      handleResult =<< processEvent (Core.EProject Core.AllProject)
+      dataPath >>= connect >>= runDB (rawDB schema) >>= printResult
     runSubcommand (Cmd.Start p) =
-      startServer p
+      defaultEngine >>= startServer p
 
-handleResult :: (Show a) => Either DBException a -> IO ()
-handleResult = putStrLn . show
-
-processEvent :: (MonadIO m) => Core.Event a -> m (Either DBException a)
-processEvent = runDatabse . persist . Core.process
-
-runDatabse :: (MonadIO m) => DB a -> m (Either DBException a)
-runDatabse d = do
-  dpath <- liftIO dataPath
-  ds <- liftIO $ connect dpath
-  runDB d ds
-
+printResult :: (Show a) => Either DBException a -> IO ()
+printResult = putStrLn . show
