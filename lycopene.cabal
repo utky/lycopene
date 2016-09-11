@@ -95,6 +95,8 @@ library
                        Lycopene.Database.Relational.Decode.Class
                        Lycopene.Database.Relational.Decode.Project
                        Lycopene.Web.Api
+                       Lycopene.Web.Trans
+                       Lycopene.Web.Instance
 
   build-depends:       base
                        , text
@@ -124,6 +126,7 @@ library
                        , servant-server
                        , wai
                        , warp
+                       , http-api-data
 
   ghc-options:         -Wall
 

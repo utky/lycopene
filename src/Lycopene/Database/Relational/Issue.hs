@@ -9,22 +9,22 @@ import           Lycopene.Database.Relational.TH (defineRelationFromDB)
 import qualified Lycopene.Database.Relational.Sprint as Sprint
 import qualified Lycopene.Database.Relational.Project as Project
 
-closeStatus :: Integer
+closeStatus :: Int
 closeStatus = 0
 
-openStatus :: Integer
+openStatus :: Int
 openStatus = 1
 
-notReady :: Integer
+notReady :: Int
 notReady = 0
 
-ready :: Integer
+ready :: Int
 ready = 1
 
 $(defineRelationFromDB "issue")
 $(defineRelationFromDB "issue_status")
 
-toggleIssue :: Update (Integer, String)
+toggleIssue :: Update (Int, String)
 toggleIssue = typedUpdate tableOfIssue . updateTarget' $ \proj -> do
     fmap fst $ placeholder (\ph -> do
       status' <-# ph ! fst'
@@ -46,7 +46,7 @@ instance Eq IssueR where
 $(makeRecordPersistableDefault ''IssueR)
 
 
-openIssues :: Relation (String, Integer) IssueR
+openIssues :: Relation (String, Int) IssueR
 openIssues = relation' . placeholder $ \ph -> do
   i <- query issue
   s <- query Sprint.sprint
@@ -67,7 +67,7 @@ data IssueV = IssueV
              { vTitle :: String
              , vDescription :: Maybe String
              , vSprintId :: String
-             , vStatus :: Integer
+             , vStatus :: Int
              }
 
 $(makeRecordPersistableDefault ''IssueV)

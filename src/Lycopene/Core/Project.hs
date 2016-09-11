@@ -17,7 +17,6 @@ module Lycopene.Core.Project
   , fetchAllProject
   , activateProject
   , deactivateProject
-  , runProjectPure
   ) where
 
 import           Prelude hiding (id)
@@ -86,7 +85,7 @@ _status = field status (\a s -> s { status = a })
 -- Lift ordinary values to Project semantices
 data ProjectEvent a where
   -- | Lift Name and Description into a volatile entity.
-  NewProject :: Name -> Description -> ProjectEvent ProjectId
+  NewProject :: Name -> Description -> ProjectEvent Project
   -- | Fetch a project which identified by ProjectId
   FetchProject :: ProjectId -> ProjectEvent Project
   -- | Fetch list of active project
@@ -107,7 +106,9 @@ data ProjectEvent a where
 -- | 
 processProjectEvent :: ProjectEvent a -> ProjectM a
 processProjectEvent (NewProject n d) =
-  (fmap id . addProject) $ newProject n d
+  addProject $ newProject n d
+processProjectEvent (RemoveProject i) =
+  () <$ removeProject i
 processProjectEvent (FetchProject i) =
   fetchByIdProject i
 -- FIXME: eliminate in-memory filtering
@@ -144,9 +145,8 @@ processProjectEvent (DeactivateProject i) =
 -- (f :<$> (Fetch n d))
 -- (Update f (Fetch (Name "hoge")))
 data ProjectF a where
-  NewProjectF :: ProjectId -> Name -> Description -> ProjectF Project
   AddProjectF :: Project -> ProjectF Project
-  RemoveProjectF :: Project -> ProjectF Project
+  RemoveProjectF :: ProjectId -> ProjectF ProjectId
   UpdateProjectF :: Change Project -> Project -> ProjectF Project
   FetchByIdProjectF :: ProjectId -> ProjectF Project
   FetchByNameProjectF :: Name -> ProjectF Project
@@ -156,16 +156,16 @@ type ProjectM = Freer ProjectF
 
 -- Lifting boiler plate
 
-newProject :: Name -> Description -> ProjectM Project
+newProject :: Name -> Description -> Project
 newProject n d =
   let next = generate nameIdGen ("project", n)
-  in  liftR $ NewProjectF next n d
+  in  Project next n d ProjectActive
 
-addProject :: ProjectM Project -> ProjectM Project
-addProject = (>>= (liftR . AddProjectF))
+addProject :: Project -> ProjectM Project
+addProject = liftR . AddProjectF
 
-removeProject :: ProjectM Project -> ProjectM Project
-removeProject = (>>= (liftR . RemoveProjectF))
+removeProject :: ProjectId -> ProjectM ProjectId
+removeProject = liftR . RemoveProjectF
 
 updateProject :: Change Project -> ProjectM Project -> ProjectM Project
 updateProject f = (>>= (liftR . UpdateProjectF f))
@@ -184,26 +184,3 @@ activateProject = (>>= (liftR . UpdateProjectF (set _status ProjectActive)))
 
 deactivateProject :: ProjectM Project -> ProjectM Project
 deactivateProject = (>>= (liftR . UpdateProjectF (set _status ProjectInactive)))
-
--- | Translate AST into State manipulations
-runPure' :: ProjectF a -> VStore ProjectId Project a
-runPure' (NewProjectF i n d) = return $ Project i n d ProjectActive
-runPure' (AddProjectF x) = fmap (const x) (save (id x) x)
-runPure' FetchAllProjectF = values
-runPure' (UpdateProjectF f x) = return $ f x
-runPure' (FetchByIdProjectF i) = fetch i
-runPure' (FetchByNameProjectF n) = 
-    let nameEq = (== n) . name
-        headMaybe [] = Nothing
-        headMaybe (x:xs) = Just x
-    in values >>= (catch . headMaybe . filter nameEq)
-runPure' (RemoveProjectF x) = (remove (id x)) >> (return x)
-
-runProjectPure :: ProjectM a -> VResult a
-runProjectPure = runVStore initial . foldFreer runPure'
-
--- | Construct a Project
-newProject' :: Name -> Description -> Project
-newProject' n d =
-  let next = generate nameIdGen ("project", n)
-  in  Project next n d ProjectActive

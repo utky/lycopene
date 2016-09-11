@@ -3,20 +3,22 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Lycopene.Web.Api where
 
-import           Data.Bifunctor (first)
 import           Control.Monad.Except (ExceptT(ExceptT), withExceptT)
 import           Servant
-import           Lycopene.Application (AppEngine, runEngine)
+import           Lycopene.Application (AppEngine)
+import           Lycopene.Web.Trans (lyco)
+import           Lycopene.Web.Instance
 import qualified Lycopene.Core as Core
 import           Lycopene.Database (DBException(..))
 
 type LycopeneApi
   =    "ping" :> Get '[JSON] String
-  :<|> "projects" :> Get '[JSON] [Core.Project]
+  :<|> "projects" :> ProjectApi
 
-handleDBExc :: DBException -> ServantErr
-handleDBExc (SqlE e)    = err500 { errBody = "Database error." }
-handleDBExc (DecodeE e) = err500 { errBody = "Database fetch failure." }
+type ProjectApi
+  =    Get '[JSON] [Core.Project]
+  :<|> ReqBody '[JSON] String :> Post '[JSON] Core.Project
+  :<|> Capture "id" Core.Identifier :> DeleteNoContent '[JSON] NoContent
 
 api :: Proxy LycopeneApi
 api = Proxy
@@ -24,9 +26,12 @@ api = Proxy
 server :: AppEngine -> Server LycopeneApi
 server engine
   =    ping
-  :<|> projects
+  :<|> projectServer engine
   where
-    withApp = withExceptT handleDBExc . ExceptT . runEngine engine
     ping = return "pong"
-    projects = withApp $ Core.EProject Core.AllProject
 
+projectServer :: AppEngine -> Server ProjectApi
+projectServer engine
+  =    (lyco engine $ Core.EProject Core.AllProject)
+  :<|> (\n -> lyco engine $ Core.EProject (Core.NewProject n Nothing))
+  :<|> (\i -> NoContent <$ (lyco engine $ Core.EProject (Core.RemoveProject i)))

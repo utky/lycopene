@@ -1,6 +1,11 @@
 {-# LANGUAGE RankNTypes #-}
 -- | Driver to run domain with database interaction.
-module Lycopene.Application where
+module Lycopene.Application
+  ( AppEngine
+  , runEngine
+  , appEngine
+  , defaultEngine
+  ) where
 
 import qualified Lycopene.Core as Core
 import           Lycopene.Environment (dataPath)
@@ -19,7 +24,7 @@ appEngine ds =
    let runDatabase = flip runDB
    in  AppEngine $ runDatabase ds . persist . Core.process
 
-defaultEngine :: IO (AppEngine)
+defaultEngine :: IO AppEngine
 defaultEngine = do
   dpath <- dataPath
   ds <- connect dpath

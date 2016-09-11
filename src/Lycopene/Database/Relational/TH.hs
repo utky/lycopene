@@ -36,7 +36,7 @@ convTypes =
         , ("timestamp", [t|UTCTime|])
         , ("double", [t|Double|])
         , ("varchar", [t|String|])
-        , ("integer", [t|Integer|])
+        , ("integer", [t|Int|])
         ]
 
 date :: String -> Column
@@ -49,7 +49,7 @@ varchar :: String -> Column
 varchar n = (n, [t|String|])
 
 integer :: String -> Column
-integer n = (n, [t|Integer|])
+integer n = (n, [t|Int|])
 
 double :: String -> Column
 double n =  (n, [t|Double|])

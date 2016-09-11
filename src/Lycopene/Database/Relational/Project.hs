@@ -6,6 +6,7 @@ module Lycopene.Database.Relational.Project where
 import           Database.HDBC.Query.TH (makeRecordPersistableDefault)
 import           Database.Relational.Query
 import           Lycopene.Database.Relational.TH (defineRelationFromDB)
+import qualified Lycopene.Core as Core
 
 $(defineRelationFromDB "project")
 
@@ -18,16 +19,20 @@ selectByName = relation' . placeholder $ \ph -> do
   wheres $ p ! name' .=. ph
   return p
 
-data ProjectV = ProjectV
-              { vName :: String
-              , vDescription :: Maybe String
-              }
+insertProject' :: Core.Project -> InsertQuery ()
+insertProject' (Core.Project i n d s) = insertQueryProject encodeValues
+  where
+    encodeValues :: Relation () Project
+    encodeValues = relation . return $ 
+      Project |$| value (Core.idStr i)
+              |*| value n
+              |*| value d
+              |*| value (encodeStatus s)
+    encodeStatus :: Core.ProjectStatus -> Int
+    encodeStatus Core.ProjectInactive = 0
+    encodeStatus Core.ProjectActive = 1
 
-$(makeRecordPersistableDefault ''ProjectV)
-
-piProjectV :: Pi Project ProjectV
-piProjectV = ProjectV |$| name'
-                      |*| description'
-
-insertProjectV :: Insert ProjectV
-insertProjectV = typedInsert tableOfProject piProjectV
+deleteById :: Core.ProjectId -> Delete ()
+deleteById i =
+  typedDelete tableOfProject . restriction $ \proj -> do
+    wheres $ proj ! projectId' .=. value (Core.idStr i)

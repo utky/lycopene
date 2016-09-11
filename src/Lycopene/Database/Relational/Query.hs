@@ -75,11 +75,12 @@ fromEntity = handleE . decode
     handleE (Left e) = throwError $ DecodeE e
 
 persistProject :: ProjectF a -> DB a
-persistProject (NewProjectF i n d) = undefined
-persistProject (AddProjectF p) = undefined
-persistProject (RemoveProjectF p) = undefined
+persistProject (AddProjectF p) = 
+  p <$ db (insertQueryPersist (Pj.insertProject' p) ())
+persistProject (RemoveProjectF i) = undefined
+  () <$ db (deletePersist (Pj.deleteById i) ())
 persistProject (UpdateProjectF f p) = undefined
 persistProject (FetchByIdProjectF i) = undefined
 persistProject (FetchByNameProjectF n) = undefined
-persistProject FetchAllProjectF
-  = mapM fromEntity =<< db (selectPersist Pj.project ())
+persistProject FetchAllProjectF =
+  mapM fromEntity =<< db (selectPersist Pj.project ())

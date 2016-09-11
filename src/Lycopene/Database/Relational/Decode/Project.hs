@@ -13,7 +13,7 @@ project =
     <*> decoder Pj.description
     <*> decoder (projectStatus . Pj.status) <?> "projectStatus" 
 
-projectStatus :: Integer -> Maybe Core.ProjectStatus
+projectStatus :: Int -> Maybe Core.ProjectStatus
 projectStatus 0 = Just Core.ProjectInactive
 projectStatus 1 = Just Core.ProjectActive
 projectStatus _ = Nothing
