@@ -1,3 +1,4 @@
+{-# LANGUAGE RankNTypes #-}
 {-# LANGUAGE GADTs #-}
 module Lycopene.Coyoneda where
 
@@ -7,3 +8,5 @@ data Coyoneda f a where
 instance Functor (Coyoneda f) where
   fmap f (Coyoneda g v) = Coyoneda (f . g) v
 
+hoistCoyoneda :: (forall a. f a -> g a) -> Coyoneda f a -> Coyoneda g a
+hoistCoyoneda f (Coyoneda k m) = Coyoneda k (f m)

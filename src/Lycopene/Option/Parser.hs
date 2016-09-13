@@ -32,7 +32,6 @@ subcommand =
   subparser
     (  command "version" version
     <> command "configure" configure
-    <> command "project" projects
     <> command "start" start
     )
 
@@ -50,12 +49,6 @@ configure =
   info
     (pure Configure)
     (progDesc "Initialize database if it doesn't exist.")
-
-projects :: ParserInfo Command
-projects =
-  info
-    (pure Projects)
-    (progDesc "List projects.")
 
 start :: ParserInfo Command
 start =

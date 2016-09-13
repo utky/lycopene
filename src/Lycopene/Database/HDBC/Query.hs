@@ -7,9 +7,6 @@ import           Lycopene.Database.DataSource (DataSource)
 import           Lycopene.Database.Persist (Persist(..))
 import           Lycopene.Database.HDBC.Project (persistProject)
 
-persist :: Lycopene a -> Persist a
-persist (LProject p) = foldFreer persistProject p
-
 -- Lift method
 -- ----------------------------------------------------------------
 

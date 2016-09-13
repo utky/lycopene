@@ -1,8 +1,8 @@
 {-# LANGUAGE RankNTypes #-}
 module Lycopene.Freer where
 
-import           Control.Monad.Free (Free, foldFree, liftF)
-import           Lycopene.Coyoneda (Coyoneda(..))
+import           Control.Monad.Free (Free, foldFree, liftF, hoistFree)
+import           Lycopene.Coyoneda (Coyoneda(..), hoistCoyoneda)
 
 -- | a.k.a. Operational Monad
 type Freer f = Free (Coyoneda f)
@@ -14,3 +14,6 @@ liftR = liftF . Coyoneda id
 foldFreer :: Monad m => (forall x. f x -> m x) -> Freer f a -> m a 
 foldFreer f = foldFree deCoyoneda where
   deCoyoneda (Coyoneda g b) = fmap g (f b)
+
+hoistFreer :: (forall a. f a -> g a) -> Freer f a -> Freer g a
+hoistFreer f = hoistFree (hoistCoyoneda f)

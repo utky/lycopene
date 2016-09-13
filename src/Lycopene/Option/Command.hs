@@ -15,7 +15,6 @@ data Command =
              Version
              -- | configure DIR
              | Configure
-             | Projects
              | Start Int
              deriving (Show)
 

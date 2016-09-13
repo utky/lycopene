@@ -21,6 +21,7 @@ db = lift
 data DBException
   = SqlE SqlError
   | DecodeE DecodeError
+  | ResultSetEmpty
   deriving (Typeable)
 
 instance Exception DBException
@@ -28,6 +29,7 @@ instance Exception DBException
 instance Show DBException where
   show (SqlE e) = "SqlException: " ++ (show e)
   show (DecodeE e) = "DecodeException: " ++ (show e)
+  show ResultSetEmpty = "Result set is empty"
 
 newtype Persist a = Persist { unPersist :: forall conn. IConnection conn => conn -> IO a }
 

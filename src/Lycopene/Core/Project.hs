@@ -1,9 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GADTs #-}
 module Lycopene.Core.Project
-  ( ProjectEvent(..)
-  , processProjectEvent
-  , Project(Project)
+  ( Project(Project)
   , ProjectStatus(..)
   , ProjectId
   , ProjectF(..)
@@ -78,46 +76,7 @@ _name = field name (\a s -> s { name = a })
 _status :: Lens Project ProjectStatus
 _status = field status (\a s -> s { status = a })
 
--- Use cases of Project
--- =======================================
 
--- | Aggregation of Project use-case
--- Lift ordinary values to Project semantices
-data ProjectEvent a where
-  -- | Lift Name and Description into a volatile entity.
-  NewProject :: Name -> Description -> ProjectEvent Project
-  -- | Fetch a project which identified by ProjectId
-  FetchProject :: ProjectId -> ProjectEvent Project
-  -- | Fetch list of active project
-  ActiveProject :: ProjectEvent [Project]
-  -- | Fetch list of all project regardless of its status.
-  AllProject :: ProjectEvent [Project]
-  -- |
-  DeactivateProject :: ProjectId -> ProjectEvent ()
-  -- |
-  ActivateProject :: ProjectId -> ProjectEvent ()
-  -- | 
-  UpdateProjectName :: Name -> ProjectId ->  ProjectEvent Project
-  -- |
-  UpdateProjectDescription :: Description -> ProjectId -> ProjectEvent Project
-  -- |
-  RemoveProject :: ProjectId -> ProjectEvent ()
-
--- | 
-processProjectEvent :: ProjectEvent a -> ProjectM a
-processProjectEvent (NewProject n d) =
-  addProject $ newProject n d
-processProjectEvent (RemoveProject i) =
-  () <$ removeProject i
-processProjectEvent (FetchProject i) =
-  fetchByIdProject i
--- FIXME: eliminate in-memory filtering
-processProjectEvent ActiveProject =
-  fmap (filter ((== ProjectActive) . (get _status))) fetchAllProject
-processProjectEvent AllProject =
-  fetchAllProject
-processProjectEvent (DeactivateProject i) =
-  () <$ deactivateProject (fetchByIdProject i)
 
 -- | Operational primitives of Project
 --
@@ -146,7 +105,7 @@ processProjectEvent (DeactivateProject i) =
 -- (Update f (Fetch (Name "hoge")))
 data ProjectF a where
   AddProjectF :: Project -> ProjectF Project
-  RemoveProjectF :: ProjectId -> ProjectF ProjectId
+  RemoveProjectF :: Name -> ProjectF ()
   UpdateProjectF :: Change Project -> Project -> ProjectF Project
   FetchByIdProjectF :: ProjectId -> ProjectF Project
   FetchByNameProjectF :: Name -> ProjectF Project
@@ -164,7 +123,7 @@ newProject n d =
 addProject :: Project -> ProjectM Project
 addProject = liftR . AddProjectF
 
-removeProject :: ProjectId -> ProjectM ProjectId
+removeProject :: Name -> ProjectM ()
 removeProject = liftR . RemoveProjectF
 
 updateProject :: Change Project -> ProjectM Project -> ProjectM Project

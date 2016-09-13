@@ -9,16 +9,12 @@ import           Control.Monad.Except (throwError)
 import           Database.Relational.Query
 import           Database.Record.FromSql
 import           Database.Record.ToSql
-import           Database.HDBC.Record
--- import           Database.HDBC.Record.Query (runQuery)
--- import           Database.HDBC.Record.Insert (runInsert)
--- import           Database.HDBC.Record.KeyUpdate (runKeyUpdate)
-
 import           Database.HDBC
+import           Database.HDBC.Record
 import           Database.Relational.Query
 import           Database.HDBC.Record
 import           Database.Record (ToSql, FromSql)
-import           Lycopene.Core (Lycopene(..), ProjectF(..))
+import           Lycopene.Core (Lycopene, LycopeneF(..), ProjectF(..))
 import           Lycopene.Database.Persist
 import qualified Lycopene.Database.Relational.Project as Pj
 import           Lycopene.Database.Relational.Decode
@@ -66,7 +62,8 @@ selectPersist :: (ToSql SqlValue p, FromSql SqlValue a) => Relation p a -> p -> 
 selectPersist q p = Persist (\conn -> runQuery conn (relationalQuery q) p)
 
 persist :: Lycopene a -> DB a
-persist (LProject p) = foldFreer persistProject p
+persist = foldFreer persistLyco where
+  persistLyco (ProjectL m) = persistProject m
 
 fromEntity :: (Decoder a b) => a -> DB b
 fromEntity = handleE . decode
@@ -74,13 +71,18 @@ fromEntity = handleE . decode
     handleE (Right x) = return x
     handleE (Left e) = throwError $ DecodeE e
 
+fetchOne :: [a] -> DB a
+fetchOne (x:xs) = return x
+fetchOne _ = throwError ResultSetEmpty
+
 persistProject :: ProjectF a -> DB a
 persistProject (AddProjectF p) = 
   p <$ db (insertQueryPersist (Pj.insertProject' p) ())
-persistProject (RemoveProjectF i) = undefined
-  () <$ db (deletePersist (Pj.deleteById i) ())
+persistProject (RemoveProjectF n) =
+  () <$ db (deletePersist (Pj.deleteByName n) ())
 persistProject (UpdateProjectF f p) = undefined
 persistProject (FetchByIdProjectF i) = undefined
-persistProject (FetchByNameProjectF n) = undefined
+persistProject (FetchByNameProjectF n) =
+  fromEntity =<< fetchOne =<< db (selectPersist Pj.selectByName n)
 persistProject FetchAllProjectF =
   mapM fromEntity =<< db (selectPersist Pj.project ())

@@ -2,10 +2,8 @@ module Lycopene.Command
   ( runCommand
   ) where
 
-import           Control.Monad.Trans (MonadIO, liftIO)
 import qualified Lycopene.Option.Command as Cmd
 import qualified Lycopene.Configuration as Cfg
-import qualified Lycopene.Core as Core
 import           Lycopene.Application (defaultEngine)
 import           Lycopene.Environment (dataPath)
 import           Lycopene.Database (connect, runDB, rawDB, DBException(..))

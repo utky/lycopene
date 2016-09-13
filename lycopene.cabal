@@ -87,6 +87,7 @@ library
                        Lycopene.Core.Store
                        Lycopene.Coyoneda
                        Lycopene.Lens
+                       Lycopene.Core.Event
                        Lycopene.Core.Stage
                        Lycopene.Database.HDBC.Project
                        Lycopene.Database.HDBC.Query

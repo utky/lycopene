@@ -32,7 +32,7 @@ insertProject' (Core.Project i n d s) = insertQueryProject encodeValues
     encodeStatus Core.ProjectInactive = 0
     encodeStatus Core.ProjectActive = 1
 
-deleteById :: Core.ProjectId -> Delete ()
-deleteById i =
+deleteByName :: Core.Name -> Delete ()
+deleteByName n =
   typedDelete tableOfProject . restriction $ \proj -> do
-    wheres $ proj ! projectId' .=. value (Core.idStr i)
+    wheres $ proj ! name' .=. value n
