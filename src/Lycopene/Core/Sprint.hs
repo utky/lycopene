@@ -1,6 +1,15 @@
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GADTs #-}
 module Lycopene.Core.Sprint where
 
+import           Data.Char (toLower)
+import qualified Data.Text as T
+import           GHC.Generics
+import           Data.Aeson (ToJSON(..), FromJSON(..))
+import           Data.Aeson.Types
+                   (typeMismatch, Value(..), Parser
+                   , genericToEncoding, genericParseJSON, Options(..)
+                   , defaultOptions, withText)
 import           Lycopene.Core.Scalar
 import           Lycopene.Freer (Freer, liftR, foldFreer)
 import           Lycopene.Core.Store (Change)
@@ -11,9 +20,21 @@ import           Lycopene.Lens (Lens, set, field)
 type SprintId = Identifier
 
 data SprintStatus
-  = Finished
-  | Running
+  = SprintFinished
+  | SprintRunning
   deriving (Show, Eq, Ord)
+
+
+instance ToJSON SprintStatus where
+  toJSON SprintFinished = toJSON "finished"
+  toJSON SprintRunning = toJSON "running"
+  
+instance FromJSON SprintStatus where
+  parseJSON = withText "running|finished" $ \t ->
+    case T.unpack t of
+      "running"   -> return SprintRunning
+      "finished" -> return SprintFinished
+      _          -> fail "running|finished"
 
 -- | A time box which includes zero or more issues.
 data Sprint
@@ -24,7 +45,17 @@ data Sprint
     , sprintStartOn :: !(Maybe Date)
     , sprintEndOn :: !(Maybe Date)
     , sprintStatus :: !SprintStatus
-    } deriving (Show)
+    } deriving (Show, Generic)
+
+sprintOptions :: Options
+sprintOptions =
+  defaultOptions
+    { fieldLabelModifier = map toLower . drop (length "sprint") }
+
+instance ToJSON Sprint where
+  toEncoding = genericToEncoding sprintOptions
+instance FromJSON Sprint where
+  parseJSON = genericParseJSON sprintOptions
 
 instance Eq Sprint where
     x == y = (sprintId x) == (sprintId y)
@@ -41,75 +72,43 @@ _sprintStartOn = field sprintStartOn (\a s -> s { sprintStartOn = a })
 _sprintEndOn :: Lens Sprint (Maybe Date)
 _sprintEndOn = field sprintEndOn (\a s -> s { sprintEndOn = a })
 
--- | Aggregation of Sprint use-case
---
--- 1. Create the sprint automatically when new project created.
--- 2. Create the sprint in existing project by user with starting date and deadline.
--- 3. Modify starting date and deadline.
--- 4. List active sprints.
--- 4. Finish the sprint.
-data SprintEvent a where
-  -- | Create a new sprint for the project.
-  NewSprint :: Name -> Description -> Maybe Date -> Maybe Date -> ProjectId -> SprintEvent SprintId
-  -- | Create a new deafult sprint for the project.
-  NewDefaultSprint :: ProjectId -> SprintEvent SprintId
-  -- | Modify starting date of the sprint.
-  UpdateStartOnSprint :: Date -> SprintId -> SprintEvent ()
-  -- | Modify deadline date of the sprint.
-  UpdateEndOnSprint :: Date -> SprintId -> SprintEvent ()
-  -- | Modify the sprint status with given status (running or finished).
-  UpdateSprintStatus :: SprintStatus -> SprintId -> SprintEvent ()
-  -- | Remove the sprint.
-  RemoveSprint :: SprintId -> SprintEvent ()
-  -- | Fetch all sprint deriving from the project.
-  FetchProjectAllSprint :: ProjectId -> SprintEvent [Sprint]
-  -- | Fetch running springs for the project.
-  FetchRunningSprint :: ProjectId -> SprintEvent [Sprint]
-
-processSprintEvent :: SprintEvent a -> SprintM a
-processSprintEvent (NewSprint n d s e i) =
-  (fmap sprintId . addSprint) $ newSprint n d s e i
-processSprintEvent (NewDefaultSprint i) =
-  newDefaultSprint i
-processSprintEvent (UpdateStartOnSprint d s) =
-  updateSprint (set _sprintStartOn (Just d)) $ fetchByIdSprint s
-processSprintEvent (UpdateEndOnSprint d s) =
-  updateSprint (set _sprintEndOn (Just d)) $ fetchByIdSprint s
-processSprintEvent (UpdateSprintStatus st s) =
-  updateSprint (set _sprintStatus st) $ fetchByIdSprint s
-processSprintEvent (RemoveSprint i) =
-  removeSprint i
-processSprintEvent (FetchProjectAllSprint p) =
-  fetchAllSprint p
-processSprintEvent (FetchRunningSprint p) =
-  fetchByStatusSprint Running p
-
 
 -- |
 data SprintF a where
   -- |
-  NewSprintF :: Name -> Description -> Maybe DateTime -> Maybe DateTime -> ProjectId -> SprintF Sprint
+  AddSprintF :: ProjectId -> Sprint -> SprintF Sprint
   -- |
-  AddSprintF :: Sprint -> SprintF Sprint
+  AddDefaultSprintF :: ProjectId -> Sprint -> SprintF Sprint
   -- |
   RemoveSprintF :: Sprint -> SprintF Sprint
   -- |
   UpdateSprintF :: Change Sprint -> Sprint -> SprintF Sprint
   -- |
-  FetchByIdSprintF :: SprintId -> SprintF Sprint
+  FetchByNameSprintF :: Name -> Name -> SprintF Sprint
   -- |
-  FetchAllSprintF :: ProjectId -> SprintF [Sprint]
-  -- |
-  FetchByStatusSprintF :: SprintStatus -> SprintF [Sprint]
+  FetchByStatusSprintF :: Name -> SprintStatus -> SprintF [Sprint]
 
 type SprintM = Freer SprintF
 
 -- FIXME: IMPLEMENT sprint primitives.
-newSprint = undefined
+newBacklog :: ProjectId -> SprintM Sprint
+newBacklog p =
+  let new = newSprint "backlog" Nothing Nothing Nothing
+  in  liftR $ AddDefaultSprintF p new
+
+newSprint :: Name -> Description -> Maybe Date -> Maybe Date -> Sprint
+newSprint n d s e =
+  let next = generate nameIdGen ("sprint", n)
+  in  Sprint next n d s e SprintRunning
+
+fetchByNameSprint :: Name -> Name -> SprintM Sprint
+fetchByNameSprint pj sp = liftR $ FetchByNameSprintF pj sp
+
+fetchByStatusSprint :: Name -> SprintStatus -> SprintM [Sprint]
+fetchByStatusSprint pj st = liftR $ FetchByStatusSprintF pj st
+
 addSprint = undefined
-newDefaultSprint = undefined
 updateSprint f = undefined
 removeSprint = undefined
 fetchByIdSprint = undefined
 fetchAllSprint = undefined
-fetchByStatusSprint = undefined

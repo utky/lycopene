@@ -5,49 +5,61 @@ module Lycopene.Core.Event where
 import           Lycopene.Core.Scalar
 import           Lycopene.Core.Monad
 import qualified Lycopene.Core.Project as Project
+import qualified Lycopene.Core.Sprint as Sprint
+import qualified Lycopene.Core.Issue as Issue
 
--- | 
-data Event a
-  = EProject (ProjectEvent a)
---  | ESprint (SprintEvent a)
 
 -- Use cases of Project
 -- =======================================
 
 -- | Aggregation of Project use-case
 -- Lift ordinary values to Project semantices
-data ProjectEvent a where
+data Event a where
   -- | Lift Name and Description into a volatile entity.
-  NewProject :: Name -> Description -> ProjectEvent Project.Project
+  NewProject :: Name -> Description -> Event Project.Project
   -- | Fetch a project which identified by ProjectId
-  FetchProject :: Name -> ProjectEvent Project.Project
+  FetchProject :: Name -> Event Project.Project
   -- | Fetch list of all project regardless of its status.
-  AllProject :: ProjectEvent [Project.Project]
-  -- |
-  RemoveProject :: Name -> ProjectEvent ()
-  -- | Fetch list of active project
-  -- ActiveProject :: ProjectEvent [Project]
-  -- |
-  -- DeactivateProject :: ProjectId -> ProjectEvent ()
-  -- |
-  -- ActivateProject :: ProjectId -> ProjectEvent ()
+  AllProject :: Event [Project.Project]
+  -- | Remove a project by specified name from domain space.
+  RemoveProject :: Name -> Event ()
+  -- | Create a new sprint for the project.
+  --NewSprint :: Name -> Description -> Maybe Date -> Maybe Date -> Project.ProjectId -> Event Sprint.SprintId
+  -- | Fetch all sprint deriving from the project.
+  FetchProjectSprint :: Name -> Event [Sprint.Sprint]
   -- | 
-  -- UpdateProjectName :: Name -> ProjectId ->  ProjectEvent Project
-  -- |
-  -- UpdateProjectDescription :: Description -> ProjectId -> ProjectEvent Project
+  FetchSprint :: Name -> Name -> Event Sprint.Sprint
+  -- | 
+  NewIssue :: Name -> Name -> String -> Event Issue.Issue
+  -- | 
+  FetchIssues :: Name -> Name -> Issue.IssueStatus -> Event [Issue.Issue]
 
--- | 
-processProjectEvent :: ProjectEvent a -> Lycopene a
-processProjectEvent (NewProject n d) =
-  hoistFreer ProjectL $ Project.addProject $ Project.newProject n d
-processProjectEvent (RemoveProject n) =
-  () <$ (hoistFreer ProjectL $ Project.removeProject n)
-processProjectEvent (FetchProject n) =
-  hoistFreer ProjectL $ Project.fetchByNameProject n
-processProjectEvent AllProject =
-  hoistFreer ProjectL $ Project.fetchAllProject
--- FIXME: eliminate in-memory filtering
--- processProjectEvent ActiveProject =
---   fmap (filter ((== ProjectActive) . (get _status))) fetchAllProject
--- processProjectEvent (DeactivateProject i) =
---   () <$ deactivateProject (fetchByIdProject i)
+processEvent :: Event a -> Lycopene a
+processEvent (NewProject n d) = do
+  pj <- project $ Project.addProject $ Project.newProject n d
+  _ <- sprint $ Sprint.newBacklog (Project.projectId pj)
+  return pj
+
+processEvent (RemoveProject n) =
+  () <$ (project $ Project.removeProject n)
+
+processEvent (FetchProject n) =
+  project $ Project.fetchByNameProject n
+
+processEvent AllProject =
+  project $ Project.fetchAllProject
+
+processEvent (FetchProjectSprint p) =
+  sprint $ Sprint.fetchByStatusSprint p Sprint.SprintRunning
+
+processEvent (FetchSprint p s) =
+  sprint $ Sprint.fetchByNameSprint p s
+
+processEvent (NewIssue pj sp t) = do
+  parent <- sprint $ Sprint.fetchByNameSprint pj sp
+  issue $ Issue.addIssue (Sprint.sprintId parent)
+             $ Issue.newIssue t Nothing
+
+processEvent (FetchIssues pj sp st) = do
+  parent <- sprint $ Sprint.fetchByNameSprint pj sp
+  issue $ Issue.fetchByStatusIssue (Sprint.sprintId parent) st

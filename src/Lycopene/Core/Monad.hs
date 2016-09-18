@@ -1,14 +1,18 @@
 module Lycopene.Core.Monad
   ( Lycopene
   , LycopeneF(..)
-  , module Lycopene.Freer
+  , project
+  , sprint
+  , issue
   ) where
 
 import           Control.Monad.Trans
 import           Control.Monad.Reader
 import           Control.Monad.Except
 import           Lycopene.Freer (Freer, hoistFreer)
-import           Lycopene.Core.Project (ProjectF)
+import           Lycopene.Core.Project (ProjectM, ProjectF)
+import           Lycopene.Core.Sprint (SprintM, SprintF)
+import           Lycopene.Core.Issue (IssueM, IssueF)
 
 type Lycopene = Freer LycopeneF
 
@@ -16,3 +20,16 @@ type Lycopene = Freer LycopeneF
 -- Maybe replacable to Extensible effect
 data LycopeneF a
   = ProjectL (ProjectF a)
+  | SprintL (SprintF a)
+  | IssueL (IssueF a)
+
+-- (Hoist m o, Hoist n o) => m a -> (a -> n b) -> o b
+
+project :: ProjectM a -> Lycopene a
+project = hoistFreer ProjectL
+
+sprint :: SprintM a -> Lycopene a
+sprint = hoistFreer SprintL
+
+issue :: IssueM a -> Lycopene a
+issue = hoistFreer IssueL

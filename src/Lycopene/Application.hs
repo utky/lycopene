@@ -22,7 +22,7 @@ runEngine = unEngine
 appEngine :: DataSource -> AppEngine
 appEngine ds =
    let runDatabase = flip runDB
-   in  AppEngine $ runDatabase ds . persist . Core.process
+   in  AppEngine $ runDatabase ds . persist . Core.processEvent
 
 defaultEngine :: IO AppEngine
 defaultEngine = do

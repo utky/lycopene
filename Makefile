@@ -1,8 +1,8 @@
 LYCOHOME = schema
 STACK = stack
 LYCO = ${STACK} exec lyco --
-XDG_DATA_HOME := $(shell pwd)/.local/share
-XDG_CONFIG_HOME := $(shell pwd)/.config
+XDG_DATA_HOME := $(shell pwd)/.stack-work/docker/_home/.local/share
+XDG_CONFIG_HOME := $(shell pwd)/.stack-work/docker/_home/.config
 
 .PHONY: all quick bench clean veryclean install sdist init configure start
 

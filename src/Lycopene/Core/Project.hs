@@ -1,7 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GADTs #-}
 module Lycopene.Core.Project
-  ( Project(Project)
+  ( Project(..)
   , ProjectStatus(..)
   , ProjectId
   , ProjectF(..)
@@ -11,16 +11,19 @@ module Lycopene.Core.Project
   , removeProject
   , updateProject
   , fetchByNameProject
-  , fetchByIdProject
   , fetchAllProject
   , activateProject
   , deactivateProject
   ) where
 
-import           Prelude hiding (id)
+import           Data.Char (toLower)
+import qualified Data.Text as T
 import           GHC.Generics
-import           Data.Aeson (ToJSON, FromJSON, toJSON, parseJSON)
-import           Data.Aeson.Types (typeMismatch, Value(..), Parser)
+import           Data.Aeson (ToJSON(..), FromJSON(..))
+import           Data.Aeson.Types
+                   (typeMismatch, Value(..), Parser
+                   , genericToEncoding, genericParseJSON, Options(..)
+                   , defaultOptions, withText)
 import           Lycopene.Core.Scalar
 import           Lycopene.Freer (Freer, liftR, foldFreer)
 import           Lycopene.Core.Store (Change)
@@ -36,78 +39,56 @@ data ProjectStatus
   deriving (Eq, Ord, Show)
 
 instance ToJSON ProjectStatus where
-  toJSON ProjectInactive = toJSON (0 :: Int)
-  toJSON ProjectActive = toJSON (1 :: Int)
-
+  toJSON ProjectActive = toJSON "active"
+  toJSON ProjectInactive = toJSON "inactive"
+  
 instance FromJSON ProjectStatus where
-  parseJSON j@(Number x) = 
-    let withInteger :: Integer -> Parser ProjectStatus
-        withInteger 0 = return ProjectInactive
-        withInteger 1 = return ProjectActive
-        withInteger y = typeMismatch "0 or 1" j
-    in  parseJSON j >>= withInteger
-  parseJSON invalid = typeMismatch "Integer" invalid
+  parseJSON = withText "active|inactive" $ \t ->
+    case T.unpack t of
+      "active"   -> return ProjectActive
+      "inactive" -> return ProjectInactive
+      _          -> fail "active|inactive"
 
 data Project
   = Project
-  { id   :: !ProjectId
-  , name :: !Name
-  , description :: Description
-  , status :: !ProjectStatus
+  { projectId   :: !ProjectId
+  , projectName :: !Name
+  , projectDescription :: Description
+  , projectStatus :: !ProjectStatus
   }
   deriving (Show, Generic)
 
-instance ToJSON Project
-instance FromJSON Project
+projectOptions :: Options
+projectOptions =
+  defaultOptions
+    { fieldLabelModifier = map toLower . drop (length "project") }
+
+instance ToJSON Project where
+  toEncoding = genericToEncoding projectOptions
+instance FromJSON Project where
+  parseJSON = genericParseJSON projectOptions
 
 -- Project is identified by `projectId`
 instance Eq Project where
-  x == y = (id x) == (id y)
+  x == y = (projectId x) == (projectId y)
 
 -- Minimal lenses for Project
 -- ==================================================================
 
 _id :: Lens Project ProjectId
-_id = field id (\a s -> s { id = a })
+_id = field projectId (\a s -> s { projectId = a })
 
 _name :: Lens Project Name
-_name = field name (\a s -> s { name = a })
+_name = field projectName (\a s -> s { projectName = a })
 
 _status :: Lens Project ProjectStatus
-_status = field status (\a s -> s { status = a })
-
-
+_status = field projectStatus (\a s -> s { projectStatus = a })
 
 -- | Operational primitives of Project
---
--- ProjectF Projectという型は実質的にただの参照な気がするな
---
--- 7/9 ProjectFを要求する再帰的な構造を捨てる
--- つまり ProjectF a -> ProjectF a を
--- a -> ProjectF a
--- にした
--- これによりFlatなデータを持ち上げるだけのコンストラクタになる
--- AST的にはleafしかない。nodeはFreeが作る
---
--- :<$> :: (a -> b) -> f a -> f b
--- :>>= :: (a -> m b) -> m a -> m b
--- :>> :: m a -> m b -> m b
--- :<< :: m a -> m b -> m a
--- いやここはADTではなく関数でやればいいけどそのためには
--- ADTがMonadを要求するので結局Freerとかを使うことになる
---
--- が、仮に eval :: Monad m => f a -> m a
--- であればADTがMonad則を満たしていなくてもよいかも。
--- bind, joinなどは m a に委譲すればいいので。
---
--- ((Remove (Update f (Add (New n d)))) :>> (Fetch n))
--- (f :<$> (Fetch n d))
--- (Update f (Fetch (Name "hoge")))
 data ProjectF a where
   AddProjectF :: Project -> ProjectF Project
   RemoveProjectF :: Name -> ProjectF ()
   UpdateProjectF :: Change Project -> Project -> ProjectF Project
-  FetchByIdProjectF :: ProjectId -> ProjectF Project
   FetchByNameProjectF :: Name -> ProjectF Project
   FetchAllProjectF :: ProjectF [Project]
 
@@ -128,9 +109,6 @@ removeProject = liftR . RemoveProjectF
 
 updateProject :: Change Project -> ProjectM Project -> ProjectM Project
 updateProject f = (>>= (liftR . UpdateProjectF f))
-
-fetchByIdProject :: ProjectId -> ProjectM Project
-fetchByIdProject = liftR . FetchByIdProjectF
 
 fetchByNameProject :: Name -> ProjectM Project
 fetchByNameProject = liftR . FetchByNameProjectF

@@ -1,6 +1,9 @@
-module Lycopene.Database.Relational.Decode.Project (project) where
+{-# LANGUAGE FlexibleInstances #-}
+-- {-# LANGUAGE TemplateHaskell #-}
+module Lycopene.Database.Relational.Decode.Project where
 
 import           Data.UUID (fromString)
+-- import           Database.Relational.Query.TH (defineProductConstructorInstance)
 import           Lycopene.Database.Relational.Decode.Prim
 import qualified Lycopene.Core as Core
 import qualified Lycopene.Database.Relational.Project as Pj
@@ -17,3 +20,16 @@ projectStatus :: Int -> Maybe Core.ProjectStatus
 projectStatus 0 = Just Core.ProjectInactive
 projectStatus 1 = Just Core.ProjectActive
 projectStatus _ = Nothing
+
+
+-- $(defineProductConstructorInstance
+--  [t|Core.Project|]
+--  [|Core.Project|]
+--  -- TODO: enumerate TypeQ from reifying data constructor.
+--  [ [t|Core.ProjectId|]
+--  , [t|Core.Name|]
+--  , [t|Core.Description|]
+--  , [t|Core.ProjectStatus|]
+--  ])
+
+

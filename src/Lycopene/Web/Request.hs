@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module Lycopene.Web.Instance where
+module Lycopene.Web.Request where
 
 import           Web.HttpApiData
 import           Data.UUID
@@ -17,3 +17,5 @@ instance FromHttpApiData Core.IssueStatus where
         "open"   -> Right Core.IssueOpen
         "closed" -> Right Core.IssueClosed
         _        -> Left "IssueStatus"
+
+

@@ -84,6 +84,7 @@ library
                        Paths_lycopene
   other-modules:       Lycopene.Core.Identifier
                        Lycopene.Core.Scalar
+                       Lycopene.Core.Monad
                        Lycopene.Core.Store
                        Lycopene.Coyoneda
                        Lycopene.Lens
@@ -95,9 +96,11 @@ library
                        Lycopene.Database.Relational.Decode.Prim
                        Lycopene.Database.Relational.Decode.Class
                        Lycopene.Database.Relational.Decode.Project
+                       Lycopene.Database.Relational.Decode.Issue
+                       Lycopene.Database.Relational.Decode.Sprint
                        Lycopene.Web.Api
                        Lycopene.Web.Trans
-                       Lycopene.Web.Instance
+                       Lycopene.Web.Request
 
   build-depends:       base
                        , text

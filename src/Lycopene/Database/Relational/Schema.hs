@@ -7,6 +7,7 @@ import           Lycopene.TH
 
 schema :: String
 schema = [str|
+
 CREATE TABLE project (
   project_id TEXT PRIMARY KEY NOT NULL,
   name TEXT NOT NULL UNIQUE,
@@ -25,15 +26,15 @@ CREATE TABLE sprint (
   end_on TIMESTAMP,
   status INTEGER NOT NULL,
   UNIQUE (name, project_id),
-  FOREIGN KEY(project_id) REFERENCES project(project_id),
+  FOREIGN KEY(project_id) REFERENCES project(project_id) ON DELETE CASCADE,
   FOREIGN KEY(status) REFERENCES sprint_status(status_id)
 );
 
 CREATE TABLE backlog_sprint (
   backlog_project_id TEXT PRIMARY KEY NOT NULL,
   backlog_sprint_id TEXT NOT NULL,
-  FOREIGN KEY(backlog_project_id) REFERENCES project(project_id),
-  FOREIGN KEY(backlog_sprint_id) REFERENCES sprint(sprint_id)
+  FOREIGN KEY(backlog_project_id) REFERENCES project(project_id) ON DELETE CASCADE,
+  FOREIGN KEY(backlog_sprint_id) REFERENCES sprint(sprint_id) ON DELETE CASCADE
 );
 
 CREATE TABLE issue (
@@ -43,7 +44,7 @@ CREATE TABLE issue (
   description TEXT,
   sprint_id TEXT NOT NULL,
   status INTEGER NOT NULL,
-  FOREIGN KEY(sprint_id) REFERENCES sprint(sprint_id),
+  FOREIGN KEY(sprint_id) REFERENCES sprint(sprint_id) ON DELETE CASCADE,
   FOREIGN KEY(status) REFERENCES issue_status(status_id)
 );
 
@@ -52,7 +53,7 @@ CREATE TABLE record (
   issue_id TEXT NOT NULL,
   start_on TIMESTAMP NOT NULL,
   end_on TIMESTAMP,
-  FOREIGN KEY(issue_id) REFERENCES issue(issue_id)
+  FOREIGN KEY(issue_id) REFERENCES issue(issue_id) ON DELETE CASCADE
 );
 
 CREATE TABLE project_status (
@@ -80,7 +81,7 @@ CREATE TABLE labeled_issue (
   issue_id TEXT NOT NULL,
   label TEXT NOT NULL,
   PRIMARY KEY (issue_id, label),
-  FOREIGN KEY(issue_id) REFERENCES issue(issue_id),
+  FOREIGN KEY(issue_id) REFERENCES issue(issue_id) ON DELETE CASCADE,
   FOREIGN KEY(label) REFERENCES label(value)
 );
 
