@@ -22,6 +22,8 @@ import qualified Lycopene.Database.Relational.Issue as Is
 import           Lycopene.Database.Relational.Decode
 import           Lycopene.Freer (foldFreer)
 
+-- FIXME: debug hack
+import Debug.Trace (traceShow)
 
 -- instance ShowConstantTermsSQL Integer where
 --   showConstantTermsSQL' = let f :: Integer -> Int
@@ -107,7 +109,9 @@ persistSprint (Core.FetchByStatusSprintF p st) =
 
 persistIssue :: Core.IssueF a -> DB a
 persistIssue (Core.AddIssueF s is) =
-  is <$ db (insertQueryPersist (Is.insertIssue' s is) ())
+  -- FIXME: debug hack
+  let q = (Is.insertIssue' s is)
+  in is <$ db (insertQueryPersist (traceShow q q) ())
 
 persistIssue (Core.FetchByStatusIssueF s st) =
   let spid = Core.idStr s

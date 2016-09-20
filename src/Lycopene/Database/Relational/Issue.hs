@@ -35,7 +35,7 @@ insertIssue' sp (Core.Issue i t d s) = insertQueryIssue encodeValues
       let fmx = flattenMaybe mx
           one = just (value 1)
           next = fmx ?+? one
-          defval = value 0
+          defval = value 1
       return $
         Issue |$| value (Core.idStr i)
               |*| fromMaybe defval next

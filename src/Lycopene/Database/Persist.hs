@@ -22,7 +22,7 @@ data DBException
   = SqlE SqlError
   | DecodeE DecodeError
   | ResultSetEmpty
-  deriving (Typeable)
+  deriving (Typeable, Eq)
 
 instance Exception DBException
 

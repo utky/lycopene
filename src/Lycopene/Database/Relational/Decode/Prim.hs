@@ -6,7 +6,7 @@ type Decode a b = ReaderT a DecodeResult b
 
 type DecodeResult = Either DecodeError
 
-data DecodeError = DecodeFail String deriving (Show)
+data DecodeError = DecodeFail String deriving (Show, Eq)
 
 execDecode :: Decode a b -> a -> DecodeResult b
 execDecode = runReaderT
