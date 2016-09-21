@@ -33,6 +33,9 @@ data Event a where
   NewIssue :: Name -> Name -> String -> Event Issue.Issue
   -- | 
   FetchIssues :: Name -> Name -> Issue.IssueStatus -> Event [Issue.Issue]
+  -- |
+  FetchIssue :: Issue.IssueId -> Event Issue.Issue
+  RemoveIssue :: Issue.IssueId -> Event ()
 
 processEvent :: Event a -> Lycopene a
 processEvent (NewProject n d) = do
@@ -63,3 +66,9 @@ processEvent (NewIssue pj sp t) = do
 processEvent (FetchIssues pj sp st) = do
   parent <- sprint $ Sprint.fetchByNameSprint pj sp
   issue $ Issue.fetchByStatusIssue (Sprint.sprintId parent) st
+
+processEvent (FetchIssue is) = do
+  issue $ Issue.fetchIssue is
+
+processEvent (RemoveIssue is) = do
+  issue $ Issue.removeIssue is

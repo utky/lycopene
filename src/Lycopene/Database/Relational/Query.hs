@@ -22,14 +22,6 @@ import qualified Lycopene.Database.Relational.Issue as Is
 import           Lycopene.Database.Relational.Decode
 import           Lycopene.Freer (foldFreer)
 
--- FIXME: debug hack
-import Debug.Trace (traceShow)
-
--- instance ShowConstantTermsSQL Integer where
---   showConstantTermsSQL' = let f :: Integer -> Int
---                               f = fromInteger
---                           in showConstantTermsSQL' . f
-
 
 -- Lift method
 -- ----------------------------------------------------------------
@@ -64,6 +56,10 @@ deletePersist d p = Persist (\conn -> runDelete conn d p)
 -- Apply query parameter @p@ to 'Relation'
 selectPersist :: (ToSql SqlValue p, FromSql SqlValue a) => Relation p a -> p -> Persist [a]
 selectPersist q p = Persist (\conn -> runQuery conn (relationalQuery q) p)
+
+queryPersist :: (ToSql SqlValue p, FromSql SqlValue a) => Query p a -> p -> Persist [a]
+queryPersist q p = Persist (\conn -> runQuery conn q p)
+
 
 persist :: Core.Lycopene a -> DB a
 persist = foldFreer persistLyco where
@@ -109,14 +105,22 @@ persistSprint (Core.FetchByStatusSprintF p st) =
 
 persistIssue :: Core.IssueF a -> DB a
 persistIssue (Core.AddIssueF s is) =
-  -- FIXME: debug hack
-  let q = (Is.insertIssue' s is)
-  in is <$ db (insertQueryPersist (traceShow q q) ())
+  is <$ db (insertQueryPersist (Is.insertIssue' s is) ())
 
 persistIssue (Core.FetchByStatusIssueF s st) =
   let spid = Core.idStr s
       stat = Is.encodeStatus st
   in  mapM fromEntity =<< db (selectPersist Is.selectBySprint (spid, stat))
+
+persistIssue (Core.FetchByIdIssueF is) =
+  let isid = Core.idStr is
+  in  fromEntity =<< fetchOne =<< db (queryPersist Is.selectIssue isid)
+
+persistIssue (Core.RemoveIssueF is) =
+  let isid = Core.idStr is
+  in  () <$ db (deletePersist (Is.deleteById isid) ())
+
+-- Utilities
 
 fromEntity :: (Decoder a b) => a -> DB b
 fromEntity = handleE . decode

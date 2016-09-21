@@ -32,9 +32,9 @@ spec = do
           (mapR Core.sprintName fetched) `shouldBe` (Right "backlog")
 
         it "create a issue" $ \engine -> do
-          -- FIXME: issueが登録されない件
           _ <- runEngine engine (Core.NewProject "new" Nothing)
           created <- runEngine engine (Core.NewIssue "new" "backlog" "issue")
           fetched <- runEngine engine (Core.FetchIssues "new" "backlog" Core.IssueOpen)
           (mapR (Core.issueTitle . head) fetched) `shouldBe` (Right "issue")
+
 

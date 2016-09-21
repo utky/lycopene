@@ -39,7 +39,6 @@ CREATE TABLE backlog_sprint (
 
 CREATE TABLE issue (
   issue_id TEXT PRIMARY KEY NOT NULL,
-  issue_number INTEGER UNIQUE NOT NULL,
   title TEXT NOT NULL,
   description TEXT,
   sprint_id TEXT NOT NULL,

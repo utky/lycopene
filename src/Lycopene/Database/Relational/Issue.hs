@@ -29,20 +29,12 @@ insertIssue' :: Core.SprintId -> Core.Issue -> InsertQuery ()
 insertIssue' sp (Core.Issue i t d s) = insertQueryIssue encodeValues
   where
     encodeValues :: Relation () Issue
-    encodeValues = relation $ do
-      is <- query issue
-      mx <- queryScalar $ aggregatedUnique issue issueNumber' max'
-      let fmx = flattenMaybe mx
-          one = just (value 1)
-          next = fmx ?+? one
-          defval = value 1
-      return $
-        Issue |$| value (Core.idStr i)
-              |*| fromMaybe defval next
-              |*| value t
-              |*| value d
-              |*| value (Core.idStr sp)
-              |*| value (encodeStatus s)
+    encodeValues = relation . return $
+      Issue |$| value (Core.idStr i)
+            |*| value t
+            |*| value d
+            |*| value (Core.idStr sp)
+            |*| value (encodeStatus s)
 
 encodeStatus :: Core.IssueStatus -> Int
 encodeStatus Core.IssueOpen = 1
@@ -73,3 +65,8 @@ openIssues = relation' . placeholder $ \ph -> do
   wheres $ s ! Sprint.projectId' .=. ph ! fst'
   wheres $ i ! status'           .=. ph ! snd'
   return i
+
+deleteById :: String -> Delete ()
+deleteById i =
+  typedDelete tableOfIssue . restriction $ \proj -> do
+    wheres $ proj ! issueId' .=. value i

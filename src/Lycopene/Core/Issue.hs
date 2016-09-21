@@ -66,6 +66,8 @@ data IssueF a where
   RemoveIssueF :: IssueId -> IssueF ()
   -- | Fetch current open issue.
   FetchByStatusIssueF :: SprintId -> IssueStatus -> IssueF [Issue]
+  -- |
+  FetchByIdIssueF :: IssueId -> IssueF Issue
   -- | Move the issue to given sprint.
   -- MoveIssue :: SprintId -> IssueId -> IssueEvent ()
 
@@ -82,3 +84,9 @@ addIssue s i = liftR $ AddIssueF s i
 
 fetchByStatusIssue :: SprintId -> IssueStatus -> IssueM [Issue]
 fetchByStatusIssue sp st = liftR $ FetchByStatusIssueF sp st
+
+removeIssue :: IssueId -> IssueM ()
+removeIssue = liftR . RemoveIssueF
+
+fetchIssue :: IssueId -> IssueM Issue
+fetchIssue = liftR . FetchByIdIssueF

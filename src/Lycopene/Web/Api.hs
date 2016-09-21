@@ -27,7 +27,9 @@ type SprintApi
 
 type IssueApi
   =    QueryParam "status" Core.IssueStatus :> Get '[JSON] [Core.Issue]
+  :<|> Capture "id" Core.IssueId :> Get '[JSON] Core.Issue
   :<|> ReqBody '[JSON] String :> Post '[JSON] Core.Issue
+  :<|> Capture "id" Core.IssueId :> DeleteNoContent '[JSON] NoContent
 
 api :: Proxy LycopeneApi
 api = Proxy
@@ -66,8 +68,12 @@ sprintServer pj engine
 issueServer :: Core.Name -> Core.Name -> AppEngine -> Server IssueApi
 issueServer pj sp engine
   =    fetchIssues
+  :<|> fetchIssue
   :<|> newIssue
+  :<|> removeIssue
   where
     fetchIssues (Just st) = lyco engine $ (Core.FetchIssues pj sp st)
     fetchIssues Nothing   = lyco engine $ (Core.FetchIssues pj sp Core.IssueOpen)
     newIssue t = lyco engine $ Core.NewIssue pj sp t
+    fetchIssue issueId = lyco engine $ Core.FetchIssue issueId
+    removeIssue issueId = NoContent <$ (lyco engine $ Core.RemoveIssue issueId)
