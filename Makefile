@@ -8,7 +8,11 @@ XDG_CONFIG_HOME := $(shell pwd)/.stack-work/docker/_home/.config
 
 all: build
 
-build:
+client-build:
+	mkdir -p assets
+	(cd client ; make)
+
+build: client-build
 	@${STACK} build
 
 watch-build:
@@ -31,5 +35,5 @@ project: build
 	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- project
 
 start: build
-	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- start
+	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- start -p 8080 -d "./assets"
 

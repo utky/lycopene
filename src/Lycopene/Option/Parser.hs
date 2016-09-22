@@ -1,11 +1,6 @@
 module Lycopene.Option.Parser where
 
 import           Options.Applicative
-                   ( Parser, ParserInfo, helper, progDesc
-                   , handleParseResult, execParserPure
-                   , prefs, idm, subparser, command, info
-                   , (<>)
-                   )
 import           Lycopene.Option.Common
 import           Lycopene.Option.Command
 
@@ -53,5 +48,17 @@ configure =
 start :: ParserInfo Command
 start =
   info
-    (pure (Start 8080))
+    (Start
+      <$> (option auto
+            (long "port"
+            <> (short 'p')
+            <> (metavar "PORT")
+            <> (value 8080)
+            <> showDefault
+            <> (help "TCP port number in which server waits.")))
+      <*> (strOption
+            (long "directory"
+            <> (short 'd')
+            <> (metavar "DIR")
+            <> (help "Directory of document root."))))
     (progDesc "Start web server.")

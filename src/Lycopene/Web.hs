@@ -7,8 +7,8 @@ import           Lycopene.Web.Api (api, server)
 
 type PortNum = Int
 
-startServer :: PortNum -> AppEngine -> IO ()
-startServer portNum engine = do
+startServer :: PortNum -> FilePath -> AppEngine -> IO ()
+startServer portNum docRoot engine = do
   putStrLn $ "Listening on port " ++ (show portNum)
-  Warp.run portNum $ serve api (server engine)
+  Warp.run portNum $ serve api (server docRoot engine)
 

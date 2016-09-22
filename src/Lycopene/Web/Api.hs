@@ -12,6 +12,7 @@ import qualified Lycopene.Core as Core
 type LycopeneApi
   =    "ping" :> Get '[JSON] String
   :<|> "projects" :> ProjectApi
+  :<|> Raw
 
 type ProjectApi
   =    Get '[JSON] [Core.Project]
@@ -34,10 +35,11 @@ type IssueApi
 api :: Proxy LycopeneApi
 api = Proxy
 
-server :: AppEngine -> Server LycopeneApi
-server engine
+server :: FilePath -> AppEngine -> Server LycopeneApi
+server dir engine
   =    ping
   :<|> projectServer engine
+  :<|> serveDirectory dir
   where
     ping = return "pong"
 

@@ -4,3 +4,6 @@ cabal.sandbox.config
 tags
 dist
 .stack-work
+assets/
+client/elm-stuff/
+client/app.js

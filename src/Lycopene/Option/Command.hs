@@ -15,7 +15,7 @@ data Command =
              Version
              -- | configure DIR
              | Configure
-             | Start Int
+             | Start Int FilePath
              deriving (Show)
 
 -------------------------------------------------------------------------------
