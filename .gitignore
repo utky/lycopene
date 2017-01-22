@@ -1,9 +1,10 @@
 cabal.config
 .cabal-sandbox
 cabal.sandbox.config
-tags
+.tags
 dist
 .stack-work
-assets/
+static/
 client/elm-stuff/
+client/index.html
 client/app.js

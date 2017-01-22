@@ -18,8 +18,6 @@ Download the executable binary and run it.
 
 ### Configuration
 
-
-
 Pomodoro Technique
 -----------------
 
