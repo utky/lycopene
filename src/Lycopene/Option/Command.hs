@@ -12,7 +12,7 @@ import           Lycopene.Option.Common (CommonOption(..))
 -- This simply indicates user input from command line.
 data Command = 
              -- | version 
-             Version
+               Version
              -- | configure DIR
              | Configure
              | Start Int FilePath

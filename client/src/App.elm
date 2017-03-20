@@ -1,8 +1,7 @@
 module App exposing (..)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.App
+import Html exposing (Html, map, div)
+import Html.Attributes exposing (class)
 import Style
 import Nav
 import Project
@@ -56,10 +55,10 @@ view model =
       , Style.custom
       , div [ class "row" ]
           [ div [ class "two columns" ]
-              [ Html.App.map NavMsg (Nav.view model.projects)
+              [ map NavMsg (Nav.view model.projects)
               ]
           , div [ class "ten columns" ]
-              [ Html.App.map SprintMsg (Sprint.view model.sprints)
+              [ map SprintMsg (Sprint.view model.sprints)
               ]
           ]
       ]

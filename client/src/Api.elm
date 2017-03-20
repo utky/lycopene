@@ -30,5 +30,5 @@ req rq = pure (Rs << GenericError) (Rq rq)
 pure : (e -> a) -> a -> Cmd a
 pure fail value =
   Task.succeed value
-    |> Task.perform fail identity
+    |> Task.perform identity
 

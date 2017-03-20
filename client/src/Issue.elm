@@ -1,9 +1,8 @@
 module Issue exposing (..)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, map, form, div, textarea, text, input, i)
+import Html.Attributes exposing (class, type_, placeholder)
 import Html.Events exposing (onInput)
-import Html.App
 
 
 type alias Issue =
@@ -51,7 +50,7 @@ view model =
         [ i
             [ class "fa fa-plus" ]
             []
-        ,  Html.App.map UpdateNew (viewNewIssue model.newIssue)
+        ,  map UpdateNew (viewNewIssue model.newIssue)
         , viewIssues model.issues
         ]
     , div
@@ -61,12 +60,12 @@ view model =
 
 viewNewIssue : NewIssue -> Html NewMsg
 viewNewIssue newIssue =
-  Html.form
+  form
     []
     [ div
         [ class "row" ]
         [ input
-            [ type' "text"
+            [ type_ "text"
             , class "twelve columns"
             , placeholder "Title"
             , onInput Title

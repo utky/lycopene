@@ -6,10 +6,9 @@ module Lycopene.Configuration.Data
 import           Data.Yaml (ToJSON, FromJSON)
 import           GHC.Generics
 
-data Configuration = Configuration
-                   { dummy :: String
-                   , schema :: String
-                   } deriving (Generic)
+data Configuration = Configuration 
+                       { datafile :: String
+                       } deriving (Generic)
 
 instance ToJSON Configuration
 instance FromJSON Configuration

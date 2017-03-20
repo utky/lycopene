@@ -1,8 +1,8 @@
 module Project exposing (..)
 
-import Html exposing (..)
+import Html exposing (Html, div, ul, li, text)
 import Http
-import Json.Decode exposing (Decoder, object4, string, maybe, list, (:=))
+import Json.Decode exposing (Decoder, map4, string, maybe, list, field)
 
 type alias ProjectId = String
 type alias Name = String
@@ -56,9 +56,9 @@ decodeProjects = list decodeProject
 
 decodeProject : Decoder Project
 decodeProject =
-  object4 Project
-    ("id" := string)
-    ("name" := string)
-    ("description" := maybe string)
-    ("status" := string)
+  map4 Project
+    (field "id" string)
+    (field "name" string)
+    (field "description" (maybe string))
+    (field "status" string)
 

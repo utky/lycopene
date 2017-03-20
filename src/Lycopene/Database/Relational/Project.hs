@@ -3,7 +3,6 @@
 {-# LANGUAGE FlexibleInstances     #-}
 module Lycopene.Database.Relational.Project where
 
-import           Database.HDBC.Query.TH (makeRecordPersistableDefault)
 import           Database.Relational.Query
 import           Lycopene.Database.Relational.TH (defineRelationFromDB)
 import qualified Lycopene.Core as Core

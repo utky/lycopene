@@ -2,8 +2,8 @@
 --  project list
 module Nav exposing (..)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, nav, ul, li, a, text)
+import Html.Attributes exposing (class, href)
 import Project
 
 type alias Nav

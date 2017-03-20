@@ -8,7 +8,6 @@ module Lycopene.Application
   ) where
 
 import qualified Lycopene.Core as Core
-import           Lycopene.Environment (dataPath)
 import           Lycopene.Database (DataSource, connect, runDB, DBException(..))
 import           Lycopene.Database.Relational (persist)
 
@@ -24,9 +23,5 @@ appEngine ds =
    let runDatabase = flip runDB
    in  AppEngine $ runDatabase ds . persist . Core.processEvent
 
-defaultEngine :: IO AppEngine
-defaultEngine = do
-  dpath <- dataPath
-  ds <- connect dpath
-  return $ appEngine ds
-
+defaultEngine :: FilePath -> IO AppEngine
+defaultEngine = fmap appEngine . connect

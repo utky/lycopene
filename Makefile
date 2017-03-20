@@ -9,16 +9,16 @@ XDG_CONFIG_HOME := $(shell pwd)/.stack-work/docker/_home/.config
 all: build
 
 client-build:
-	mkdir -p assets
-	(cd client ; make)
+	@mkdir -p assets
+	@(cd client ; make)
 
 reactor:
-	(cd client ; elm-reactor)
+	@(cd client ; elm-reactor)
 
 tags:
 	stack exec hasktags -- --ignore-close-implementation --ctags -f .tags src
 
-build: client-build tags
+build: client-build
 	@${STACK} build
 
 watch-build:

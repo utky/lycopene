@@ -3,7 +3,7 @@
 module Lycopene.Core.Event where
 
 import           Lycopene.Core.Scalar
-import           Lycopene.Core.Monad
+import           Lycopene.Core.Monad (Lycopene, project, sprint, issue)
 import qualified Lycopene.Core.Project as Project
 import qualified Lycopene.Core.Sprint as Sprint
 import qualified Lycopene.Core.Issue as Issue

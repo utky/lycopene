@@ -3,8 +3,6 @@
 {-# LANGUAGE FlexibleInstances     #-}
 module Lycopene.Database.Relational.Sprint where
 
-import           Data.Time (UTCTime)
-import           Database.HDBC.Query.TH (makeRecordPersistableDefault)
 import           Database.Relational.Query
 import           Lycopene.Database.Relational.TH (defineRelationFromDB)
 import qualified Lycopene.Database.Relational.Project as Pj

@@ -1,12 +1,12 @@
 module Main exposing (..)
 
-import Html.App
+import Html exposing (program)
 import App
 import TestDispatch
 
-main : Program Never
+main : Program Never App.AppState App.Msg
 main =
-  Html.App.program
+  program
     { init = App.init
     , view = App.view
     , update = App.update TestDispatch.dispatch

@@ -1,6 +1,6 @@
 module Sprint exposing (..)
 
-import Html exposing (..)
+import Html exposing (Html, div, h6, text)
 import Date exposing (Date)
 
 type alias SprintId = String
@@ -20,7 +20,7 @@ type alias SprintFocus =
   , sprintId : String
   }
 
-
+-- | 
 type alias Sprints = 
   { sprints : List Sprint
   , focus : Maybe SprintFocus

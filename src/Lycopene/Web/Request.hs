@@ -18,4 +18,9 @@ instance FromHttpApiData Core.IssueStatus where
         "closed" -> Right Core.IssueClosed
         _        -> Left "IssueStatus"
 
-
+data NewIssueRequest =
+    NewIssueRequest
+    { project :: Core.Name
+    , sprint :: Core.Name
+    , title :: String
+    }

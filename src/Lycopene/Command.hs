@@ -16,10 +16,12 @@ runCommand cfg (Cmd.LycoCommand comm subcmd) = runSubcommand subcmd
     runSubcommand :: Cmd.Command -> IO ()
     runSubcommand Cmd.Version   =
       putStrLn "dummy version"
+
     runSubcommand Cmd.Configure =
       dataPath >>= connect >>= runDB (rawDB schema) >>= printResult
+
     runSubcommand (Cmd.Start p d) =
-      defaultEngine >>= startServer p d
+      dataPath >>= defaultEngine >>= startServer p d
 
 printResult :: (Show a) => Either DBException a -> IO ()
 printResult = putStrLn . show
