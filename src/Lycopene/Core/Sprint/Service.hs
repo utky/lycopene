@@ -1,4 +1,4 @@
-module Lycopene.Core.Sprint.Service where
+module Lycopene.Core.Sprint.Service () where
 
 import           Lycopene.Core.Monad
 import           Lycopene.Core.Context

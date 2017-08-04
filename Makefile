@@ -1,8 +1,8 @@
 LYCOHOME = schema
 STACK = stack
 LYCO = ${STACK} exec lyco --
-XDG_DATA_HOME := $(shell pwd)/.stack-work/docker/_home/.local/share
-XDG_CONFIG_HOME := $(shell pwd)/.stack-work/docker/_home/.config
+XDG_DATA_HOME := $(shell pwd)/.local/share
+XDG_CONFIG_HOME := $(shell pwd)/.config
 
 .PHONY: all quick bench clean veryclean install sdist init configure start client-build reactor
 
@@ -16,9 +16,9 @@ reactor:
 	@(cd client ; elm-reactor)
 
 tags:
-	stack exec hasktags -- --ignore-close-implementation --ctags -f .tags src
+	@hasktags --ignore-close-implementation --ctags -f .tags src
 
-build: client-build
+build: client-build tags
 	@${STACK} build
 
 watch-build:
@@ -35,11 +35,11 @@ version: build
 	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- version
 
 configure: build
-	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- configure
+	@sh -c 'XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}"; ${LYCO} -- configure'
 
 project: build
 	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- project
 
 start: build
-	@XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}" ${LYCO} -- start -p 8080 -d "./static"
+	@sh -c 'XDG_DATA_HOME="${XDG_DATA_HOME}" XDG_CONFIG_HOME="${XDG_CONFIG_HOME}"; ${LYCO} -- start -p 8080 -d "./static"'
 

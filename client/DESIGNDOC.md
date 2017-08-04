@@ -1,11 +1,11 @@
 # Design doc
 
-Simple&Smallを原則にする。(と言ってもどうしたらいいか解らない)
+Simple&Smallを原則にする。
 
 ## View component tree
 
 * main
-  * nav (left))
+  * nav (left)
     * current sprint name
     * menu
       * project
@@ -21,6 +21,21 @@ Simple&Smallを原則にする。(と言ってもどうしたらいいか解ら�
         * description
         * record summary
         * pomodoro action
+
+## keyboard friendly
+
+keyboard shortcutとの親和性を最大化するためのUI構造が何かを考える。
+基点となるデータを決める。Vimであれば行が基点だろう。
+hjklで移動
+iでinsert -> new
+ddでdelete
+みたいな
+
+hmmm 行列だ。
+project, sprint, issue のcolumnを持つ
+あれ、itunesのUIじゃないか！あるいはFinder
+とりあえず3columnだけを実装してみるか
+
 
 ## notes
 

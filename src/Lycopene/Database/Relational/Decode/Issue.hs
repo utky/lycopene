@@ -9,7 +9,7 @@ import qualified Lycopene.Database.Relational.Issue as Is
 issue :: Decode Is.Issue Core.Issue
 issue =
   Core.Issue
-    <$> decoder (fromString . Is.issueId) <?> "issueId"
+    <$> decoder (fmap Core.uuid . fromString . Is.issueId) <?> "issueId"
     <*> decoder Is.title
     <*> decoder Is.description
     <*> decoder (issueStatus . Is.status) <?> "issueStatus" 

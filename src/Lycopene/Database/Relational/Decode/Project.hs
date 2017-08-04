@@ -11,7 +11,7 @@ import qualified Lycopene.Database.Relational.Project as Pj
 project :: Decode Pj.Project Core.Project
 project =
   Core.Project
-    <$> decoder (fromString . Pj.projectId) <?> "projectId"
+    <$> decoder (fmap Core.uuid . fromString . Pj.projectId) <?> "projectId"
     <*> decoder Pj.name
     <*> decoder Pj.description
     <*> decoder (projectStatus . Pj.status) <?> "projectStatus" 

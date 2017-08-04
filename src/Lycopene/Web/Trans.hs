@@ -4,6 +4,7 @@ module Lycopene.Web.Trans where
 
 import           Servant
 import           Servant.Utils.Enter ((:~>)(Nat), enter)
+import qualified Data.ByteString.Lazy.Char8 as B
 import           Control.Monad.Reader (ReaderT)
 import           Control.Monad.Except (ExceptT(ExceptT), withExceptT)
 import           Lycopene.Application (AppEngine, runEngine)
@@ -21,5 +22,5 @@ withApp :: AppEngine -> Core.Event :~> Handler
 withApp engine = Nat $ withExceptT handleDBExc . ExceptT . runEngine engine
 
 handleDBExc :: DBException -> ServantErr
-handleDBExc (SqlE e)    = err500 { errBody = "Database error." }
-handleDBExc (DecodeE e) = err500 { errBody = "Database fetch failure." }
+handleDBExc (SqlE e)    = err500 { errBody = (B.pack $ show e) }
+handleDBExc (DecodeE e) = err500 { errBody = (B.pack $ show e) }

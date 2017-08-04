@@ -1,9 +1,9 @@
-module Lycopene.Core.Resource
-    ( Resource(..)
-    , runResource
-    , file
-    , connection
-    ) where
+module Lycopene.Core.Resource () where
+--     ( Resource(..)
+--     , runResource
+--     , file
+--     , connection
+--     ) where
 
 import           System.IO
 import           Database.HDBC (IConnection, disconnect)

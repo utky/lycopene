@@ -9,7 +9,7 @@ import qualified Lycopene.Database.Relational.Sprint as Sp
 sprint :: Decode Sp.Sprint Core.Sprint
 sprint =
   Core.Sprint
-    <$> decoder (fromString . Sp.sprintId) <?> "sprintId"
+    <$> decoder (fmap Core.uuid . fromString . Sp.sprintId) <?> "sprintId"
     <*> decoder Sp.name
     <*> decoder Sp.description
     <*> decoder (fmap Core.toDate . Sp.startOn)

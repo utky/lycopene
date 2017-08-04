@@ -1,3 +1,4 @@
+/*
 a {
   color: #337ab7;
   text-decoration: none;
@@ -89,7 +90,6 @@ a:focus {
   left: 300px;
   height: 100%;
   width: 250px;
-  /* margin-left: -250px; */
   overflow-y: auto;
 }
 
@@ -100,3 +100,4 @@ a:focus {
 .collapse {
   display: none;
 }
+*/

@@ -2,68 +2,54 @@
 --  project list
 module Nav exposing (..)
 
-import Html exposing (Html, nav, ul, li, a, text)
+import Html as Html exposing (Html, nav, ul, li, a, text)
 import Html.Attributes exposing (class, href)
+import Data.Product as Product
+import Task
 import Project
-
-type alias Nav
-  = { items : List NavItem }
-
-type NavItem = NavItem
-  { name : String
-  , children : List NavItem
-  }
+import Sprint
 
 type Msg
-  = NoOp
+  = ProjectMsg Project.Msg
+  | SprintMsg Sprint.Msg
 
-view : Project.Projects -> Html Msg
-view projects =
-  nav
-    []
-    [ ul
-        [ class "nav" ]
-        [ li
-            []
-            [ a
-                [ href "#" ]
-                [ text "Lycopene" ]
-            ]
-         , li
-            []
-            [ a
-                [ href "#", class "disabled" ]
+view : Project.Model -> Sprint.Model -> Html Msg
+view project sprint =
+  nav []
+    [ ul [ class "nav" ]
+        [ li []
+            [ a [ href "#", class "disabled" ]
                 [ text "Projects" ]
-            , viewItems projects
+            , Project.view project |> Html.map ProjectMsg
+            ]
+        , li []
+            [ a [ href "#", class "disabled" ]
+                [ text "Sprints" ]
+            , Sprint.view sprint |> Html.map SprintMsg
             ]
         ]
     ]
 
-viewItems : Project.Projects -> Html Msg
-viewItems projects =
-  ul
-    [ class "nav" ]
-    (List.map
-      (viewItem projects.focusProject)
-      projects.projects)
-
-viewItem : Maybe Project.Project -> Project.Project -> Html Msg
-viewItem focus project =
-  let
-    isActive =
-      case focus of
-        (Just focused) -> focused.id == project.id
-        Nothing -> False
-    classes = if isActive then [ class "active" ] else []
-  in
-    li
-      classes
-      [ a
-          [ href "#" ]
-          [ text project.name ]
-      ]
-  
-update : Msg -> Project.Projects -> ( Project.Projects, Cmd Msg )
-update msg projects =
+update : Msg -> (Project.Model, Sprint.Model) -> ( (Project.Model, Sprint.Model), Cmd Msg )
+update msg (project, sprint) =
   case msg of
-    NoOp -> ( projects, Cmd.none )
+    ProjectMsg m -> 
+      Project.update m project
+        |> Product.tmap
+          (\n -> (n, sprint))
+          (\c -> Cmd.batch [ (Cmd.map ProjectMsg c), handleProjectFocus m ])
+    SprintMsg m -> 
+      Sprint.update m sprint
+        |> Product.tmap
+          (\n -> (project, n))
+          (Cmd.map SprintMsg)
+
+cmd : m -> Cmd m
+cmd msg = Task.perform (always msg) (Task.succeed msg)
+
+handleProjectFocus : Project.Msg -> Cmd Msg
+handleProjectFocus msg =
+  case msg of
+    Project.Focus p ->
+      Cmd.map SprintMsg (cmd (Sprint.FetchAll p))
+    _ -> Cmd.none

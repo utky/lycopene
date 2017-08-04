@@ -7,13 +7,11 @@ import           Data.Time (UTCTime, Day, LocalTime)
 import           Database.HDBC (runRaw)
 import           Database.HDBC.Schema.Driver (typeMap)
 import           Database.HDBC.Schema.SQLite3 (driverSQLite3)
-import           Database.Relational.Query (defaultConfig)
 import           Database.HDBC.Query.TH (defineTableFromDB)
-import           Database.Record.TH (derivingShow)
 import           Language.Haskell.TH (Q, Dec, TypeQ)
 
 defineRelationFromDB
-  :: String	-- ^ Table name
+  :: String -- ^ Table name
   -> Q [Dec]
 defineRelationFromDB tableName =
   defineTableFromDB

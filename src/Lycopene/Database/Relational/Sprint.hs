@@ -10,8 +10,6 @@ import qualified Lycopene.Core as Core
 
 $(defineRelationFromDB "sprint")
 
-$(defineRelationFromDB "backlog_sprint")
-
 insertSprint' :: Core.ProjectId -> Core.Sprint -> InsertQuery ()
 insertSprint' p (Core.Sprint i n d s e st) = insertQuerySprint encodeValues
   where
@@ -43,17 +41,12 @@ selectByProjectAndName = relation' . placeholder $ \ph -> do
   wheres $ s ! name' .=. ph ! snd'
   return s
 
-selectBacklogByProject :: Relation String String
-selectBacklogByProject = relation' . placeholder $ \ph -> do 
-  a <- query backlogSprint
-  wheres $ a ! backlogProjectId' .=. ph
-  return $ a ! backlogSprintId'
 
 selectByProjectAndStatus :: Relation (String, Int) Sprint
 selectByProjectAndStatus = relation'. placeholder $ \ph -> do
   p <- query Pj.project
   s <- query sprint
   on $ p ! Pj.projectId' .=. s ! projectId'
-  wheres $ p ! Pj.name' .=. ph ! fst'
+  wheres $ p ! Pj.projectId' .=. ph ! fst'
   wheres $ s ! status' .=. ph ! snd'
   return s

@@ -56,8 +56,7 @@ library
                        Lycopene.Core.Project
                        Lycopene.Core.Sprint
                        Lycopene.Core.Issue
-                       Lycopene.Core.Record
-                       Lycopene.Database.HDBC
+                       Lycopene.Core.Pomodoro
                        Lycopene.Directory
                        Lycopene.Environment
                        Lycopene.Command
@@ -76,8 +75,10 @@ library
                        Lycopene.Database.Relational.Schema
                        Lycopene.Database.Relational.Project
                        Lycopene.Database.Relational.Sprint
+                       Lycopene.Database.Relational.BacklogSprint
+                       Lycopene.Database.Relational.SprintIssue
                        Lycopene.Database.Relational.Issue
-                       Lycopene.Database.Relational.Record
+                       Lycopene.Database.Relational.Pomodoro
                        Lycopene.Database.Relational.Decode
                        Lycopene.Application
                        Lycopene.Web
@@ -90,8 +91,6 @@ library
                        Lycopene.Lens
                        Lycopene.Core.Event
                        Lycopene.Core.Stage
-                       Lycopene.Database.HDBC.Project
-                       Lycopene.Database.HDBC.Query
                        Lycopene.Database.Relational.TH
                        Lycopene.Database.Relational.Decode.Prim
                        Lycopene.Database.Relational.Decode.Class

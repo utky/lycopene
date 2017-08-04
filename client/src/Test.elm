@@ -1,14 +1,14 @@
-module Main exposing (..)
+module Test exposing (..)
 
 import Html exposing (program)
 import App
-import Dispatch
+import TestDispatch
 
 main : Program Never App.State App.Msg
 main =
   program
     { init = App.init
     , view = App.view
-    , update = App.update Dispatch.perform
+    , update = App.update TestDispatch.perform
     , subscriptions = App.subscriptions
     }

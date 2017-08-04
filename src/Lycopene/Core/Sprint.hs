@@ -7,15 +7,14 @@ import qualified Data.Text as T
 import           GHC.Generics
 import           Data.Aeson (ToJSON(..), FromJSON(..))
 import           Data.Aeson.Types
-                   (typeMismatch, Value(..), Parser
-                   , genericToEncoding, genericParseJSON, Options(..)
+                   (genericToEncoding, genericParseJSON, Options(..)
                    , defaultOptions, withText)
 import           Lycopene.Core.Scalar
-import           Lycopene.Freer (Freer, liftR, foldFreer)
+import           Lycopene.Freer (Freer, liftR)
 import           Lycopene.Core.Store (Change)
 import           Lycopene.Core.Project (ProjectId)
 import           Lycopene.Core.Identifier (generate, nameIdGen)
-import           Lycopene.Lens (Lens, set, field)
+import           Lycopene.Lens (Lens, field)
 
 type SprintId = Identifier
 
@@ -84,28 +83,33 @@ data SprintF a where
   -- |
   UpdateSprintF :: Change Sprint -> Sprint -> SprintF Sprint
   -- |
-  FetchByNameSprintF :: Name -> Name -> SprintF Sprint
+  FetchSprintF :: SprintId -> SprintF Sprint
   -- |
-  FetchByStatusSprintF :: Name -> SprintStatus -> SprintF [Sprint]
+  FetchByStatusSprintF :: ProjectId -> SprintStatus -> SprintF [Sprint]
+  -- |
+  FetchBacklogSprintF :: ProjectId -> SprintF Sprint
 
 type SprintM = Freer SprintF
 
 -- FIXME: IMPLEMENT sprint primitives.
 newBacklog :: ProjectId -> SprintM Sprint
 newBacklog p =
-  let new = newSprint "backlog" Nothing Nothing Nothing
+  let new = newSprint p "backlog" Nothing Nothing Nothing
   in  liftR $ AddDefaultSprintF p new
 
-newSprint :: Name -> Description -> Maybe Date -> Maybe Date -> Sprint
-newSprint n d s e =
-  let next = generate nameIdGen ("sprint", n)
+newSprint :: ProjectId -> Name -> Description -> Maybe Date -> Maybe Date -> Sprint
+newSprint p n d s e =
+  let next = generate nameIdGen ("sprint", (n ++ "-" ++ (idStr p)) )
   in  Sprint next n d s e SprintRunning
 
-fetchByNameSprint :: Name -> Name -> SprintM Sprint
-fetchByNameSprint pj sp = liftR $ FetchByNameSprintF pj sp
+fetchSprint :: SprintId -> SprintM Sprint
+fetchSprint sp = liftR $ FetchSprintF sp
 
-fetchByStatusSprint :: Name -> SprintStatus -> SprintM [Sprint]
+fetchByStatusSprint :: ProjectId -> SprintStatus -> SprintM [Sprint]
 fetchByStatusSprint pj st = liftR $ FetchByStatusSprintF pj st
+
+fetchBacklogSprint :: ProjectId -> SprintM Sprint
+fetchBacklogSprint pj = liftR $ FetchBacklogSprintF pj
 
 addSprint = undefined
 updateSprint f = undefined

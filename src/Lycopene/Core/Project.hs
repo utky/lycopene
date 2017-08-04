@@ -10,7 +10,7 @@ module Lycopene.Core.Project
   , addProject
   , removeProject
   , updateProject
-  , fetchByNameProject
+  , fetchProject
   , fetchAllProject
   , activateProject
   , deactivateProject
@@ -21,15 +21,14 @@ import qualified Data.Text as T
 import           GHC.Generics
 import           Data.Aeson (ToJSON(..), FromJSON(..))
 import           Data.Aeson.Types
-                   (typeMismatch, Value(..), Parser
-                   , genericToEncoding, genericParseJSON, Options(..)
+                   (genericToEncoding, genericParseJSON, Options(..)
                    , defaultOptions, withText)
 import           Lycopene.Core.Scalar
-import           Lycopene.Freer (Freer, liftR, foldFreer)
+import           Lycopene.Freer (Freer, liftR)
 import           Lycopene.Core.Store (Change)
 import           Lycopene.Core.Identifier (generate, nameIdGen)
-import           Lycopene.Core.Pure (VStore, VResult, runVStore, initial, values, save, fetch, remove, catch)
-import           Lycopene.Lens (Lens, set, get, field)
+import           Lycopene.Lens (Lens, set, field)
+
 
 type ProjectId = Identifier
 
@@ -87,9 +86,9 @@ _status = field projectStatus (\a s -> s { projectStatus = a })
 -- | Operational primitives of Project
 data ProjectF a where
   AddProjectF :: Project -> ProjectF Project
-  RemoveProjectF :: Name -> ProjectF ()
+  RemoveProjectF :: ProjectId -> ProjectF ()
   UpdateProjectF :: Change Project -> Project -> ProjectF Project
-  FetchByNameProjectF :: Name -> ProjectF Project
+  FetchProjectF :: ProjectId -> ProjectF Project
   FetchAllProjectF :: ProjectF [Project]
 
 type ProjectM = Freer ProjectF
@@ -104,14 +103,14 @@ newProject n d =
 addProject :: Project -> ProjectM Project
 addProject = liftR . AddProjectF
 
-removeProject :: Name -> ProjectM ()
+removeProject :: ProjectId -> ProjectM ()
 removeProject = liftR . RemoveProjectF
 
 updateProject :: Change Project -> ProjectM Project -> ProjectM Project
 updateProject f = (>>= (liftR . UpdateProjectF f))
 
-fetchByNameProject :: Name -> ProjectM Project
-fetchByNameProject = liftR . FetchByNameProjectF
+fetchProject :: ProjectId -> ProjectM Project
+fetchProject = liftR . FetchProjectF
 
 fetchAllProject :: ProjectM [Project]
 fetchAllProject = liftR FetchAllProjectF

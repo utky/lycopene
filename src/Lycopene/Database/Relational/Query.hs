@@ -7,11 +7,7 @@ module Lycopene.Database.Relational.Query
 
 import           Control.Monad.Except (throwError)
 import           Database.Relational.Query
-import           Database.Record.FromSql
-import           Database.Record.ToSql
 import           Database.HDBC
-import           Database.HDBC.Record
-import           Database.Relational.Query
 import           Database.HDBC.Record
 import           Database.Record (ToSql, FromSql)
 import qualified Lycopene.Core as Core
@@ -19,6 +15,8 @@ import           Lycopene.Database.Persist
 import qualified Lycopene.Database.Relational.Project as Pj
 import qualified Lycopene.Database.Relational.Sprint as Sp
 import qualified Lycopene.Database.Relational.Issue as Is
+import qualified Lycopene.Database.Relational.BacklogSprint as Bs
+import qualified Lycopene.Database.Relational.SprintIssue as Si
 import           Lycopene.Database.Relational.Decode
 import           Lycopene.Freer (foldFreer)
 
@@ -71,13 +69,13 @@ persistProject :: Core.ProjectF a -> DB a
 persistProject (Core.AddProjectF p) = 
   p <$ db (insertQueryPersist (Pj.insertProject' p) ())
 
-persistProject (Core.RemoveProjectF n) =
-  () <$ db (deletePersist (Pj.deleteByName n) ())
+persistProject (Core.RemoveProjectF i) =
+  () <$ db (deletePersist (Pj.deleteProject i) ())
 
 persistProject (Core.UpdateProjectF f p) = undefined
 
-persistProject (Core.FetchByNameProjectF n) =
-  fromEntity =<< fetchOne =<< db (selectPersist Pj.selectByName n)
+persistProject (Core.FetchProjectF i) =
+  fromEntity =<< fetchOne =<< db (queryPersist Pj.selectProject (Core.idStr i))
 
 persistProject Core.FetchAllProjectF =
   mapM fromEntity =<< db (selectPersist Pj.project ())
@@ -87,25 +85,30 @@ persistSprint (Core.AddDefaultSprintF p s) = do
   let pjid = Core.idStr p
       spid = Core.idStr $ Core.sprintId s
   _ <- db (insertQueryPersist (Sp.insertSprint' p s) ())
-  _ <- db (insertPersist Sp.insertBacklogSprint (Sp.BacklogSprint pjid spid))
+  _ <- db (insertPersist Bs.insertBacklogSprint (Bs.BacklogSprint pjid spid))
   return s
 
 persistSprint (Core.AddSprintF p sp) =
   sp <$ db (insertQueryPersist (Sp.insertSprint' p sp) ())
 
-persistSprint (Core.FetchByNameSprintF pj sp) = do
-  p <- fetchOne =<< db (selectPersist Pj.selectByName pj)
-  let pjid = Pj.projectId p
-  fromEntity =<< fetchOne =<< db (selectPersist Sp.selectByProjectAndName (pjid, sp))
+persistSprint (Core.FetchSprintF sp) = do
+  fromEntity =<< fetchOne =<< db (queryPersist Sp.selectSprint (Core.idStr sp))
+
+persistSprint (Core.FetchBacklogSprintF pj) = do
+  fromEntity =<< fetchOne =<< db (selectPersist Bs.selectBacklogByProject (Core.idStr pj))
 
 persistSprint (Core.FetchByStatusSprintF p st) =
   let ist = Sp.encodeStatus st
-      param = (p, ist)
+      param = ((Core.idStr p), ist)
   in  mapM fromEntity =<< db (selectPersist Sp.selectByProjectAndStatus param)
 
 persistIssue :: Core.IssueF a -> DB a
-persistIssue (Core.AddIssueF s is) =
-  is <$ db (insertQueryPersist (Is.insertIssue' s is) ())
+persistIssue (Core.AddIssueF p s is) = db procedure
+  where
+    procedure = do
+      insertQueryPersist (Is.insertIssue' p is) ()
+      insertPersist Si.insertSprintIssue (Si.SprintIssue (Core.idStr s) (Core.idStr (Core.issueId is)))
+      return is
 
 persistIssue (Core.FetchByStatusIssueF s st) =
   let spid = Core.idStr s

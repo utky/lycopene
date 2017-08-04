@@ -3,8 +3,8 @@ module Lycopene.Option.Common
         , commonOption
         ) where
 
-import           System.FilePath
 import           Options.Applicative
+import           Data.Monoid ((<>))
 
 data CommonOption = CommonOption
                    { verbose :: Bool

@@ -3,6 +3,7 @@ module Lycopene.Option.Parser where
 import           Options.Applicative
 import           Lycopene.Option.Common
 import           Lycopene.Option.Command
+import           Data.Monoid ((<>))
 
 
 type Arguments = [String]

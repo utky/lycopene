@@ -19,18 +19,18 @@ type LycopeneApi
 
 type ProjectApi
   =    Get '[JSON] [Core.Project]
-  :<|> Capture "name" Core.Name :> Get '[JSON] Core.Project
-  :<|> ReqBody '[JSON] String :> Post '[JSON] Core.Project
-  :<|> Capture "name" Core.Name :> DeleteNoContent '[JSON] NoContent
+  :<|> Capture "id" Core.Id :> Get '[JSON] Core.Project
+  :<|> ReqBody '[JSON] PostProject :> Post '[JSON] Core.Project
+  :<|> Capture "id" Core.Id :> DeleteNoContent '[JSON] NoContent
 
 type SprintApi
-  =    QueryParam "project" Core.Name :> Get '[JSON] [Core.Sprint]
-  :<|> QueryParam "project" Core.Name :> Capture "name" Core.Name :> Get '[JSON] Core.Sprint
+  =    QueryParam "project" Core.Id :> Get '[JSON] [Core.Sprint]
+  :<|> Capture "id" Core.Id :> Get '[JSON] Core.Sprint
 
 type IssueApi
-  =    QueryParam "project" Core.Name :> QueryParam "sprint" Core.Name :> QueryParam "status" Core.IssueStatus :> Get '[JSON] [Core.Issue]
+  =    QueryParam "project" Core.Id :> QueryParam "sprint" Core.Id :> QueryParam "status" Core.IssueStatus :> Get '[JSON] [Core.Issue]
   :<|> Capture "id" Core.IssueId :> Get '[JSON] Core.Issue
-  -- :<|> ReqBody '[JSON] String :> Post '[JSON] Core.Issue
+  :<|> ReqBody '[JSON] PostIssue :> Post '[JSON] Core.Issue
   :<|> Capture "id" Core.IssueId :> DeleteNoContent '[JSON] NoContent
 
 api :: Proxy LycopeneApi
@@ -49,14 +49,15 @@ server dir engine
 projectServer :: AppEngine -> Server ProjectApi
 projectServer engine
   =    allProjects
-  :<|> fetchByName
+  :<|> fetch
   :<|> newProject
   :<|> removeProject
   where
     allProjects = lyco engine $ Core.AllProject
-    fetchByName n = lyco engine $ (Core.FetchProject n)
-    newProject n = lyco engine $ Core.NewProject n Nothing
-    removeProject n = NoContent <$ (lyco engine $ Core.RemoveProject n)
+    -- FIXME ここもIDでもらう方がいいかな
+    fetch i = lyco engine $ (Core.FetchProject i)
+    newProject (PostProject n d) = lyco engine $ Core.NewProject n d
+    removeProject i = NoContent <$ (lyco engine $ Core.RemoveProject i)
 
 sprintServer :: AppEngine -> Server SprintApi
 sprintServer engine
@@ -64,21 +65,20 @@ sprintServer engine
   :<|> fetchSprint
   where
     fetchSprints (Just pj) = lyco engine $ (Core.FetchProjectSprint pj)
-    fetchSprints Nothing = throwError $ err400 { errBody = "project name missing" }
-    fetchSprint (Just pj) sp = lyco engine $ (Core.FetchSprint pj sp)
-    fetchSprint Nothing _ = throwError $ err400 { errBody = "project name missing" }
+    -- FIXME: fetch all active sprint
+    fetchSprints Nothing = throwError $ err400 { errBody = "project id missing" }
+    fetchSprint sp = lyco engine $ (Core.FetchSprint sp)
 
 issueServer :: AppEngine -> Server IssueApi
 issueServer engine
   =    fetchIssues
   :<|> fetchIssue
-  -- :<|> newIssue
+  :<|> newIssue
   :<|> removeIssue
   where
-    fetchIssues (Just pj) (Just sp) (Just st) = lyco engine $ (Core.FetchIssues pj sp st)
-    fetchIssues (Just pj) (Just sp) Nothing  = lyco engine $ (Core.FetchIssues pj sp Core.IssueOpen)
-    fetchIssues Nothing _ _ = throwError $ err400 { errBody = "project name missing" }
-    fetchIssues _ Nothing _ = throwError $ err400 { errBody = "sprint name missing" }
+    fetchIssues (Just pj) spm (Just st) = lyco engine $ (Core.FetchIssues pj spm st)
+    fetchIssues (Just pj) spm Nothing  = lyco engine $ (Core.FetchIssues pj spm Core.IssueOpen)
+    fetchIssues Nothing _ _ = throwError $ err400 { errBody = "project id missing" }
     fetchIssue issueId = lyco engine $ Core.FetchIssue issueId
-    -- newIssue t = lyco engine $ Core.NewIssue pj sp t
+    newIssue (PostIssue n d pj sp) = lyco engine $ Core.NewIssue n d pj sp
     removeIssue issueId = NoContent <$ (lyco engine $ Core.RemoveIssue issueId)

@@ -15,5 +15,5 @@ foldFreer :: Monad m => (forall x. f x -> m x) -> Freer f a -> m a
 foldFreer f = foldFree deCoyoneda where
   deCoyoneda (Coyoneda g b) = fmap g (f b)
 
-hoistFreer :: (forall a. f a -> g a) -> Freer f a -> Freer g a
+hoistFreer :: (forall x. f x -> g x) -> Freer f a -> Freer g a
 hoistFreer f = hoistFree (hoistCoyoneda f)

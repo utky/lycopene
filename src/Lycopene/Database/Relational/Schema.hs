@@ -10,12 +10,11 @@ schema = [str|
 
 CREATE TABLE project (
   project_id TEXT PRIMARY KEY NOT NULL,
-  name TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
   description TEXT,
   status INTEGER NOT NULL,
   FOREIGN KEY(status) REFERENCES project_status(status_id)
 );
-
 
 CREATE TABLE sprint (
   sprint_id TEXT PRIMARY KEY NOT NULL,
@@ -25,33 +24,62 @@ CREATE TABLE sprint (
   start_on TIMESTAMP,
   end_on TIMESTAMP,
   status INTEGER NOT NULL,
-  UNIQUE (name, project_id),
   FOREIGN KEY(project_id) REFERENCES project(project_id) ON DELETE CASCADE,
   FOREIGN KEY(status) REFERENCES sprint_status(status_id)
 );
 
 CREATE TABLE backlog_sprint (
-  backlog_project_id TEXT PRIMARY KEY NOT NULL,
-  backlog_sprint_id TEXT NOT NULL,
-  FOREIGN KEY(backlog_project_id) REFERENCES project(project_id) ON DELETE CASCADE,
-  FOREIGN KEY(backlog_sprint_id) REFERENCES sprint(sprint_id) ON DELETE CASCADE
+  project_id TEXT PRIMARY KEY NOT NULL,
+  sprint_id TEXT NOT NULL,
+  FOREIGN KEY(project_id) REFERENCES project(project_id) ON DELETE CASCADE,
+  FOREIGN KEY(sprint_id) REFERENCES sprint(sprint_id) ON DELETE CASCADE
 );
 
 CREATE TABLE issue (
   issue_id TEXT PRIMARY KEY NOT NULL,
   title TEXT NOT NULL,
   description TEXT,
-  sprint_id TEXT NOT NULL,
+  project_id TEXT NOT NULL,
   status INTEGER NOT NULL,
-  FOREIGN KEY(sprint_id) REFERENCES sprint(sprint_id) ON DELETE CASCADE,
+  FOREIGN KEY(project_id) REFERENCES project(project_id) ON DELETE CASCADE,
   FOREIGN KEY(status) REFERENCES issue_status(status_id)
 );
 
-CREATE TABLE record (
-  record_id TEXT PRIMARY KEY NOT NULL,
+CREATE TABLE sprint_issue (
+  sprint_id TEXT NOT NULL,
   issue_id TEXT NOT NULL,
-  start_on TIMESTAMP NOT NULL,
-  end_on TIMESTAMP,
+  PRIMARY KEY (sprint_id, issue_id),
+  FOREIGN KEY(sprint_id) REFERENCES sprint(sprint_id) ON DELETE CASCADE,
+  FOREIGN KEY(issue_id) REFERENCES issue(issue_id) ON DELETE CASCADE
+);
+
+
+CREATE TABLE todo (
+  todo_id TEXT PRIMARY KEY NOT NULL,
+  description TEXT,
+  created_at DATE NOT NULL
+);
+
+CREATE TABLE todo_issue (
+  todo_issue_id TEXT PRIMARY KEY NOT NULL,
+  todo_id TEXT NOT NULL,
+  issue_id TEXT NOT NULL,
+  FOREIGN KEY(todo_id) REFERENCES todo(todo_id) ON DELETE CASCADE,
+  FOREIGN KEY(issue_id) REFERENCES issue(issue_id) ON DELETE CASCADE
+);
+
+CREATE TABLE interruption (
+  interruption_id TEXT PRIMARY KEY NOT NULL,
+  todo_issue_id TEXT NOT NULL,
+  description TEXT,
+  FOREIGN KEY(todo_issue_id) REFERENCES todo_issue(todo_issue_id) ON DELETE CASCADE
+);
+
+CREATE TABLE pomodoro (
+  pomodoro_id TEXT PRIMARY KEY NOT NULL,
+  issue_id TEXT NOT NULL,
+  start_at TIMESTAMP NOT NULL,
+  end_at TIMESTAMP,
   FOREIGN KEY(issue_id) REFERENCES issue(issue_id) ON DELETE CASCADE
 );
 
@@ -91,7 +119,7 @@ CREATE TABLE color (
   blue INTEGER NOT NULL
 );
 
-INSERT INTO project_status VALUES (0, 'inactive');
+INSERT INTO project_status VALUES (0, 'archived');
 INSERT INTO project_status VALUES (1, 'active');
 
 INSERT INTO sprint_status VALUES (0, 'finished');

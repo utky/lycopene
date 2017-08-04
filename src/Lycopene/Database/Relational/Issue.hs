@@ -24,15 +24,15 @@ ready = 1
 $(defineRelationFromDB "issue")
 $(defineRelationFromDB "issue_status")
 
-insertIssue' :: Core.SprintId -> Core.Issue -> InsertQuery ()
-insertIssue' sp (Core.Issue i t d s) = insertQueryIssue encodeValues
+insertIssue' :: Core.ProjectId -> Core.Issue -> InsertQuery ()
+insertIssue' pj (Core.Issue i t d s) = insertQueryIssue encodeValues
   where
     encodeValues :: Relation () Issue
     encodeValues = relation . return $
       Issue |$| value (Core.idStr i)
             |*| value t
             |*| value d
-            |*| value (Core.idStr sp)
+            |*| value (Core.idStr pj)
             |*| value (encodeStatus s)
 
 encodeStatus :: Core.IssueStatus -> Int
@@ -42,7 +42,9 @@ encodeStatus Core.IssueClosed = 0
 selectBySprint :: Relation (String, Int) Issue
 selectBySprint = relation' . placeholder $ \ph -> do
   i <- query issue
-  wheres $ i ! sprintId' .=. ph ! fst'
+  s <- query Sprint.sprint
+  on $ s ! Sprint.projectId' .=. i ! projectId'
+  wheres $ s ! Sprint.sprintId' .=. ph ! fst'
   wheres $ i ! status' .=. ph ! snd'
   return i
 
@@ -55,14 +57,10 @@ toggleIssue = typedUpdate tableOfIssue . updateTarget' $ \proj -> do
 openIssues :: Relation (String, Int) Issue
 openIssues = relation' . placeholder $ \ph -> do
   i <- query issue
-  s <- query Sprint.sprint
   p <- query Project.project
-  st <- query issueStatus
-  on $ i ! status'            .=. st ! statusId'
-  on $ s ! Sprint.sprintId'   .=. i ! sprintId'
-  on $ p ! Project.projectId' .=. s ! Sprint.projectId'
-  wheres $ s ! Sprint.projectId' .=. ph ! fst'
-  wheres $ i ! status'           .=. ph ! snd'
+  on $ p ! Project.projectId' .=. i ! projectId'
+  wheres $ i ! projectId'     .=. ph ! fst'
+  wheres $ i ! status'        .=. ph ! snd'
   return i
 
 deleteById :: String -> Delete ()

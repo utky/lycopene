@@ -1,7 +1,10 @@
 module Sprint exposing (..)
 
-import Html exposing (Html, div, h6, text)
+import Html exposing (Html, div, ul, li, h6, text, a)
+import Html.Attributes exposing (class, placeholder, type_, href, value, style)
+import Html.Events exposing (onInput, onClick)
 import Date exposing (Date)
+import Project
 
 type alias SprintId = String
 
@@ -14,22 +17,18 @@ type alias Sprint =
   , status : String
   }
 
--- | A focus into a sprint via a project
-type alias SprintFocus =
-  { projectId : String
-  , sprintId : String
-  }
-
 -- | 
-type alias Sprints = 
+type alias Model = 
   { sprints : List Sprint
-  , focus : Maybe SprintFocus
+  , focus : Maybe SprintId
   }
 
 type Msg
-  = NoOp
+  = FetchAll Project.ProjectId
+  | Load (List Sprint)
+  | Focus SprintId
 
-init : Sprints
+init : Model
 init =
   { sprints = []
   , focus = Nothing
@@ -41,34 +40,50 @@ find id sprints =
     |> List.filter (\s -> id == s.id)
     |> List.head
 
-view : Sprints -> Html Msg
+view : Model -> Html Msg
 view model =
-  let
-    sprintBoard =
-      case model.focus of
-        Just focus -> viewSprintBoard focus model.sprints
-        Nothing    -> text "no sprint"
-  in
-    div
-      []
-      [ sprintBoard ]
+  div []
+    [ viewSprints model ]
 
-viewSprintBoard : SprintFocus -> List Sprint -> Html Msg
-viewSprintBoard focus sprints =
+viewSprints : Model -> Html Msg
+viewSprints model =
+  List.map (viewItem model.focus) model.sprints |> ul []
+ 
+  
+viewItem : Maybe SprintId -> Sprint -> Html Msg
+viewItem focus sprint =
   let
-    focused = find focus.sprintId sprints
-  in
-    case focused of
-      Nothing -> text ("no sprint matches in: " ++ focus.sprintId)
-      Just s  ->
-        div
-          []
-          [ h6
-              []
-              [ text s.name ]
-          ]
+    styles =
+      case focus of
+        Nothing -> []
+        Just id ->
+          if id == sprint.id then [("color", "red")] else []
 
-update : Msg -> Sprints -> ( Sprints, Cmd Msg )
+  in
+    li [style styles]
+      [ a [ href "#", onClick (Focus sprint.id) ]
+          [ text sprint.name ]
+      ]
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
   case msg of
-    NoOp -> model ! []
+    Load s ->
+      { model | sprints = s } ! []
+    Focus id ->
+      { model | focus = Just id } ! []
+    -- FIXME: cases not exhausitive
+    otherwise -> model ! []
+
+decodeSprints : Decoder (List Sprint)
+decodeSprints = list decodeSprint
+
+decodeSprint : Decoder Sprint
+decodeSprint =
+  Sprint
+    |$| field "id" string
+    |*| field "name" string
+    |*| field "description" (maybe string)
+    |*| field "startOn" string
+    |*| field "endOn" string
+    |*| field "status" string

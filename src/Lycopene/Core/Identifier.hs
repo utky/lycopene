@@ -7,26 +7,11 @@ module Lycopene.Core.Identifier
     , nameIdGen
     ) where
 
-import           GHC.Generics
-import           Data.Aeson (ToJSON,FromJSON, toJSON, parseJSON) 
-import           Data.Aeson.Types (Value(String), typeMismatch)
 import           Data.Word
-import qualified Data.Text as T
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as C
-import           Data.UUID (UUID, fromString)
 import           Data.UUID.V5 (generateNamed, namespaceURL)
-import           Lycopene.Core.Scalar (Identifier, Name)
-
-instance ToJSON UUID where
-  toJSON = String . T.pack . show
-
-instance FromJSON UUID where
-  parseJSON j@(String t) =
-    case fromString (T.unpack t) of
-      (Just u) -> return u
-      Nothing  -> typeMismatch ("Invalid UUID format: " ++ (show t)) j
-  parseJSON invalid = typeMismatch "UUID" invalid
+import           Lycopene.Core.Scalar (uuid, Identifier, Name)
 
 -- | Super class which specifies namespace
 type Domain = String
@@ -56,5 +41,5 @@ generate (IdGen g) a = g a
 type NameIdGen = IdGen (Domain, Name)
 
 nameIdGen :: NameIdGen
-nameIdGen = IdGen (generateNamed namespaceURL . namedURL)
+nameIdGen = IdGen (uuid . generateNamed namespaceURL . namedURL)
 

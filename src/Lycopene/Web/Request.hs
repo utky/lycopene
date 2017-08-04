@@ -1,26 +1,46 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
 module Lycopene.Web.Request where
 
-import           Web.HttpApiData
-import           Data.UUID
-import           Data.Maybe (maybe)
-import qualified Data.Text as T
+import           Data.Char (toLower)
+import           GHC.Generics
+import           Data.Aeson (ToJSON(..), FromJSON(..))
+import           Data.Aeson.Types
+                   ( genericToEncoding
+                   , genericParseJSON
+                   , Options(..)
+                   , defaultOptions
+                   , withText)
+
 import qualified Lycopene.Core as Core
 
-instance FromHttpApiData UUID where
-  parseUrlPiece = maybe (Left "UUID") Right . fromString . T.unpack
+prefixFieldOptions :: String -> Options
+prefixFieldOptions p = 
+  let modifyField = lowerFirst . drop (length p)
+      lowerFirst (x:xs) = (toLower x) : xs
+  in  defaultOptions { fieldLabelModifier = modifyField }
 
-instance FromHttpApiData Core.IssueStatus where
-  parseQueryParam = parse where
-    parse t =
-      case T.unpack t of
-        "open"   -> Right Core.IssueOpen
-        "closed" -> Right Core.IssueClosed
-        _        -> Left "IssueStatus"
+data PostProject =
+    PostProject
+    { postProjectName :: Core.Name
+    , postProjectDescription :: Core.Description
+    } deriving (Show, Generic)
 
-data NewIssueRequest =
-    NewIssueRequest
-    { project :: Core.Name
-    , sprint :: Core.Name
-    , title :: String
-    }
+projectOptions :: Options
+projectOptions = prefixFieldOptions "postProject"
+
+instance FromJSON PostProject where
+  parseJSON = genericParseJSON projectOptions
+
+data PostIssue =
+    PostIssue
+    { postIssueTitle       :: Core.Name
+    , postIssueDescription :: Core.Description
+    , postProjectProjectId :: Core.ProjectId
+    , postProjectSprintId  :: Maybe Core.SprintId
+    } deriving (Show, Generic)
+
+issueOptions :: Options
+issueOptions = prefixFieldOptions "postIssue"
+
+instance FromJSON PostIssue where
+  parseJSON = genericParseJSON issueOptions

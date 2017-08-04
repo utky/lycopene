@@ -5,15 +5,16 @@ module Lycopene.Core.Issue where
 import           Data.Char (toLower)
 import qualified Data.Text as T
 import           GHC.Generics
+import           Web.HttpApiData
 import           Data.Aeson (ToJSON(..), FromJSON(..))
 import           Data.Aeson.Types
-                   (typeMismatch, Value(..), Parser
-                   , genericToEncoding, genericParseJSON, Options(..)
+                   (genericToEncoding, genericParseJSON, Options(..)
                    , defaultOptions, withText)
 import           Lycopene.Core.Scalar
 import           Lycopene.Core.Identifier (generate, nameIdGen)
+import           Lycopene.Core.Project (ProjectId)
 import           Lycopene.Core.Sprint (SprintId)
-import           Lycopene.Freer (Freer, liftR, foldFreer)
+import           Lycopene.Freer (Freer, liftR)
 
 type IssueId = Identifier
 
@@ -32,6 +33,15 @@ instance FromJSON IssueStatus where
       "open"   -> return IssueOpen
       "closed" -> return IssueClosed
       _          -> fail "open|closed"
+
+instance FromHttpApiData IssueStatus where
+  parseQueryParam = parse where
+    parse t =
+      case T.unpack t of
+        "open"   -> Right IssueOpen
+        "closed" -> Right IssueClosed
+        _        -> Left $ T.pack "IssueStatus"
+
 
 data Issue
     = Issue
@@ -59,7 +69,7 @@ instance FromJSON Issue where
 -- | Aggregation of Issue use-case
 data IssueF a where
   -- | Create new issue for the sprint.
-  AddIssueF :: SprintId -> Issue -> IssueF Issue
+  AddIssueF :: ProjectId -> SprintId -> Issue -> IssueF Issue
   -- |
   UpdateIssueStatusF :: IssueStatus -> IssueId -> IssueF Issue
   -- | Remove the issue from sprint.
@@ -79,11 +89,11 @@ newIssue n d =
   let next = generate nameIdGen ("issue", n)
   in  Issue next n d IssueOpen
 
-addIssue :: SprintId -> Issue -> IssueM Issue
-addIssue s i = liftR $ AddIssueF s i
+addIssue :: ProjectId -> SprintId -> Issue -> IssueM Issue
+addIssue p s i = liftR $ AddIssueF p s i
 
-fetchByStatusIssue :: SprintId -> IssueStatus -> IssueM [Issue]
-fetchByStatusIssue sp st = liftR $ FetchByStatusIssueF sp st
+fetchByStatusIssue :: ProjectId -> SprintId -> IssueStatus -> IssueM [Issue]
+fetchByStatusIssue pj sp st = liftR $ FetchByStatusIssueF sp st
 
 removeIssue :: IssueId -> IssueM ()
 removeIssue = liftR . RemoveIssueF

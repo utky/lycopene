@@ -1,7 +1,8 @@
 module App exposing (..)
 
-import Html exposing (Html, map, div)
+import Html exposing (Html, map, div, text)
 import Html.Attributes exposing (class)
+import Http
 import Style
 import Nav
 import Project
@@ -9,18 +10,20 @@ import Issue
 import Sprint
 import Route
 import Api
+import Data.Product as Product
+import Internal exposing (promote)
 
 -- MODEL
 
-type alias AppState =
+type alias State =
   { route : Route.Route
-  , projects : Project.Projects
+  , projects : Project.Model
   , issues : Issue.Issues
-  , sprints : Sprint.Sprints
+  , sprints : Sprint.Model
   }
 
 
-init : ( AppState, Cmd Msg )
+init : ( State, Cmd Msg )
 init =
   let
     model =
@@ -29,7 +32,10 @@ init =
       , issues = Issue.init
       , sprints = Sprint.init
       }
-    cmd = Cmd.map ApiMsg (Api.req Api.FetchProjects)
+    cmd = Project.FetchAll
+            |> Nav.ProjectMsg
+            |> NavMsg
+            |> promote
   in
     ( model, cmd )
 
@@ -38,8 +44,7 @@ init =
 
 
 type Msg
-  = NoOp
-  | ApiMsg Api.Msg
+  = ApiError Api.Error
   | NavMsg Nav.Msg
   | ProjectMsg Project.Msg
   | IssueMsg Issue.Msg
@@ -47,7 +52,7 @@ type Msg
 
 -- VIEW
 
-view : AppState -> Html Msg
+view : State -> Html Msg
 view model =
   div [ ]
       [ Style.normalize
@@ -55,10 +60,10 @@ view model =
       , Style.custom
       , div [ class "row" ]
           [ div [ class "two columns" ]
-              [ map NavMsg (Nav.view model.projects)
+              [ Nav.view model.projects model.sprints |> map NavMsg 
               ]
           , div [ class "ten columns" ]
-              [ map SprintMsg (Sprint.view model.sprints)
+              [ text "issues"
               ]
           ]
       ]
@@ -66,48 +71,52 @@ view model =
 -- UPDATE
 
 
-update : Api.Dispatch -> Msg -> AppState -> ( AppState, Cmd Msg )
-update dispatch msg model =
+update : Api.Handler Msg -> Msg -> State -> ( State, Cmd Msg )
+update handler msg model =
+  case handler msg of
+    Api.Done cmd -> model ! [cmd]
+    Api.Next m cmd ->
+      let
+        (mdl, later) = updateState m model
+      in
+        mdl ! [cmd, later]
+    Api.Pass m -> updateState m model
+
+
+updateState : Msg -> State -> ( State, Cmd Msg )
+updateState msg model =
   case msg of
-
-    NoOp -> model ! []
-
-    ApiMsg m ->
-      case m of
-        Api.Rq r -> (model, Api.runDispatch dispatch r |> Cmd.map ApiMsg)
-        Api.Rs r -> 
-          case r of
-            -- TODO: where should I handle response
-            (Api.GenericError e) -> model ! [] 
-            (Api.FetchProjectsDone pjs) -> 
-              let
-                projects = model.projects
-              in
-                ({ model | projects = { projects | projects = pjs } }, Cmd.none)
-            (Api.FetchProjectsFail e) -> model ! []
-
+    ApiError e -> model ! []
     NavMsg m -> 
-      let (n, c) = Nav.update m model.projects
-      in  ({ model | projects = n }, Cmd.map NavMsg c)
+      Nav.update m (model.projects, model.sprints)
+        |> Product.tmap
+          (\n -> { model | 
+                   projects = Tuple.first n,
+                   sprints = Tuple.second n })
+          (Cmd.map NavMsg)
 
     ProjectMsg m ->
-      let (n, c) = Project.update m model.projects
-      in  ({ model | projects = n }, Cmd.map ProjectMsg c)
+      Project.update m model.projects
+        |> Product.tmap
+          (\n -> { model | projects = n })
+          (Cmd.map ProjectMsg)
 
     IssueMsg m ->
-      let (n, c) = Issue.update m model.issues
-      in  ({ model | issues = n}, Cmd.map IssueMsg c)
+      Issue.update m model.issues
+        |> Product.tmap
+          (\n -> { model | issues = n})
+          (Cmd.map IssueMsg)
 
     SprintMsg m ->
-      let (n, c) = Sprint.update m model.sprints
-      in  ({ model | sprints = n}, Cmd.map SprintMsg c)
-
+      Sprint.update m model.sprints
+        |> Product.tmap
+          (\n -> { model | sprints = n})
+          (Cmd.map SprintMsg)
 
 
 -- SUBSCRIPTIONS
 
 
-subscriptions : AppState -> Sub Msg
-subscriptions model =
-  Sub.none
+subscriptions : State -> Sub Msg
+subscriptions model = Sub.none
 

@@ -1,34 +1,14 @@
 module Api exposing (..)
 
 import Http
-import Task
-import Project
+import Result as Result exposing (Result(..))
 
+type alias Handler a = a -> Api a
+type Api a = Done (Cmd a) | Next a (Cmd a) | Pass a
 type alias Error = Http.Error
 
-type Msg
-  = Rq Req
-  | Rs Res
-
-type Req
-  = FetchProjects
-
-type Res
-  = GenericError Error
-  | FetchProjectsDone (List Project.Project)
-  | FetchProjectsFail Error
-
-type alias Dispatch
-  = Req -> Cmd Res
-
-runDispatch : Dispatch -> Req -> Cmd Msg
-runDispatch dispatch req = dispatch req |> Cmd.map Rs
-
-req : Req -> Cmd Msg
-req rq = pure (Rs << GenericError) (Rq rq)
-
-pure : (e -> a) -> a -> Cmd a
-pure fail value =
-  Task.succeed value
-    |> Task.perform identity
-
+fold : (e -> m) -> (a -> m) -> Result e a -> m
+fold f g r =
+  case r of
+    Err x -> f x
+    Ok y  -> g y

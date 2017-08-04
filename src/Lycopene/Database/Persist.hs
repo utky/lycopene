@@ -53,8 +53,8 @@ instance Monad Persist where
 
 runDB :: (IConnection conn , MonadIO m)
       => DB r -> conn -> m (Either DBException r)
-runDB db conn = liftIO $
-  (runPersist (runExceptT db) conn)
+runDB d conn = liftIO $
+  (runPersist (runExceptT d) conn)
     `catchSql` (return . Left . SqlE)
 
 -- | Run database middleware and gain result with side-effect.

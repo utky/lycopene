@@ -12,6 +12,8 @@ import           System.IO.Error
                    )
 import           System.Environment (lookupEnv)
 
+import Debug.Trace (trace)
+
 data XdgDirectory
   = XdgData
   | XdgConfig
@@ -30,8 +32,8 @@ getXdgDirectory xdgDir suffix =
     get _ name fallback = do
       env <- lookupEnv name
       case env of
-        Nothing                     -> fallback'
-        Just path | isRelative path -> fallback'
-                  | otherwise       -> return path
+        Nothing                     -> trace "empty env" fallback'
+        Just path | isRelative path -> trace "fallback" fallback'
+                  | otherwise       -> return (trace ("new path: " ++ path) path)
       where fallback' = (</> fallback) <$> getHomeDirectory
 

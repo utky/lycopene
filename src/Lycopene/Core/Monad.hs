@@ -6,9 +6,6 @@ module Lycopene.Core.Monad
   , issue
   ) where
 
-import           Control.Monad.Trans
-import           Control.Monad.Reader
-import           Control.Monad.Except
 import           Lycopene.Freer (Freer, hoistFreer)
 import           Lycopene.Core.Project (ProjectM, ProjectF)
 import           Lycopene.Core.Sprint (SprintM, SprintF)
@@ -33,3 +30,4 @@ sprint = hoistFreer SprintL
 
 issue :: IssueM a -> Lycopene a
 issue = hoistFreer IssueL
+
