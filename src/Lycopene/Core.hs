@@ -17,4 +17,3 @@ import           Lycopene.Core.Issue
 import           Lycopene.Core.Record
 import           Lycopene.Core.Pure
 import           Lycopene.Core.Monad
-

@@ -10,8 +10,8 @@ import           Lycopene.Option.Common (CommonOption(..))
 
 -- | Command describes what to do for the application.
 -- This simply indicates user input from command line.
-data Command = 
-             -- | version 
+data Command =
+             -- | version
              Version
              -- | configure DIR
              | Configure

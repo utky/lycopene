@@ -2,14 +2,15 @@
 # For more information, see: http://docs.haskellstack.org/en/stable/yaml_configuration/
 
 # Specifies the GHC version and set of packages available (e.g., lts-3.5, nightly-2015-09-21, ghc-7.10.2)
-resolver: lts-6.6
+resolver: lts-13.11
 
 # Local packages, usually specified by relative directory name
 packages:
 - '.'
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)
 extra-deps:
-#  - HDBC-session-0.1.0.0
+  - HDBC-sqlite3-2.3.3.1
+#  - HDBC-session-0.1.2.0
 #  - persistable-record-0.4.0.0
 #  - relational-query-0.8.2.1
 #  - relational-query-HDBC-0.6.0.0
@@ -60,8 +61,6 @@ extra-package-dbs: []
 # Allow a newer minor version of GHC than the snapshot specifies
 # compiler-check: newer-minor
 
-#nix:
-#  enable: true
-#  packages: [ sqlite, zlib ]
-docker:
+nix:
   enable: true
+  packages: [ sqlite, zlib ]

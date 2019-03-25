@@ -8,7 +8,6 @@ module Lycopene.Core.Identifier
     ) where
 
 import           GHC.Generics
-import           Data.Aeson (ToJSON,FromJSON, toJSON, parseJSON) 
 import           Data.Aeson.Types (Value(String), typeMismatch)
 import           Data.Word
 import qualified Data.Text as T
@@ -17,16 +16,6 @@ import qualified Data.ByteString.Char8 as C
 import           Data.UUID (UUID, fromString)
 import           Data.UUID.V5 (generateNamed, namespaceURL)
 import           Lycopene.Core.Scalar (Identifier, Name)
-
-instance ToJSON UUID where
-  toJSON = String . T.pack . show
-
-instance FromJSON UUID where
-  parseJSON j@(String t) =
-    case fromString (T.unpack t) of
-      (Just u) -> return u
-      Nothing  -> typeMismatch ("Invalid UUID format: " ++ (show t)) j
-  parseJSON invalid = typeMismatch "UUID" invalid
 
 -- | Super class which specifies namespace
 type Domain = String
